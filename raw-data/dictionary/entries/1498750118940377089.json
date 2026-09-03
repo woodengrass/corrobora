@@ -1,0 +1,25 @@
+{
+  "id": "1498750118940377089",
+  "terms": [
+    "DC",
+    "dc",
+    "double chest"
+  ],
+  "definition": "In storage tech terminology, DC is an abbreviation for a doublechest.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1498750118940377089",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1498750118940377089/1498750120794001448",
+  "status": "APPROVED",
+  "statusMessageID": "1498750120794001448",
+  "updatedAt": 1777400277673,
+  "references": [],
+  "referencedBy": [
+    "MIS003",
+    "LS002",
+    "LS005",
+    "CH003",
+    "MH002",
+    "PI005",
+    "SP008",
+    "VIP003"
+  ]
+}

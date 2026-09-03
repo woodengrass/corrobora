@@ -1,0 +1,39 @@
+{
+  "id": "1454753674298396785",
+  "terms": [
+    "Keygen",
+    "Item Wanker"
+  ],
+  "definition": "Usually part of a Box Sorter, a keygen is a contraption that takes one item out of a box, breaks it and sends the item and sends one through one hopper or Dropperline and the other through another one, with some delay.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753674298396785",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753674298396785/1454753674898440377",
+  "status": "APPROVED",
+  "statusMessageID": "1454753674898440377",
+  "updatedAt": 1766910704705,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Box Sorter",
+      "id": "1454753516269736090",
+      "url": "https://discord.com/channels/1375556143186837695/1454753516269736090/1454753518383792221",
+      "matches": [
+        "Box Sorter"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Dropperline",
+      "id": "1454753569768079468",
+      "url": "https://discord.com/channels/1375556143186837695/1454753569768079468/1454753576474644492",
+      "matches": [
+        "Dropperline"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "DH002",
+    "DH003",
+    "DH004",
+    "MIS010"
+  ]
+}

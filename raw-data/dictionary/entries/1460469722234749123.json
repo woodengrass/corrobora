@@ -1,0 +1,76 @@
+{
+  "id": "1460469722234749123",
+  "terms": [
+    "Cyclical variable sorter",
+    "cycvar"
+  ],
+  "definition": "A cyclical variable sorter (cycvar) is a variable sorting device which takes in mixed boxes and outputs single-type boxes with minimum partial box output (ideal output). A cycvar works similarly to a sequential shulker unloader (SSU) by putting shulker boxes over a filter, but uses variable filters to automatically change the item type of the filter. The output of the filter in each slice is then packed into boxes using a box loader.\n\nTo ensure ideal output conditions, the filters of each slice are not reset until all boxes of the input have cycled through the system, making sure that all items of a type have been unloaded from the input boxes. Remaining boxes are recycled after the filters are reset to unload other item types. This process repeats cyclically until all boxes are unloaded completely (hence the \"cyclical\" in the name).\n\nCycvars perform well when the input has boxes with high variety of items, and performs poorly with one item type because a single item type is limited to hopperspeed. Cycvars can use regular hoppers under boxes (conventional) or use hoppercarts with filter items (cart cycvar) for 8x higher speeds.\n\n[Explanation video by datNerd](https://www.youtube.com/watch?v=D-Yoo-E8MxM)",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1460469722234749123",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1460469722234749123/1460469724369387550",
+  "status": "APPROVED",
+  "statusMessageID": "1460469724369387550",
+  "updatedAt": 1768273522730,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Variable sort",
+      "id": "1454754850322649100",
+      "url": "https://discord.com/channels/1375556143186837695/1454754850322649100/1454754852465807504",
+      "matches": [
+        "variable sort"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Ideal box output",
+      "id": "1460470569966374956",
+      "url": "https://discord.com/channels/1375556143186837695/1460470569966374956/1460470570809557257",
+      "matches": [
+        "ideal output"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Sequential shulker unloader",
+      "id": "1460454576493957333",
+      "url": "https://discord.com/channels/1375556143186837695/1460454576493957333/1460454577995251899",
+      "matches": [
+        "sequential shulker unloader",
+        "SSU"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "slice"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Loader",
+      "id": "1454753686558605373",
+      "url": "https://discord.com/channels/1375556143186837695/1454753686558605373/1454753686948675720",
+      "matches": [
+        "loader"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Hopper speed",
+      "id": "1454937395693879409",
+      "url": "https://discord.com/channels/1375556143186837695/1454937395693879409/1454937397304365294",
+      "matches": [
+        "hopperspeed",
+        "8x"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "VIP005",
+    "RD004",
+    "VBS004"
+  ]
+}

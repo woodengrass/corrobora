@@ -1,0 +1,26 @@
+{
+  "task_type": "document_triage",
+  "model": "deepseek-v4-flash",
+  "prompt_version": "document_triage@1",
+  "input_hash": "2c19d56d7ce1f2368d33741474b0feae591ddce6df8022fad0e95b5e4518dd59",
+  "source_path": "wiki-export-hopper.html",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "response": {
+    "rawAssetId": 0,
+    "candidates": [{
+    "candidateType": "claim",
+    "normalizedTitle": "漏斗传输冷却（Java 1.21）",
+    "normalizedContent": "在 Java 版 1.21 原版中，漏斗成功传输一个物品后进入传输冷却，冷却期间不再向下一个容器推送物品，也不从上方容器抽取物品。冷却按游戏刻计数，与红石信号无关。漏斗成功传输后冷却为 8gt，漏斗矿车为 4gt。页面明确声明 Bedrock 版数值不适用。",
+    "termRefs": [
+      "漏斗",
+      "传输冷却",
+      "漏斗矿车",
+      "gt"
+    ],
+    "qualityFlags": [],
+    "confidence": 0.82,
+    "rationale": "内容为单一主题的机制说明，含明确版本前提（Java 1.21）与可验证数值，且附有对应代码片段，适合作为 Claim 候选。外部链接区段不含技术内容。"
+    }]
+  }
+}

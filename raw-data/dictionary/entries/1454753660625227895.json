@@ -1,0 +1,65 @@
+{
+  "id": "1454753660625227895",
+  "terms": [
+    "Hopperlocking",
+    "hopperlocked",
+    "hopper-locked"
+  ],
+  "definition": "Hopper-locking powers inactive hoppers with redstone to prevent them from doing anything, reducing lag. Because a locked hopper can’t move items, it can skip several expensive checks each tick and generate far less lag. As a result, many older storage-tech builds include wiring to lock hoppers as an optimization.\n\n## Lithium makes hopper locking optional\n[Lithium](https://github.com/CaffeineMC/lithium) is a mod used on most technical Minecraft servers. Lithium includes an optimization that automatically manages inactive hoppers so they produce essentially no lag, effectively \"locking\" them without any extra wiring. **If you have Lithium, manual hopper locking won't improve performance.** (See RD001)",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753660625227895",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753660625227895/1454753661765947422",
+  "status": "APPROVED",
+  "statusMessageID": "1454753661765947422",
+  "updatedAt": 1766981115148,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "tick"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1451060139560931523",
+      "code": "RD001",
+      "name": "I can't believe this is optimal: why Lithium makes hopperlocking unnecessary",
+      "url": "https://discord.com/channels/1375556143186837695/1451060467060707470",
+      "path": "Archive/RD_tomes-and-diagrams/RD001_I_cant_believe_this_is_optimal_why_Lithium_makes_hopperlocking_unnecessary",
+      "matches": [
+        "RD001"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS001",
+    "MIS005",
+    "MIS006",
+    "MIS009",
+    "MIS013",
+    "LS003",
+    "LS004",
+    "CH005",
+    "CH006",
+    "DH003",
+    "DH004",
+    "MH001",
+    "PI002",
+    "FL004",
+    "IBS002",
+    "IBS003",
+    "OBP001",
+    "TD001",
+    "TD005",
+    "OD003",
+    "OD007",
+    "MF003",
+    "US007",
+    "US001",
+    "CKL001",
+    "SP004",
+    "VIP007"
+  ]
+}

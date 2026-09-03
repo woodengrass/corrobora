@@ -1,0 +1,53 @@
+{
+  "id": "1473812335243165757",
+  "terms": [
+    "Whitelister",
+    "Blacklister"
+  ],
+  "definition": "A whitelister or blacklister is typically a device which checks if the first item in a single-type box is within some set or list of item types. Whitelisters/blacklisters are useful for quickly determining if an item belongs in a chest hall or bulk, or for multi-item-sorting. Whitelisters/blacklisters are not constrained to sorting boxes however, for example they have been used to describe devices which sorts carts, using the same logic of checking if the contained item type is within a list of item types. An encoded version of a whitelister, is called an encoder.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1473812335243165757",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1473812335243165757/1473812336434479176",
+  "status": "APPROVED",
+  "statusMessageID": "1473812336434479176",
+  "updatedAt": 1771454646470,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Chest Hall",
+      "id": "1454753529700024331",
+      "url": "https://discord.com/channels/1375556143186837695/1454753529700024331/1454753530488426527",
+      "matches": [
+        "chest hall"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Encoded",
+      "id": "1454753595424505866",
+      "url": "https://discord.com/channels/1375556143186837695/1454753595424505866/1454753596133605426",
+      "matches": [
+        "encoded"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Encoder",
+      "id": "1454753601967624213",
+      "url": "https://discord.com/channels/1375556143186837695/1454753601967624213/1454753602802548800",
+      "matches": [
+        "encoder"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS003",
+    "MIS004",
+    "MIS006",
+    "MIS010",
+    "MIS011",
+    "DH004",
+    "OIP003",
+    "VBS006",
+    "VBS007"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "1475946143023239229",
+  "terms": [
+    "Palla",
+    "PallaPalla"
+  ],
+  "definition": "PallaPalla is a legendary Technical Minecraft Youtuber known for pioneering the field of encoded storage technology years before anyone else. Despite Palla's retirement from Minecraft, his concepts are widely cited and he is widely regarded as the greatest storage techer of all time.\n\n[Youtube channel](https://www.youtube.com/@pallapalla)\n\nFun fact: The :palla: llama emoji in every storage tech community is derived from PallaPalla's profile picture.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1475946143023239229",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1475946143023239229/1475946144206033191",
+  "status": "APPROVED",
+  "statusMessageID": "1475946144206033191",
+  "updatedAt": 1771963496229,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Encoded",
+      "id": "1454753595424505866",
+      "url": "https://discord.com/channels/1375556143186837695/1454753595424505866/1454753596133605426",
+      "matches": [
+        "encoded"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "CH009"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "1464761941246349412",
+  "terms": [
+    "Restock station"
+  ],
+  "definition": "A restock station is a simple device which displays shulker boxes of useful items for the player to take items from. It's called a restock station because it allows the player to restock on food, fireworks, ender pearls, totems and other essential survival items. They are typically made with a wall box display with chests for manual refilling. The box display automatically replaces the box with a full one if emptied by the player.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1464761941246349412",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1464761941246349412/1464761943725441085",
+  "status": "APPROVED",
+  "statusMessageID": "1464761943725441085",
+  "updatedAt": 1769296908742,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Box Display",
+      "id": "1454753497638506689",
+      "url": "https://discord.com/channels/1375556143186837695/1454753497638506689/1454753498494144522",
+      "matches": [
+        "box display"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS011",
+    "LS002",
+    "OD001",
+    "OD004",
+    "SP001"
+  ]
+}

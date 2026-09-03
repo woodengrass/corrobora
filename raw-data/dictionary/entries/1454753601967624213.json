@@ -1,0 +1,44 @@
+{
+  "id": "1454753601967624213",
+  "terms": [
+    "Encoder"
+  ],
+  "definition": "An Encoder has two main meanings in storage tech: A contraption that translates items into a code, where code can be any sort of signal in any base (bin, hex, other less used ones) or other codes (block event delay), or a contraption that translates a player input (say a selection panel) into code. In addition, in computational redstone, this sometimes refers to decreasing the size of the base used in the code: for example hex to bin. see Transcoder.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753601967624213",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753601967624213/1454753602802548800",
+  "status": "APPROVED",
+  "statusMessageID": "1454753602802548800",
+  "updatedAt": 1766910687512,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Hexadecimal",
+      "id": "1454753655063580723",
+      "url": "https://discord.com/channels/1375556143186837695/1454753655063580723/1454753656326062249",
+      "matches": [
+        "hex"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Block event delay",
+      "id": "1454753468966506558",
+      "url": "https://discord.com/channels/1375556143186837695/1454753468966506558/1454753470643961980",
+      "matches": [
+        "block event delay"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Transcoder",
+      "id": "1454754818777153576",
+      "url": "https://discord.com/channels/1375556143186837695/1454754818777153576/1454754819062632553",
+      "matches": [
+        "Transcoder"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "VBS002"
+  ]
+}

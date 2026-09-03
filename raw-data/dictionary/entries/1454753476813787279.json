@@ -1,0 +1,30 @@
+{
+  "id": "1454753476813787279",
+  "terms": [
+    "Block Update Detector",
+    "BUD"
+  ],
+  "definition": "A Block Update detector is a device that has something happen when it receives an update. Example: A piston that is Quasi-powered (Quasi connectivity) but not yet updated is called \"BUDded\", and will fire when updated. This term is sometimes used to refer to a component that is being QC powered by saying it's \"BUD powered\".",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753476813787279",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753476813787279/1454753477443063869",
+  "status": "APPROVED",
+  "statusMessageID": "1454753477443063869",
+  "updatedAt": 1766924351250,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Quasi connectivity",
+      "id": "1454754708773273641",
+      "url": "https://discord.com/channels/1375556143186837695/1454754708773273641/1454754710643933326",
+      "matches": [
+        "Quasi connectivity",
+        "QC"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "DH002",
+    "OD006",
+    "CC005"
+  ]
+}

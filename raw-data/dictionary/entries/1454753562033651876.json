@@ -1,0 +1,49 @@
+{
+  "id": "1454753562033651876",
+  "terms": [
+    "Dropper speed",
+    "dropperspeed",
+    "DS",
+    "2x"
+  ],
+  "definition": "Similar to Hopper speed, but less frequently used. Refers to the speed at which items are processed in a dropper when clocked at the minimum interval (1 item every 4gt). 1x Dropper speed is equal to 2x Hopper speed.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753562033651876",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753562033651876/1454753563258519584",
+  "status": "APPROVED",
+  "statusMessageID": "1454753563258519584",
+  "updatedAt": 1766954804934,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Hopper speed",
+      "id": "1454937395693879409",
+      "url": "https://discord.com/channels/1375556143186837695/1454937395693879409/1454937397304365294",
+      "matches": [
+        "Hopper speed",
+        "1x"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "gt"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS010",
+    "LS003",
+    "LS004",
+    "FL001",
+    "FL005",
+    "AL006",
+    "OL005",
+    "OL006",
+    "BU002",
+    "DT003",
+    "FL006"
+  ]
+}

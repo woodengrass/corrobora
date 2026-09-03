@@ -1,0 +1,35 @@
+{
+  "id": "1473809831696797848",
+  "terms": [
+    "Box Matcher"
+  ],
+  "definition": "A box matcher is a device which checks if a specific item type is contained in a box. The box can be a mixed box, in which a match means that a slot in the box has the desired item type. Box matchers typically work by pulling from the box with a hopper filter, if it can pull an item out, then it means that the box is a match, otherwise it is rejected. The item that is pulled out is recombined with the box afterwards. A variable matcher which sets the filter type dynamically is called a grouper.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1473809831696797848",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1473809831696797848/1473809834351526049",
+  "status": "APPROVED",
+  "statusMessageID": "1473809834351526049",
+  "updatedAt": 1771520781637,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Mixed Box",
+      "id": "1454753707530129576",
+      "url": "https://discord.com/channels/1375556143186837695/1454753707530129576/1454753708247089184",
+      "matches": [
+        "mixed box"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Grouper",
+      "id": "1473805823884005457",
+      "url": "https://discord.com/channels/1375556143186837695/1473805823884005457/1473805824701763748",
+      "matches": [
+        "grouper"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "OBP005"
+  ]
+}

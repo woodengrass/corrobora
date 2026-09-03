@@ -1,0 +1,36 @@
+{
+  "id": "1454754850322649100",
+  "terms": [
+    "Variable sort"
+  ],
+  "definition": "An item filter that does not always filter for the same item, but instead can be remapped,  meaning getting the item type reassigned (in contrast with Fixed Sorter). There are many different types of variable sorters: * Timer-based variable sorters unmap when a timer runs out. * Self-resetting variable sorters try to unmap constantly but fail if more items come in of the same type. * Globally-Triggered variable sorters unmap when receiving a signal from a global trigger",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754850322649100",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754850322649100/1454754852465807504",
+  "status": "APPROVED",
+  "statusMessageID": "1454754852465807504",
+  "updatedAt": 1767458635813,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Fixed Sorter",
+      "id": "1454753621576126610",
+      "url": "https://discord.com/channels/1375556143186837695/1454753621576126610/1454753622528098306",
+      "matches": [
+        "Fixed Sorter"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Global",
+      "id": "1454753648574992557",
+      "url": "https://discord.com/channels/1375556143186837695/1454753648574992557/1454753649480958066",
+      "matches": [
+        "global"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS004",
+    "MIS011"
+  ]
+}

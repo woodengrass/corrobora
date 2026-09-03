@@ -1,0 +1,17 @@
+{
+  "id": "1454812343409053849",
+  "terms": [
+    "Mods"
+  ],
+  "definition": "Mods can be 2 types - client side or server side, client side mods just effect the client side of the game, so mostly the visuals and server side mods effect the code of the game / what the game does. Most mods you will encounter here are technical tools to help players build and debug complex redstone. An example of a server side mod is sodium, which improves game performance, whilst litematica a client side mod is mostly visual and helps the player build. \nRecommended Mods -\nLitematica\nSodium\nCarpet\nCarpet TIS\nClient Commands\nG4meSpeed\nIsometric Renders\nItem Scroller\nMinihud\nPistorder\nTech Utils\nTweakeroo\nTweakerMore\nViafabricPlus\nAxiom",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454812343409053849",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454812343409053849/1454812344642306079",
+  "status": "APPROVED",
+  "statusMessageID": "1454812344642306079",
+  "updatedAt": 1766925691841,
+  "references": [],
+  "referencedBy": [
+    "RD001",
+    "TT006"
+  ]
+}

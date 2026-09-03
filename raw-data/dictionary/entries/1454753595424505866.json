@@ -1,0 +1,45 @@
+{
+  "id": "1454753595424505866",
+  "terms": [
+    "Encoded"
+  ],
+  "definition": "A system is said to be encoded when a signal in the form of a code is used to decide the fate of items or boxes. In broader terms, it refers to systems that use codes to transfer instructions. Codes can be a Binary signal, a Hexadecimal signal or, less often, octal or quaternary, with either multiple or single digits. Encoded storage technology was first pioneered by PallaPalla, a legendary Technical Minecraft Youtuber.\n\n## Note\nThere is a separate encoded storage development community/discord called [Soontech](https://soontech.org).",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753595424505866",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753595424505866/1454753596133605426",
+  "status": "APPROVED",
+  "statusMessageID": "1454753596133605426",
+  "updatedAt": 1771963586139,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Binary",
+      "id": "1454753454865125437",
+      "url": "https://discord.com/channels/1375556143186837695/1454753454865125437/1454753455808712925",
+      "matches": [
+        "Binary"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Hexadecimal",
+      "id": "1454753655063580723",
+      "url": "https://discord.com/channels/1375556143186837695/1454753655063580723/1454753656326062249",
+      "matches": [
+        "Hexadecimal"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Palla",
+      "id": "1475946143023239229",
+      "url": "https://discord.com/channels/1375556143186837695/1475946143023239229/1475946144206033191",
+      "matches": [
+        "PallaPalla"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS004",
+    "MIS011"
+  ]
+}

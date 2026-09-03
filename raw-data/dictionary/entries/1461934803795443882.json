@@ -1,0 +1,33 @@
+{
+  "id": "1461934803795443882",
+  "terms": [
+    "Dynamic Bulk"
+  ],
+  "definition": "Unlike traditional fixed bulk storage systems, a dynamic bulk will automatically allocate storage slices to item types depending on what item types are input.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1461934803795443882",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1461934803795443882/1461934804944818318",
+  "status": "APPROVED",
+  "statusMessageID": "1461934804944818318",
+  "updatedAt": 1768622822354,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Bulk Storage",
+      "id": "1454753523668484213",
+      "url": "https://discord.com/channels/1375556143186837695/1454753523668484213/1454753524637499577",
+      "matches": [
+        "bulk storage"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "slice"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

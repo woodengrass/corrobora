@@ -1,0 +1,28 @@
+{
+  "id": "1473819225020960850",
+  "terms": [
+    "Pipelined",
+    "hyperthread"
+  ],
+  "definition": "Pipelining (also referred to as hyperthreading), is design paradigm where a process with multiple steps can occur simultaneously with another process at a later stage. A process here can refer to a cycle in a cycvar, or any other repeatable sequence which has multiple steps. The goal of pipelining is to increase how often you can run a process without having to reduce how long it takes to finish a single process. This effectively increases the throughput without decreasing the latency.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1473819225020960850",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1473819225020960850/1473819226677444694",
+  "status": "APPROVED",
+  "statusMessageID": "1473819226677444694",
+  "updatedAt": 1771456707188,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Cyclical variable sorter",
+      "id": "1460469722234749123",
+      "url": "https://discord.com/channels/1375556143186837695/1460469722234749123/1460469724369387550",
+      "matches": [
+        "cycvar"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS011",
+    "VBS003"
+  ]
+}

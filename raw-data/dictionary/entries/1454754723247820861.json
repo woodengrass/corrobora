@@ -1,0 +1,71 @@
+{
+  "id": "1454754723247820861",
+  "terms": [
+    "Serializer",
+    "Deserializer"
+  ],
+  "definition": "Components used to convert Serial codes into Parallel codes or viceversa. These sometimes also act as Encoders(Encoder) or Decoders(Decoder), in the computational redstone sense. For example serial hex to parallel binary is a deserializer encoder.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754723247820861",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754723247820861/1454754724107653162",
+  "status": "APPROVED",
+  "statusMessageID": "1454754724107653162",
+  "updatedAt": 1766910954994,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Serial codes",
+      "id": "1454754716138475581",
+      "url": "https://discord.com/channels/1375556143186837695/1454754716138475581/1454754716981661882",
+      "matches": [
+        "Serial codes"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Parallel codes",
+      "id": "1454753751335436422",
+      "url": "https://discord.com/channels/1375556143186837695/1454753751335436422/1454753752350457887",
+      "matches": [
+        "Parallel codes"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Encoder",
+      "id": "1454753601967624213",
+      "url": "https://discord.com/channels/1375556143186837695/1454753601967624213/1454753602802548800",
+      "matches": [
+        "Encoder",
+        "encoder"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Decoder",
+      "id": "1454753547974607053",
+      "url": "https://discord.com/channels/1375556143186837695/1454753547974607053/1454753549153079441",
+      "matches": [
+        "Decoder"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Hexadecimal",
+      "id": "1454753655063580723",
+      "url": "https://discord.com/channels/1375556143186837695/1454753655063580723/1454753656326062249",
+      "matches": [
+        "hex"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Binary",
+      "id": "1454753454865125437",
+      "url": "https://discord.com/channels/1375556143186837695/1454753454865125437/1454753455808712925",
+      "matches": [
+        "binary"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

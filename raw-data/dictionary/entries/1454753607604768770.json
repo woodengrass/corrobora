@@ -1,0 +1,30 @@
+{
+  "id": "1454753607604768770",
+  "terms": [
+    "Fill Sorter",
+    "IsEmpty",
+    "IsFull"
+  ],
+  "definition": "A Fill Sorter is a Box Separator that has different outputs based on how full the box is, usually Empty / Full / Partial.\nIsEmpty is a Fill Sorter that only has outputs for empty and not-empty ( Full / Partial )\nIsFull is a Fill Sorter that only has outputs for full and not-full ( Empty / Partial )",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753607604768770",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753607604768770/1454753609131495434",
+  "status": "APPROVED",
+  "statusMessageID": "1454753609131495434",
+  "updatedAt": 1766910689014,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Box Separator",
+      "id": "1454753502818599097",
+      "url": "https://discord.com/channels/1375556143186837695/1454753502818599097/1454753503775031296",
+      "matches": [
+        "Box Separator"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "FBS003",
+    "FBS006",
+    "MIS010"
+  ]
+}

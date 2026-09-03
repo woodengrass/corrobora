@@ -1,0 +1,34 @@
+{
+  "id": "1454754824758493380",
+  "terms": [
+    "Unloader"
+  ],
+  "definition": "A contraption that removes item contents from a shulkerbox.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754824758493380",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754824758493380/1454754825345433803",
+  "status": "APPROVED",
+  "statusMessageID": "1454754825345433803",
+  "updatedAt": 1766910979034,
+  "references": [],
+  "referencedBy": [
+    "FS002",
+    "MIS003",
+    "MIS007",
+    "MIS010",
+    "MIS011",
+    "MIS012",
+    "LS003",
+    "LS004",
+    "LS005",
+    "BU003",
+    "BU006",
+    "BU010",
+    "BU012",
+    "AC001",
+    "VIP003",
+    "PU001",
+    "PU004",
+    "SSU001",
+    "TG004"
+  ]
+}

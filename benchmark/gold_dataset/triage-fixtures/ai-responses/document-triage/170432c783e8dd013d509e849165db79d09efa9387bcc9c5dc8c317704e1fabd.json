@@ -1,0 +1,26 @@
+{
+  "task_type": "document_triage",
+  "model": "deepseek-v4-flash",
+  "prompt_version": "document_triage@1",
+  "input_hash": "170432c783e8dd013d509e849165db79d09efa9387bcc9c5dc8c317704e1fabd",
+  "source_path": "gtmc-database/LoadingTicket/b-附页-一些译名.md",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "response": {
+    "rawAssetId": 0,
+    "candidates": [
+      {
+        "candidateType": "term",
+        "normalizedTitle": "加载票系统相关译名对照",
+        "normalizedContent": "Lazy Processing Chunk / Lazy Load / Block Ticking = 弱加载；Entity Processing Chunk / Entity Ticking = 强加载；Loading Border Chunk / Border Load = 加载边界；Inaccessible = 不可访问；RenderDistance / ViewDistance = 渲染距离；SimulationDistance = 模拟距离；Ticket = 加载票；Level = 加载等级。",
+        "termRefs": [
+          "弱加载", "强加载", "加载边界", "不可访问",
+          "渲染距离", "模拟距离", "加载票", "加载等级"
+        ],
+        "qualityFlags": [],
+        "confidence": 0.75,
+        "rationale": "全文只有一个含表格的根区段，根区段敘述僅約 30 字元但含表格而豁免下限，未被排除。表格列出英文全称与对应中文译名，属于术语别名候选，交由 T2.6 与既有词典比对，不在此处自定 canonical definition。"
+      }
+    ]
+  }
+}

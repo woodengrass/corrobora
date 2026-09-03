@@ -1,0 +1,14 @@
+{
+  "id": "1454753692841676824",
+  "terms": [
+    "Locational"
+  ],
+  "definition": "A contraption is said to be locational when it exhibits different behavior when built in different locations in the world. This is almost always caused by redstone dust updates themselves being locational: the way they notify their neighbors of their updates is not consistent across locations in the world.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753692841676824",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753692841676824/1454753693978329262",
+  "status": "APPROVED",
+  "statusMessageID": "1454753693978329262",
+  "updatedAt": 1766910709247,
+  "references": [],
+  "referencedBy": []
+}

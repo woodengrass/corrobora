@@ -1,0 +1,16 @@
+{
+  "id": "1493155354039681224",
+  "terms": [
+    "Input handler"
+  ],
+  "definition": "An input handler is an item pre-processing device which attaches to user input interfaces in main storage systems. Because the user can input anything, a robust input handler must be capable of preprocessing all items. An input handler often has the following filters:\n\n1. An isBox check which separates out boxes and loose items.\n2. An isBoxFull check (for bulk) which ensures that bulk boxes are full\n3. An isBoxEmpty which removes empty boxes early for routing into empty box storage\n4. An isUnstackable filter (optional)",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1493155354039681224",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1493155354039681224/1493155355696562238",
+  "status": "APPROVED",
+  "statusMessageID": "1493155355696562238",
+  "updatedAt": 1776066383468,
+  "references": [],
+  "referencedBy": [
+    "PI002"
+  ]
+}

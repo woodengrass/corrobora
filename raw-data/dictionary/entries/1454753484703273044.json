@@ -1,0 +1,24 @@
+{
+  "id": "1454753484703273044",
+  "terms": [
+    "Box Comparer"
+  ],
+  "definition": "A Box Comparer is a contraption that takes two boxes as input, and compares them by signal strength. A Box comparer normally has dedicated outputs for the fuller and less full boxes.\nBox comparers are used in many contraptions, one example is making sure that Mergers(Merger) get the fuller box in the correct input.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753484703273044",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753484703273044/1454753486272069807",
+  "status": "APPROVED",
+  "statusMessageID": "1454753486272069807",
+  "updatedAt": 1766910659708,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Merger",
+      "id": "1454753701204987938",
+      "url": "https://discord.com/channels/1375556143186837695/1454753701204987938/1454753702773526549",
+      "matches": [
+        "Merger"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

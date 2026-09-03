@@ -1,0 +1,46 @@
+{
+  "id": "1454754741694365787",
+  "terms": [
+    "Slice Preservation",
+    "Local Output"
+  ],
+  "definition": "A contraption is said to be slice preserving if it outputs the shulker boxes or items within the slice, in contrast to Global Output, where there's one output for all Slices(Slice). This term is mostly used for 1-Wide Tileable(N-Wide Tileable) contraptions. Since some systems are only mostly slice preserving, but fail to be so in some specific condition or with a very low change, some people use the term perfect slice preservation for a system that does not have said flaws.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754741694365787",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754741694365787/1454754742784884902",
+  "status": "APPROVED",
+  "statusMessageID": "1454754742784884902",
+  "updatedAt": 1766910960895,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "slice",
+        "Slice"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Global Output",
+      "id": "1454753641226305589",
+      "url": "https://discord.com/channels/1375556143186837695/1454753641226305589/1454753642233204868",
+      "matches": [
+        "Global Output"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "n-Wide tileable",
+      "id": "1454753738425368687",
+      "url": "https://discord.com/channels/1375556143186837695/1454753738425368687/1454753741785010208",
+      "matches": [
+        "N-Wide Tileable"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "FL006"
+  ]
+}

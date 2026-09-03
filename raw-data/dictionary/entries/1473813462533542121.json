@@ -1,0 +1,43 @@
+{
+  "id": "1473813462533542121",
+  "terms": [
+    "SVAR",
+    "shulker box variable sorter"
+  ],
+  "definition": "SVAR stands for Shulker Variable sorter. It takes the form of an array of variable filters, which when empty are set by the first item and box pair that passes over them, and if they are already set serves to pull matching token items and boxes into their slice. this is done by keygening the box initially, and then running the key item over the variable filters, and the box in an parallel dropper line. When the key item is removed by a filter from its dropper line, the box is also removed into the same slice. \n\nThis is almost exclusively used with single item type boxes exclusively, since it only checks for matches of the first item type in the box. This is typically done to create groups of boxes of the same type.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1473813462533542121",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1473813462533542121/1473813463137517691",
+  "status": "APPROVED",
+  "statusMessageID": "1473813463137517691",
+  "updatedAt": 1771455375428,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Variable sort",
+      "id": "1454754850322649100",
+      "url": "https://discord.com/channels/1375556143186837695/1454754850322649100/1454754852465807504",
+      "matches": [
+        "Variable sort"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "slice"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Keygen",
+      "id": "1454753674298396785",
+      "url": "https://discord.com/channels/1375556143186837695/1454753674298396785/1454753674898440377",
+      "matches": [
+        "keygen"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

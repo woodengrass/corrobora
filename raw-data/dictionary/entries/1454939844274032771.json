@@ -1,0 +1,37 @@
+{
+  "id": "1454939844274032771",
+  "terms": [
+    "fullspeed"
+  ],
+  "definition": "Can process items without pausing at any point. Fullspeed box loaders and unloaders have special box breaking mechanisms so that it doesn't pause item flow when the box is being replaced. Fullspeed prevents buffering of items inside inventories over time.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454939844274032771",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454939844274032771/1454939852222238955",
+  "status": "APPROVED",
+  "statusMessageID": "1454939852222238955",
+  "updatedAt": 1766955100013,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Loader",
+      "id": "1454753686558605373",
+      "url": "https://discord.com/channels/1375556143186837695/1454753686558605373/1454753686948675720",
+      "matches": [
+        "loader"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Unloader",
+      "id": "1454754824758493380",
+      "url": "https://discord.com/channels/1375556143186837695/1454754824758493380/1454754825345433803",
+      "matches": [
+        "unloader"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "PI004",
+    "OL001",
+    "VIP001"
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "task_type": "document_triage",
+  "model": "deepseek-v4-flash",
+  "prompt_version": "document_triage@1",
+  "input_hash": "e20d7ddf173baeeaa2964d575bceb66fbc9fdf1ab8eb5dd0f09d47080b08b399",
+  "source_path": "gtmc-database/LoadingTicket/a-附页-辅助mod.md",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "response": {
+    "rawAssetId": 0,
+    "candidates": [
+      {
+        "candidateType": "community_note",
+        "normalizedTitle": "辅助 mod：Chunkdebug",
+        "normalizedContent": "Chunkdebug（Modrinth: chunk-debug）可以查看服务器上各个地方的区块加载情况，附带演示截图。",
+        "termRefs": ["Chunkdebug", "区块加载"],
+        "qualityFlags": [],
+        "confidence": 0.6,
+        "rationale": "确定性层（第 5.3 节 S3）已排除根区段、Intricarpet 与 MessMod 三节：根区段无实质叙述，Intricarpet 与 MessMod 均短于 120 字元且不含表格、程式码或图片。只有 Chunkdebug 一节含图片豁免下限，故本次只对该节生成候选。内容为单一 mod 的用途说明，非可独立验证的技术结论，归为 community_note。"
+      }
+    ]
+  }
+}

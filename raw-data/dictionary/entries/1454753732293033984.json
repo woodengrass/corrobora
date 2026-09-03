@@ -1,0 +1,50 @@
+{
+  "id": "1454753732293033984",
+  "terms": [
+    "A/B Tiling",
+    "AB tileable",
+    "AB-tileable",
+    "1wABt",
+    "2wABt",
+    "nwABt"
+  ],
+  "definition": "An extension of n-Wide tileable, but where a solution has been provided by the author on how to put 2 Slices(Slice) of the same system next to each other, by moving/editing some components within the system. The capital letters ( AB, or ABC, or ABCD, ... ) annotate how the slices are tiled, and how many versions of the slice exist to achieve a result.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753732293033984",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753732293033984/1454753733035687988",
+  "status": "APPROVED",
+  "statusMessageID": "1454753733035687988",
+  "updatedAt": 1775748669922,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "n-Wide tileable",
+      "id": "1454753738425368687",
+      "url": "https://discord.com/channels/1375556143186837695/1454753738425368687/1454753741785010208",
+      "matches": [
+        "n-Wide tileable"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "Slice",
+        "slice"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "FL001",
+    "FL005",
+    "FL006",
+    "BU012",
+    "IBS002",
+    "TD005",
+    "BD003",
+    "MF005",
+    "HS003",
+    "AC003"
+  ]
+}

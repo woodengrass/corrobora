@@ -1,0 +1,27 @@
+{
+  "id": "1454754796937674891",
+  "terms": [
+    "Tile Tick Priority",
+    "ttp"
+  ],
+  "definition": "Refers to the phenomenon where short pulsing a comparator for 2gt only causes it to activate if it is pointing into another comparator or repeater block.\n\n## Details\nThe scheduled block tick list is a [priority queue](https://en.wikipedia.org/wiki/Priority_queue) which prioritizes processing higher priority entries over lower ones. While both comparators and repeater blocks are considered to be diode blocks, they have different priorities assigned to them.\n\nFor comparators: tick priority is HIGH if there is another diode block it's pointing into and it's not pointing backwards. Otherwise, it has NORMAL priority. See [`ComparatorBlock.checkTickOnNeighbor()`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/level/block/ComparatorBlock#L151).\n\nFor repeaters: tick priority is EXTREMELY_HIGH if there is another diode block it's pointing into and it's not pointing backwards. Otherwise, if powered it has VERY_HIGH priority. If unpowered it has HIGH priority. See [`DiodeBlock.checkTickOnNeighbor()`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/level/block/DiodeBlock#L102-112).\n\nFor other redstone components which use scheduled ticks, such as redstone torches and observers, by default it has NORMAL priority.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754796937674891",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754796937674891/1454754797709164586",
+  "status": "APPROVED",
+  "statusMessageID": "1454754797709164586",
+  "updatedAt": 1773034603499,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "gt",
+        "tick",
+        "ticks"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

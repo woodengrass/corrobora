@@ -1,0 +1,32 @@
+{
+  "task_type": "document_triage",
+  "model": "deepseek-v4-flash",
+  "prompt_version": "document_triage@1",
+  "input_hash": "143eac6afa9b6a7ba18fb4fafcf10a1291f8c7efba9c5bca7804b2dba8f96f05",
+  "source_path": "gtmc-database/MicroTiming/01-刻与刻间时序.md",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "response": {
+    "rawAssetId": 0,
+    "candidates": [
+      {
+        "candidateType": "claim",
+        "normalizedTitle": "游戏刻、红石刻与 TPS/MSPT",
+        "normalizedContent": "游戏主循环在正常运行下每秒约 20 次，最短间隔称为 GameTick（gt），1gt = 0.05 秒。红石刻（rt）与游戏刻的换算为 1rt = 2gt。TPS 指每秒执行的游戏刻数，正常为 20；mspt 指每刻耗时毫秒数，mspt 低于 50 时 TPS 为 20，大于 50 时 TPS = 1000 / mspt。",
+        "termRefs": ["游戏刻", "GameTick", "红石刻", "RedstoneTick", "TPS", "mspt"],
+        "qualityFlags": [],
+        "confidence": 0.86,
+        "rationale": "文件为结构完整的技术文章，包含可验证的时间单位与性能关系。文中未标注适用版本，版本范围需由后续 Track 标记。"
+      },
+      {
+        "candidateType": "claim",
+        "normalizedTitle": "常见红石元件延迟、锁存与充能",
+        "normalizedContent": "常见元件的宏观延迟：中继器 2-8gt（随档位变化），比较器固定 2gt，侦测器 2gt。中继器侧面被中继器或比较器直接输入时进入锁存状态，锁存期间输入端变化不影响其亮灭。强充能可激活周围 6 个方向的红石粉，弱充能只能激活输入端对着该方块的中继器、比较器等元件。",
+        "termRefs": ["中继器", "比较器", "侦测器", "锁存", "强充能", "弱充能"],
+        "qualityFlags": [],
+        "confidence": 0.86,
+        "rationale": "这些结论与时间单位属于同一 Raw 资产但可独立检索和审查，故建立第二笔 Claim 候选。"
+      }
+    ]
+  }
+}

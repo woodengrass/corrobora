@@ -1,0 +1,45 @@
+{
+  "id": "1460454576493957333",
+  "terms": [
+    "Sequential shulker unloader",
+    "SSU"
+  ],
+  "definition": "A sequential shulker unloader is a device which takes out items of a specific type out of a mixed box, and then breaks the box when it runs out of that item type. SSU's work by putting a shulker box over an item filter, the filter hopper will naturally only pull out items which match the item type wherever it is, the rest of the items stay in the box. This is useful because if you just want one item its faster to use an SSU than unloading the entire box, filtering the items, and then loading the remaining items back in. Some SSU designs are tileable so you can unload different item types in each slice. Boxes with leftover items travel through each slice sequentially (this is where the word \"sequential\" comes from). An variable SSU which sets its filters dynamically is called a cycvar.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1460454576493957333",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1460454576493957333/1460454577995251899",
+  "status": "APPROVED",
+  "statusMessageID": "1460454577995251899",
+  "updatedAt": 1771453187994,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Mixed Box",
+      "id": "1454753707530129576",
+      "url": "https://discord.com/channels/1375556143186837695/1454753707530129576/1454753708247089184",
+      "matches": [
+        "mixed box"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "slice"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Cyclical variable sorter",
+      "id": "1460469722234749123",
+      "url": "https://discord.com/channels/1375556143186837695/1460469722234749123/1460469724369387550",
+      "matches": [
+        "cycvar"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "SSU001"
+  ]
+}

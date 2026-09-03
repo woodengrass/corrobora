@@ -1,0 +1,60 @@
+{
+  "id": "1456912184172085260",
+  "terms": [
+    "Update order"
+  ],
+  "definition": "Update order is the order in which Minecraft will process actions. Because Minecraft is a software program, actions that appear to occur simultaneously must occur sequentially one after another in some way. For designs using redstone which activates on the same tick, the behavior of a circuit depends on which activates first, in other words, update order.\n\n## Details\n- The default update order is West, East, Down, Up, North, South. See [`NeighborUpdater.UPDATE_ORDER`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/level/redstone/NeighborUpdater#L20).\n- Redstone dust has random/locational redstone update order, but deterministic shape updates. So powering something with dust will have locational order (avoid!!), but observing a dust wire with an observer will have consistent source to sink order (fine).\n- Powered and activator rails have directional redstone update order, it is source to sink in the north-south axis, and is sink to source in the east-west axis. Shape updates are consistently sink to source (opposite of dust).\n- Pistons have block event delay, which means adding a piston to logic will often mean the next thing the piston triggers will update last.\n- Repeaters and comparators have different tile tick priority depending on the block it is pointed to.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1456912184172085260",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1456912184172085260/1456912184922607793",
+  "status": "APPROVED",
+  "statusMessageID": "1456912184922607793",
+  "updatedAt": 1771902238145,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "tick"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Locational",
+      "id": "1454753692841676824",
+      "url": "https://discord.com/channels/1375556143186837695/1454753692841676824/1454753693978329262",
+      "matches": [
+        "locational"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Directional",
+      "id": "1454753554815389834",
+      "url": "https://discord.com/channels/1375556143186837695/1454753554815389834/1454753555566166029",
+      "matches": [
+        "directional"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Block event delay",
+      "id": "1454753468966506558",
+      "url": "https://discord.com/channels/1375556143186837695/1454753468966506558/1454753470643961980",
+      "matches": [
+        "block event delay"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Tile Tick Priority",
+      "id": "1454754796937674891",
+      "url": "https://discord.com/channels/1375556143186837695/1454754796937674891/1454754797709164586",
+      "matches": [
+        "tile tick priority"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

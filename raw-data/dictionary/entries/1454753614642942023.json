@@ -1,0 +1,26 @@
+{
+  "id": "1454753614642942023",
+  "terms": [
+    "Filtered Loader"
+  ],
+  "definition": "A Loader combined with an item filter that fills a box with just one item type.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753614642942023",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753614642942023/1454753615280345234",
+  "status": "APPROVED",
+  "statusMessageID": "1454753615280345234",
+  "updatedAt": 1766910690659,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Loader",
+      "id": "1454753686558605373",
+      "url": "https://discord.com/channels/1375556143186837695/1454753686558605373/1454753686948675720",
+      "matches": [
+        "Loader"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "OIP003"
+  ]
+}

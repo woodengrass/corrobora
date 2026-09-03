@@ -1,0 +1,123 @@
+{
+  "id": "1454754780273574001",
+  "terms": [
+    "Temp Storage"
+  ],
+  "definition": "Short for \"temporary storage\", it refers to a specific storage device used in variable sorting systems to store partial boxes. These temp storages will typically store a partial box item until a second box of the same item type reaches the system. Both are then output so they can be combined in a merger and then be sent to a more final storage (like Bulk Storage, Chest Hall or others).\n\nTemp storages can be encoded or unencoded. Typically in this archive they are unencoded since they are easier to use (go to [soontech](https://soontech.org) if you are interested in encoded). Unencoded temp storages fall under the following categories:\n\n- Whitelister temp with manual categories, eg VBS003\n- Matrix temp which uses two whitelisters for higher speeds, eg VBS006\n- Variable whitelister temp which requires no prior configuration, eg VBS002\n-  Pattern-based temp which collects requests and executes them all at once, eg VBS004",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754780273574001",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754780273574001/1454754781196451978",
+  "status": "APPROVED",
+  "statusMessageID": "1454754781196451978",
+  "updatedAt": 1777305551433,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Variable sort",
+      "id": "1454754850322649100",
+      "url": "https://discord.com/channels/1375556143186837695/1454754850322649100/1454754852465807504",
+      "matches": [
+        "variable sort"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Merger",
+      "id": "1454753701204987938",
+      "url": "https://discord.com/channels/1375556143186837695/1454753701204987938/1454753702773526549",
+      "matches": [
+        "merger"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Bulk Storage",
+      "id": "1454753523668484213",
+      "url": "https://discord.com/channels/1375556143186837695/1454753523668484213/1454753524637499577",
+      "matches": [
+        "Bulk Storage"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Chest Hall",
+      "id": "1454753529700024331",
+      "url": "https://discord.com/channels/1375556143186837695/1454753529700024331/1454753530488426527",
+      "matches": [
+        "Chest Hall"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Encoded",
+      "id": "1454753595424505866",
+      "url": "https://discord.com/channels/1375556143186837695/1454753595424505866/1454753596133605426",
+      "matches": [
+        "encoded"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Whitelister",
+      "id": "1473812335243165757",
+      "url": "https://discord.com/channels/1375556143186837695/1473812335243165757/1473812336434479176",
+      "matches": [
+        "Whitelister",
+        "whitelister"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1439818384933130322",
+      "code": "VBS003",
+      "name": "Hyperthreaded Whitelister Temp",
+      "url": "https://discord.com/channels/1375556143186837695/1473820723696107726",
+      "path": "Archive/VBS_variable-box-processing/VBS003_Hyperthreaded_Whitelister_Temp",
+      "matches": [
+        "VBS003"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Matrix",
+      "id": "1473814417367109653",
+      "url": "https://discord.com/channels/1375556143186837695/1473814417367109653/1473814418595778662",
+      "matches": [
+        "Matrix"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1480307278585270385",
+      "code": "VBS006",
+      "name": "400 Item Matrix Temp Storage",
+      "url": "https://discord.com/channels/1375556143186837695/1480308116716257483",
+      "path": "Archive/VBS_variable-box-processing/VBS006_400_Item_Matrix_Temp_Storage",
+      "matches": [
+        "VBS006"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1401371516389687346",
+      "code": "VBS002",
+      "name": "Unencoded Variable Box Temp",
+      "url": "https://discord.com/channels/1375556143186837695/1401376236223074426",
+      "path": "Archive/VBS_variable-box-processing/VBS002_Unencoded_Variable_Box_Temp",
+      "matches": [
+        "VBS002"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1463261169404874976",
+      "code": "VBS004",
+      "name": "Pattern-based temporary storages for partial boxes",
+      "url": "https://discord.com/channels/1375556143186837695/1464409896463106232",
+      "path": "Archive/VBS_variable-box-processing/VBS004_Pattern-based_temporary_storages_for_partial_boxes",
+      "matches": [
+        "VBS004"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

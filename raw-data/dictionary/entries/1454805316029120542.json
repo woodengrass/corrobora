@@ -1,0 +1,26 @@
+{
+  "id": "1454805316029120542",
+  "terms": [
+    "Redstone Tick"
+  ],
+  "definition": "Referring to 2 Gameticks, a redstone tick is the time it takes for a repeater to power, an observer to turn on. It is also equivalent to a tenth of a second (assuming no lag)",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454805316029120542",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454805316029120542/1454805317320835073",
+  "status": "APPROVED",
+  "statusMessageID": "1454805317320835073",
+  "updatedAt": 1766923239521,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "Gameticks"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "CKL001"
+  ]
+}

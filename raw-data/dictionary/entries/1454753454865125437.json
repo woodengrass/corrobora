@@ -1,0 +1,24 @@
+{
+  "id": "1454753454865125437",
+  "terms": [
+    "Binary"
+  ],
+  "definition": "An encoding where each digit of a code is either on or off (we say it has a binary state, usually represented with 0s and 1s). A four digit (Bit) signal could have the states 0000 or 0110 or 0100, or any other combination of the valid states. In terms of minecraft, this usually translates to a wire or a rail being on or off, a piston being extended or retracted, a note block being powered or unpowered, etc.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753454865125437",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753454865125437/1454753455808712925",
+  "status": "APPROVED",
+  "statusMessageID": "1454753455808712925",
+  "updatedAt": 1769406467949,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Bit",
+      "id": "1454753462171734026",
+      "url": "https://discord.com/channels/1375556143186837695/1454753462171734026/1454753462905737238",
+      "matches": [
+        "Bit"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

@@ -1,0 +1,44 @@
+{
+  "id": "1454754810854244488",
+  "terms": [
+    "tps",
+    "Ticks per second"
+  ],
+  "definition": "A measurement of how many gameticks are happening each second. The game normally operates at 20TPS, but if MSPT exceeds 50ms then the game will start to slow down. Mods such as Carpet Mod are able to stop, slow down,  or speed up the tick speed of a server, which can be useful for testing.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754810854244488",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754810854244488/1454754812834091051",
+  "status": "APPROVED",
+  "statusMessageID": "1454754812834091051",
+  "updatedAt": 1766927365282,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "gameticks",
+        "tick"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "mspt",
+      "id": "1454753719664119890",
+      "url": "https://discord.com/channels/1375556143186837695/1454753719664119890/1454753720259575821",
+      "matches": [
+        "MSPT"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Mods",
+      "id": "1454812343409053849",
+      "url": "https://discord.com/channels/1375556143186837695/1454812343409053849/1454812344642306079",
+      "matches": [
+        "Mods"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

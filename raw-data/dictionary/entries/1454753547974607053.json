@@ -1,0 +1,51 @@
+{
+  "id": "1454753547974607053",
+  "terms": [
+    "Decoder"
+  ],
+  "definition": "A Decoder has two main meanings in storage tech: A contraption that translates code or data to item, like an encoded storage hall, the inverse of an Encoder, or one that translates code into user-readable information, like a display. In addition, in computational redstone it's sometimes used to mean increasing the size of a base, bin to hex, for example, see Transcoder.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753547974607053",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753547974607053/1454753549153079441",
+  "status": "APPROVED",
+  "statusMessageID": "1454753549153079441",
+  "updatedAt": 1766910674760,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Encoded",
+      "id": "1454753595424505866",
+      "url": "https://discord.com/channels/1375556143186837695/1454753595424505866/1454753596133605426",
+      "matches": [
+        "encoded"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Encoder",
+      "id": "1454753601967624213",
+      "url": "https://discord.com/channels/1375556143186837695/1454753601967624213/1454753602802548800",
+      "matches": [
+        "Encoder"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Hexadecimal",
+      "id": "1454753655063580723",
+      "url": "https://discord.com/channels/1375556143186837695/1454753655063580723/1454753656326062249",
+      "matches": [
+        "hex"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Transcoder",
+      "id": "1454754818777153576",
+      "url": "https://discord.com/channels/1375556143186837695/1454754818777153576/1454754819062632553",
+      "matches": [
+        "Transcoder"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

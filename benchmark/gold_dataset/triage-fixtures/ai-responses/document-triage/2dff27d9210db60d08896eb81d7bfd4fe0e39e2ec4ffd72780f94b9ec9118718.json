@@ -1,0 +1,28 @@
+{
+  "task_type": "document_triage",
+  "model": "deepseek-v4-flash",
+  "prompt_version": "document_triage@1",
+  "input_hash": "2dff27d9210db60d08896eb81d7bfd4fe0e39e2ec4ffd72780f94b9ec9118718",
+  "source_path": "community-note-hopper.txt",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "response": {
+    "rawAssetId": 0,
+    "candidates": [{
+    "candidateType": "needs_review",
+    "normalizedTitle": "漏斗限速笔记（版本不明）",
+    "normalizedContent": "笔记主张漏斗成功传输后冷却固定为 7gt 且所有版本一致，并据此建议限速按 7gt 计算；同时提到不可堆叠物品分类需要限速，否则物品会在同一 gt 内被后方漏斗取走。笔记自身记录了另一种说法为 8gt，未给出判断依据。",
+    "termRefs": [
+      "漏斗",
+      "传输冷却",
+      "限速",
+      "不可堆叠"
+    ],
+    "qualityFlags": [
+      "conflicting_fact"
+    ],
+    "confidence": 0.34,
+    "rationale": "文本未标注版本与运行环境，却宣称结论适用所有版本，并且内部即存在 7gt 与 8gt 两种互相冲突的说法。依规则不得猜测，输出 needs_review 并交由 Pro 做冲突比对。"
+    }]
+  }
+}

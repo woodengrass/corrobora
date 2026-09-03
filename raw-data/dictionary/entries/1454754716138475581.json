@@ -1,0 +1,33 @@
+{
+  "id": "1454754716138475581",
+  "terms": [
+    "Serial codes"
+  ],
+  "definition": "A code is said to be serial if the bits of the signal are sent one after the other through a single wire. This is more space and resource efficient than Parallel codes, but usually slower and harder to implement.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754716138475581",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754716138475581/1454754716981661882",
+  "status": "APPROVED",
+  "statusMessageID": "1454754716981661882",
+  "updatedAt": 1766910953384,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Bit",
+      "id": "1454753462171734026",
+      "url": "https://discord.com/channels/1375556143186837695/1454753462171734026/1454753462905737238",
+      "matches": [
+        "bit"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Parallel codes",
+      "id": "1454753751335436422",
+      "url": "https://discord.com/channels/1375556143186837695/1454753751335436422/1454753752350457887",
+      "matches": [
+        "Parallel codes"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

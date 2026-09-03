@@ -1,0 +1,153 @@
+{
+  "id": "1454937395693879409",
+  "terms": [
+    "Hopper speed",
+    "hopperspeed",
+    "HS",
+    "1x",
+    "4x",
+    "6x",
+    "8x"
+  ],
+  "definition": "Refers to the speed at which items are processed in a hopper (1 item every 8gt, or 2.5 items per second). Usually written as an integer (e.g. \"3x hopper speed\").\n## Common hopperspeeds\n1x: 9000 items/hr\n2x: 18000 items/hr (dropperspeed)\n4x: 36000 items/hr\n6x: 54000 items/hr\n8x: 72000 items/hr\n## Note\nTypically, a device being some x hopperspeed will mean it is the maximum possible throughput, it is not necessarily sustained. Most box loaders and unloaders will pause the input while the box is being broken. Fullspeed devices, which are truly capable of sustaining their max speed indefinitely, are usually marked as such.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454937395693879409",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454937395693879409/1454937397304365294",
+  "status": "APPROVED",
+  "statusMessageID": "1454937397304365294",
+  "updatedAt": 1766955411453,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "gt"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Dropper speed",
+      "id": "1454753562033651876",
+      "url": "https://discord.com/channels/1375556143186837695/1454753562033651876/1454753563258519584",
+      "matches": [
+        "2x",
+        "dropperspeed"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Loader",
+      "id": "1454753686558605373",
+      "url": "https://discord.com/channels/1375556143186837695/1454753686558605373/1454753686948675720",
+      "matches": [
+        "loader"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Unloader",
+      "id": "1454754824758493380",
+      "url": "https://discord.com/channels/1375556143186837695/1454754824758493380/1454754825345433803",
+      "matches": [
+        "unloader"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "fullspeed",
+      "id": "1454939844274032771",
+      "url": "https://discord.com/channels/1375556143186837695/1454939844274032771/1454939852222238955",
+      "matches": [
+        "Fullspeed"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "FS003",
+    "MIS001",
+    "MIS003",
+    "MIS005",
+    "MIS006",
+    "MIS008",
+    "MIS009",
+    "MIS010",
+    "MIS002",
+    "MIS012",
+    "MIS013",
+    "LS002",
+    "LS004",
+    "LS005",
+    "CH006",
+    "MH003",
+    "FL001",
+    "FL002",
+    "FL003",
+    "FL004",
+    "FL005",
+    "FL006",
+    "ML001",
+    "ML003",
+    "ML004",
+    "ML005",
+    "ML006",
+    "ML007",
+    "ML008",
+    "ML009",
+    "ML010",
+    "ML011",
+    "ML012",
+    "ML013",
+    "AL006",
+    "OL001",
+    "OL003",
+    "OL004",
+    "OL005",
+    "BU002",
+    "BU003",
+    "BU004",
+    "BU005",
+    "BU006",
+    "BU012",
+    "IBS002",
+    "IBS003",
+    "IBS004",
+    "FBS003",
+    "FBS005",
+    "FBS006",
+    "FBS007",
+    "FBS008",
+    "FBS009",
+    "OBP005",
+    "MF003",
+    "MF004",
+    "HS002",
+    "US002",
+    "US003",
+    "US006",
+    "US007",
+    "US009",
+    "US001",
+    "OIP001",
+    "OIP004",
+    "OIP005",
+    "AB003",
+    "DT002",
+    "DT003",
+    "CT001",
+    "SP004",
+    "SP005",
+    "SP008",
+    "VIP003",
+    "VIP005",
+    "VIP006",
+    "VIP007",
+    "VBS007",
+    "PU001",
+    "PU003",
+    "PU004",
+    "PU005",
+    "SSU001",
+    "TT005"
+  ]
+}

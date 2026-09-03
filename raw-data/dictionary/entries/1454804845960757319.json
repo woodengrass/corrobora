@@ -1,0 +1,29 @@
+{
+  "id": "1454804845960757319",
+  "terms": [
+    "0 tick",
+    "0-tick"
+  ],
+  "definition": "Typically referring to piston movements or redstone dust, when it turns on and off in the same gametick, this makes redstone dust not power, and sticky pistons to spit out their blocks",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454804845960757319",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454804845960757319/1454804847290220666",
+  "status": "APPROVED",
+  "statusMessageID": "1454804847290220666",
+  "updatedAt": 1766923508017,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "gametick"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "AL006",
+    "OD004",
+    "TT003"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "1454753462171734026",
+  "terms": [
+    "Bit"
+  ],
+  "definition": "Short for binary digit: the digits in a binary system.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753462171734026",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753462171734026/1454753462905737238",
+  "status": "APPROVED",
+  "statusMessageID": "1454753462905737238",
+  "updatedAt": 1766910654379,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Binary",
+      "id": "1454753454865125437",
+      "url": "https://discord.com/channels/1375556143186837695/1454753454865125437/1454753455808712925",
+      "matches": [
+        "binary"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "CC004",
+    "NT005"
+  ]
+}

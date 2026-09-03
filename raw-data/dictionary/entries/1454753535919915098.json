@@ -1,0 +1,30 @@
+{
+  "id": "1454753535919915098",
+  "terms": [
+    "Comparator Update Detector",
+    "CUD"
+  ],
+  "definition": "A Comparator Update Detector is based on the behavior inherent to comparators where they don't notice inventory changes when reading it through a solid block (including an inventory being moved away or put in place, like a composter being moved by a piston). The CUD will then change it's signal once it either receives a block or inventory update. See [`updateNeighbourForOutputSignal`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/level/Level#L992-1008).\n\n## Special behaviors\n- Brewing stand: Sends a comparator update when consuming fuel, brewing begins, and when brewing progresses. See calls to [`BlockEntity.setChanged()`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/level/block/entity/BlockEntity#L208-219) in [`BrewingStandBlockEntity.serverTick()`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/level/block/entity/BrewingStandBlockEntity#L98-122)\n- Detector rail: Sends a comparator update every tick when an entity is colliding with it. See calls to [`ServerLevel.updateNeighbourForOutputSignal()` in `DetectorRailBlock.tick()`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/level/block/DetectorRailBlock#L82-115)",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753535919915098",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753535919915098/1454753536629018626",
+  "status": "APPROVED",
+  "statusMessageID": "1454753536629018626",
+  "updatedAt": 1771902059513,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "tick"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "US002",
+    "VBS002",
+    "LS002",
+    "OL004"
+  ]
+}

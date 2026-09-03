@@ -1,0 +1,43 @@
+{
+  "id": "1454753641226305589",
+  "terms": [
+    "Global Output"
+  ],
+  "definition": "A contraption, usually a 1-wide tileable(n-Wide Tileable) one, that has only one output for all the Slices(Slice), in contrast to one output per slice (see Slice Preservation).",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753641226305589",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753641226305589/1454753642233204868",
+  "status": "APPROVED",
+  "statusMessageID": "1454753642233204868",
+  "updatedAt": 1766910697080,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "n-Wide tileable",
+      "id": "1454753738425368687",
+      "url": "https://discord.com/channels/1375556143186837695/1454753738425368687/1454753741785010208",
+      "matches": [
+        "n-Wide Tileable"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "Slice",
+        "slice"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice Preservation",
+      "id": "1454754741694365787",
+      "url": "https://discord.com/channels/1375556143186837695/1454754741694365787/1454754742784884902",
+      "matches": [
+        "Slice Preservation"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

@@ -1,0 +1,34 @@
+{
+  "id": "1454753516269736090",
+  "terms": [
+    "Box Sorter"
+  ],
+  "definition": "A Box Sorter is a contraption that takes in boxes of a single item-type, takes the first item out and assigns the box to a storage Slice that matches the filter of that item.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753516269736090",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753516269736090/1454753518383792221",
+  "status": "APPROVED",
+  "statusMessageID": "1454753518383792221",
+  "updatedAt": 1766910667354,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "Slice"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS004",
+    "DH002",
+    "DH003",
+    "DH005",
+    "DH004",
+    "IBS004",
+    "MIS010",
+    "FS003",
+    "MIS011"
+  ]
+}

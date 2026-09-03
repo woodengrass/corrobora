@@ -1,0 +1,27 @@
+{
+  "task_type": "document_triage",
+  "model": "deepseek-v4-flash",
+  "prompt_version": "document_triage@1",
+  "input_hash": "94d1b9ee581edac94d3933fb157d07150495fbfd91dbbb0baa58478d3929ff4f",
+  "source_path": "learn-submission-observer.txt",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "response": {
+    "rawAssetId": 0,
+    "candidates": [{
+    "candidateType": "claim",
+    "normalizedTitle": "侦测器的触发方式与朝向（Java 1.20.1 原版）",
+    "normalizedContent": "侦测器检测到面前方块状态变化后，在背面输出 2gt 脉冲。侦测器不依赖方块更新工作，而是每刻比较面前方块的状态，因此隔一格或被压线都不会使其误触发。输出端位于带红点的一面，朝向以放置时玩家面对的方向为准；朝向放反会使线路时序整体偏移 2gt。投稿者标注的验证环境为 Java 1.20.1 原版单人存档。",
+    "termRefs": [
+      "侦测器",
+      "方块更新",
+      "压线",
+      "比较器",
+      "gt"
+    ],
+    "qualityFlags": [],
+    "confidence": 0.68,
+    "rationale": "社群投稿但主题单一、结论可验证，并自行标注了版本与运行环境，符合 claim 候选条件。信心值低于文件来源，因为内容为个人实测转述且无法从投稿本身核对。依规则只能建立 pending 候选，不得因内容合理而升为 approved。"
+    }]
+  }
+}

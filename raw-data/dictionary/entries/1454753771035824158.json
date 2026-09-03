@@ -1,0 +1,30 @@
+{
+  "id": "1454753771035824158",
+  "terms": [
+    "Peripheral"
+  ],
+  "definition": "Term used to describe contraptions that are almost Storage Tech. Examples are Furnace Arrays, Brewers, Crafting stations, Autocrafters, ...",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753771035824158",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753771035824158/1454753771555913873",
+  "status": "APPROVED",
+  "statusMessageID": "1454753771555913873",
+  "updatedAt": 1766910727949,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Furnace Array",
+      "id": "1469657186740469760",
+      "url": "https://discord.com/channels/1375556143186837695/1469657186740469760/1469657189575692492",
+      "matches": [
+        "Furnace Array"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS011",
+    "LS002",
+    "LS003",
+    "LS004",
+    "LS005"
+  ]
+}

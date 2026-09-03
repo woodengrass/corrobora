@@ -1,0 +1,45 @@
+{
+  "id": "1454754837379022858",
+  "terms": [
+    "Unstackable sorter"
+  ],
+  "definition": "An item sorter that sorts unstackable items into different categories. Regular item sorters can not be used for this use case, because the items don't stack, so unique behaviors of each item type have to be used in order to separate them. Not to be confused with Unstackable filter\n\n## Methods of sorting\nCopper Golem - Can sort all unstackables but potion and enchanted book variants I believe depends on nbt data\nShulker Box - Placement with dispenser / Carpet stackableshulkerboxes\nMinecart Variants - Can be sorted using unique interractions on rails / ability to pull items out of containers and pick up mobs\nBoats / Rafts / Chestboats / Chestrafts can be sorted based on if it can be placed upon a waterlogged block and entity ride spots\nGold Items - Can be picked up by Piglin\nNetherite Items - Can be burned and be detected by calibrated sculk sensor\nWater Bucket - Can Waterlog Blocks\nLava Bucket - Dispenser Interraction\nPowdered Snow Bucket - Can be moved / Slows entities / Supports leather boots on armor stands / goats too?\nFlint and steel - Can light things\nShears - Can shear sheep and dispenser interaction\nBrush - Can brush armadillo\nHelmets / Leather Cap / Turtle Shell - Can be placed on armor stand with dispenser with all other slots blocked\nChestplates / Leather Tunic / Elytra - Can be placed on armor stand with dispenser with all other slots blocked\nLeggings / Leather Pants - Can be placed on armor stand with dispenser with all other slots blocked\nBoots - Can be placed on armor stand with dispenser with all other slots blocked\nMob Buckets - Cant be sorted as item, can sort mobs based on hitboxes leaving water buckets\nMusic Discs - Can enter Jukebox, output somewhat different signal strengths and have different playtimes\nSaddle - Can be placed on pigs horses and other mobs using dispensers and sheared off\nHorse Armor - Can be placed on horse variants with dispensers and sheared off\nWolf Armor - Can be placed on wolfs using dispensers and sheared off\nPotions - Can be sorted by either duping and detecting effects or using cuds to determine one of 7 categories they can fall into based on what ingredients they can accept, can also enter brewing stands if you dont care about effects\nEnchanted Books - Can enter chiseled bookshelves",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754837379022858",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754837379022858/1454754839224516712",
+  "status": "APPROVED",
+  "statusMessageID": "1454754839224516712",
+  "updatedAt": 1766924462411,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Unstackable filter",
+      "id": "1454754830101774427",
+      "url": "https://discord.com/channels/1375556143186837695/1454754830101774427/1454754831284568139",
+      "matches": [
+        "Unstackable filter"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Bucket",
+      "id": "1464788208796565709",
+      "url": "https://discord.com/channels/1375556143186837695/1464788208796565709/1464788210138878080",
+      "matches": [
+        "Bucket",
+        "bucket"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS004",
+    "MIS006",
+    "MIS008",
+    "MIS010",
+    "MIS011",
+    "LS002",
+    "LS003",
+    "LS004",
+    "LS005",
+    "US008"
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "1454753442471084134",
+  "terms": [
+    "Aligner"
+  ],
+  "definition": "It aligns items within a block to ensure some sort of behavior. More basic concepts involve simply letting items in a water or ice stream hit against a block with a certain hitbox, while more complex ones involve precisely timed contraptions, see Perfect aligner. The more simple use cases involve using a chest, dragon egg, 2 or 3 stack of pickles, cake or some other block to align the items between two blocks such that they go over some hoppers and are inside a water stream at the same time. The use of different hitboxes allows for some more complex behaviour, where items can cycle exactly twice in a loop and then exit, or you can send many channels along one water line and have each channel exit in a different spot of the stream.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753442471084134",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753442471084134/1454753443678916638",
+  "status": "APPROVED",
+  "statusMessageID": "1454753443678916638",
+  "updatedAt": 1766910649590,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Perfect aligner",
+      "id": "1454753764606083180",
+      "url": "https://discord.com/channels/1375556143186837695/1454753764606083180/1454753765365256286",
+      "matches": [
+        "Perfect aligner"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "AB003",
+    "VBS002",
+    "TT001"
+  ]
+}

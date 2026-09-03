@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "databasePath": "public/database/database.json",
+  "databaseSha256": "740760518779d3e244f5de7667f4cc4e76f7bd5dd098a1555faf55c40a2dc688",
+  "cases": [
+    {
+      "id": "machine-001",
+      "query": "推薦適合 Java 1.20+ 的不可堆疊物品打包機器。",
+      "topSubIds": [
+        "sub-1778344851021-846",
+        "sub-1778344851072-585"
+      ]
+    },
+    {
+      "id": "machine-002",
+      "query": "有作者是 Maizuma 的機器推薦嗎？",
+      "topSubIds": []
+    },
+    {
+      "id": "machine-003",
+      "query": "推薦一個有分類功能的機器。",
+      "topSubIds": []
+    },
+    {
+      "id": "machine-004",
+      "query": "我需要生電機器，目錄裡有哪些選擇？",
+      "topSubIds": []
+    },
+    {
+      "id": "name-001",
+      "query": "0t 堆肥桶可访问打包机怎么用？",
+      "topSubIds": [
+        "sub-1772764832049"
+      ]
+    },
+    {
+      "id": "author-001",
+      "query": "Floppy 做过哪些机器？",
+      "topSubIds": [
+        "sub-1778344850969-309"
+      ]
+    },
+    {
+      "id": "tag-001",
+      "query": "潜影盒打包机相关的机器有哪些",
+      "topSubIds": [
+        "sub-1772764832049",
+        "sub-1778344851090-192",
+        "sub-1778344851036-569",
+        "sub-1772667193043",
+        "sub-1778344851161-358"
+      ]
+    },
+    {
+      "id": "version-001",
+      "query": "1.21.x 版本有哪些机器可以用",
+      "topSubIds": [
+        "sub-1778344850992-834",
+        "sub-1772730841971"
+      ]
+    },
+    {
+      "id": "nohit-001",
+      "query": "zzz这是一个不存在的查询关键字qwerty12345",
+      "topSubIds": []
+    }
+  ]
+}

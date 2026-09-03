@@ -1,0 +1,68 @@
+{
+  "id": "1456908472384884879",
+  "terms": [
+    "item entity"
+  ],
+  "definition": "Item entities are items in entity form. Each item entity can have a full stack of items, up to 64 items for 64-stackables.\n\n## Item entity tick\nEvery game tick, item entities will do the following actions in order. See [`ItemEntity.tick()`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/entity/item/ItemEntity#L116-187)\n1. apply water/lava/gravity momentum\n2. item glitching/block clipping (See RD002)\n3. self movement via momentum. effects from the block its on occurs here. Requires modulo 4 to start (See RD003).\n4. Item merging (See RD003).\n5. Item despawn after 5 minutes.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1456908472384884879",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1456908472384884879/1456908473844502594",
+  "status": "APPROVED",
+  "statusMessageID": "1456908473844502594",
+  "updatedAt": 1771902166624,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "tick"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1455030177531691050",
+      "code": "RD002",
+      "name": "How Item Entity Clipping Works",
+      "url": "https://discord.com/channels/1375556143186837695/1455030735089041534",
+      "path": "Archive/RD_tomes-and-diagrams/RD002_How_Item_Entity_Clipping_Works",
+      "matches": [
+        "RD002"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Modulo 4",
+      "id": "1456914381366493408",
+      "url": "https://discord.com/channels/1375556143186837695/1456914381366493408/1456914383195344947",
+      "matches": [
+        "modulo 4"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1456723394752942214",
+      "code": "RD003",
+      "name": "Item entity order and age mechanics",
+      "url": "https://discord.com/channels/1375556143186837695/1456724032819957984",
+      "path": "Archive/RD_tomes-and-diagrams/RD003_Item_entity_order_and_age_mechanics",
+      "matches": [
+        "RD003"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "HS003",
+    "OIP002",
+    "CT001",
+    "CT003",
+    "CT005",
+    "VIP005",
+    "VIP006",
+    "PU004",
+    "RD003",
+    "VIP008",
+    "MIS012",
+    "NT006"
+  ]
+}

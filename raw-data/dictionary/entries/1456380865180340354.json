@@ -1,0 +1,18 @@
+{
+  "id": "1456380865180340354",
+  "terms": [
+    "Stacked cart",
+    "cart stack"
+  ],
+  "definition": "Cart stacking refers to putting multiple cart entities in the same location. This can be done by dropping carts onto a rail from above, the carts will snap onto the rail regardless of how many carts there were before. Stacked carts are useful for moving lots of items in a compact form.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1456380865180340354",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1456380865180340354/1456380866623311915",
+  "status": "APPROVED",
+  "statusMessageID": "1456380866623311915",
+  "updatedAt": 1767298661024,
+  "references": [],
+  "referencedBy": [
+    "CT003",
+    "CT005"
+  ]
+}

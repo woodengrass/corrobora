@@ -1,0 +1,25 @@
+{
+  "id": "1454753542177816576",
+  "terms": [
+    "Crosstalk"
+  ],
+  "definition": "A term used for when 2 tiled Slices(slice) are interfering with each other in any situation.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753542177816576",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753542177816576/1454753542878269451",
+  "status": "APPROVED",
+  "statusMessageID": "1454753542878269451",
+  "updatedAt": 1766910673241,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "Slice",
+        "slice"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

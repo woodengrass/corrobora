@@ -1,0 +1,31 @@
+{
+  "id": "1454753497638506689",
+  "terms": [
+    "Box Display"
+  ],
+  "definition": "A contraption that displays a shulker box and has some or all of the following features:\na button to dispense a new box, breaking of the box when it empties, automatically dispensing a new box when the old one is broken, storage for new shulker boxes, access to said storage, and some others, like hopper locking and not hiding boxes from the player in inaccessible inventories (called no buffer).",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753497638506689",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753497638506689/1454753498494144522",
+  "status": "APPROVED",
+  "statusMessageID": "1454753498494144522",
+  "updatedAt": 1766910662594,
+  "references": [],
+  "referencedBy": [
+    "FS002",
+    "MIS006",
+    "LS002",
+    "DH002",
+    "DH003",
+    "DH005",
+    "DH004",
+    "MH002",
+    "PI003",
+    "BD003",
+    "OD001",
+    "OD003",
+    "OD004",
+    "OD005",
+    "OD007",
+    "SP001"
+  ]
+}

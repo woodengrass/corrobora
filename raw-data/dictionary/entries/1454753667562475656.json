@@ -1,0 +1,24 @@
+{
+  "id": "1454753667562475656",
+  "terms": [
+    "Item Call"
+  ],
+  "definition": "A device, mechanism or feature that allows the user to request items. The requested items may land in a user accessible inventory or be used to restock some component. Some systems can also use item call to automatically restock, for example from Bulk Storage.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753667562475656",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753667562475656/1454753669236002850",
+  "status": "APPROVED",
+  "statusMessageID": "1454753669236002850",
+  "updatedAt": 1766910703456,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Bulk Storage",
+      "id": "1454753523668484213",
+      "url": "https://discord.com/channels/1375556143186837695/1454753523668484213/1454753524637499577",
+      "matches": [
+        "Bulk Storage"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

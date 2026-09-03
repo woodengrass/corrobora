@@ -1,0 +1,22 @@
+{
+  "id": "1457020951001567444",
+  "terms": [
+    "Rising Edge",
+    "Falling Edge",
+    "Dual Edge",
+    "Monostable"
+  ],
+  "definition": "A rising/falling/dual edge detector or monostable is a device which outputs a short pulse when:\n- Rising edge: Change from unpowered to powered outputs a short pulse\n- Falling edge: Change from powered to unpowered outputs a short pulse\n- Dual edge: When both changes of state output a short pulse",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1457020951001567444",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1457020951001567444/1457020954642485484",
+  "status": "APPROVED",
+  "statusMessageID": "1457020954642485484",
+  "updatedAt": 1767456174933,
+  "references": [],
+  "referencedBy": [
+    "SP004",
+    "CC004",
+    "LC001",
+    "LC002"
+  ]
+}

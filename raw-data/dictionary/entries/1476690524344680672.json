@@ -1,0 +1,33 @@
+{
+  "id": "1476690524344680672",
+  "terms": [
+    "Palla logic"
+  ],
+  "definition": "A concept used developed by PallaPalla to use the passive readouts from a chest hall to allow for loading with items until it reaches a certain signal stregth before then loading it full of boxes",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1476690524344680672",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1476690524344680672/1476690525922001013",
+  "status": "APPROVED",
+  "statusMessageID": "1476690525922001013",
+  "updatedAt": 1772483101059,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Palla",
+      "id": "1475946143023239229",
+      "url": "https://discord.com/channels/1375556143186837695/1475946143023239229/1475946144206033191",
+      "matches": [
+        "PallaPalla"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Chest Hall",
+      "id": "1454753529700024331",
+      "url": "https://discord.com/channels/1375556143186837695/1454753529700024331/1454753530488426527",
+      "matches": [
+        "chest hall"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

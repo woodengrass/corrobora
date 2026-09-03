@@ -1,0 +1,55 @@
+{
+  "id": "1454753738425368687",
+  "terms": [
+    "n-Wide tileable",
+    "1wt",
+    "2wt",
+    "nwt"
+  ],
+  "definition": "Annotates the width of a slice, and whether or not you can build them right next to each other. There are systems that are 1 wide, but you can't put 2 next to each other due to Crosstalk, so they don't get this annotation. Sometimes they are n-Wide AB Tileable instead.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753738425368687",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753738425368687/1454753741785010208",
+  "status": "APPROVED",
+  "statusMessageID": "1454753741785010208",
+  "updatedAt": 1766959409712,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "slice"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Crosstalk",
+      "id": "1454753542177816576",
+      "url": "https://discord.com/channels/1375556143186837695/1454753542177816576/1454753542878269451",
+      "matches": [
+        "Crosstalk"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "A/B Tiling",
+      "id": "1454753732293033984",
+      "url": "https://discord.com/channels/1375556143186837695/1454753732293033984/1454753733035687988",
+      "matches": [
+        "AB Tileable"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MH003",
+    "ML007",
+    "MF004",
+    "MF005",
+    "CC006",
+    "CC007",
+    "LC001",
+    "LC002",
+    "SSU001"
+  ]
+}

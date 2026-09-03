@@ -1,0 +1,17 @@
+{
+  "id": "1454754788473307200",
+  "terms": [
+    "Tile Entity",
+    "Block Entity",
+    "TE",
+    "BE"
+  ],
+  "definition": "Tile entities (less often referred to as Block Entities) are blocks that have NBT-data attached to them, for example all blocks with inventories.\nMore information on the [block entity wiki page](https://minecraft.wiki/w/Block_entity)",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754788473307200",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754788473307200/1454754789320560680",
+  "status": "APPROVED",
+  "statusMessageID": "1454754789320560680",
+  "updatedAt": 1766910971028,
+  "references": [],
+  "referencedBy": []
+}

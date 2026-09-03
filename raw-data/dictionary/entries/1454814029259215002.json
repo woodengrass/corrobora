@@ -1,0 +1,33 @@
+{
+  "id": "1454814029259215002",
+  "terms": [
+    "MS"
+  ],
+  "definition": "Abbreviation for main storage, typically having a bulk, chest halls and a MIS to sort items",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454814029259215002",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454814029259215002/1454814030291271807",
+  "status": "APPROVED",
+  "statusMessageID": "1454814030291271807",
+  "updatedAt": 1766953964279,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Chest Hall",
+      "id": "1454753529700024331",
+      "url": "https://discord.com/channels/1375556143186837695/1454753529700024331/1454753530488426527",
+      "matches": [
+        "chest hall"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Multi Item Sorter",
+      "id": "1454753725091676293",
+      "url": "https://discord.com/channels/1375556143186837695/1454753725091676293/1454753725829877954",
+      "matches": [
+        "MIS"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

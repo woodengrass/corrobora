@@ -1,0 +1,43 @@
+{
+  "id": "1473813478782402745",
+  "terms": [
+    "Butterfly tiling",
+    "mirror tiling"
+  ],
+  "definition": "Butterfly tiling or miror tiling refers to the technique of flipping every other slice to avoid crosstalk between slices. Butterfly tiled devices are in effect, 1wABt.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1473813478782402745",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1473813478782402745/1473813479470403656",
+  "status": "APPROVED",
+  "statusMessageID": "1473813479470403656",
+  "updatedAt": 1771454926245,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice",
+      "id": "1454754736224997386",
+      "url": "https://discord.com/channels/1375556143186837695/1454754736224997386/1454754736858206261",
+      "matches": [
+        "slice"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Crosstalk",
+      "id": "1454753542177816576",
+      "url": "https://discord.com/channels/1375556143186837695/1454753542177816576/1454753542878269451",
+      "matches": [
+        "crosstalk"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "A/B Tiling",
+      "id": "1454753732293033984",
+      "url": "https://discord.com/channels/1375556143186837695/1454753732293033984/1454753733035687988",
+      "matches": [
+        "1wABt"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

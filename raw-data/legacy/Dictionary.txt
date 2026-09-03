@@ -1,0 +1,117 @@
+Accessible-可访问的
+Accessible Loader-可交互打包机
+Aligner-矫正器
+Array-阵列
+Based-基于
+Binary(bin)-二进制
+Bit-位
+Blocker-填充物, 占位物
+Blockerless-防填充物的, 防占位物的
+Block Event Delay(BED)-方块事件深度
+Block Update Detector(BUD)-方块更新检测器
+(Shulker) Box Comparer-盒子比对器
+(Shulker) Box Detection-盒子扫描器
+(Shulker) Box Display-潜影盒展示
+(Shulker) Box Grouper-盒子分组器
+(Shulker) Box Processor-潜影盒处理
+(Shulker) Box Separator-盒子分离器
+(Shulker) Box Sorter-潜影盒分类
+Bufferless-无缓存
+Bulk (Storage)-大宗存储
+Chest Hall-全物品单片
+Comparator Update Detector(CUD)(同DUD/TEUD)-比较器更新检测器
+Crosstalk-串线
+Cyclical(cyc)-循环的
+Decimal-十进制
+Decoder-解码器
+Deserializer-串行信号接收器
+Directional-方向性
+(Shulker Box) Disk Driver-盒子硬盘
+Dropper Speed(HS; 1/2x; 1x; 2x)-投掷器速
+Dropperline-投掷器链
+Dust Updateless-无红石粉能量变化;无粉(广义)
+Dustless-无粉(狭义)
+Dynamic-动态的
+Encoded-编码的
+Encoder-编码器
+Fifo(同Shift Register)-移位寄存器
+Fill (level) Sorter-填充度分类器
+Flitered-分类的
+Filtered Loader-分类打包机
+Fully Hopper Locked(FHL)-全锁
+Game Tick(gt)-游戏刻(2gt = 1rt)
+Global-全局的
+Hexadecimal(Hex)-十六进制
+Hopper Speed(HS)-单倍漏斗速
+Hopper Locked-锁漏斗
+HSS(同OSS)-强模
+Hybrid-复合的(缓存打包)
+Item Call-物品呼叫
+Item Wanker(同Keygen)-潜影盒取样器
+Keygen(同Wanker)-物盒分离(潜影盒取样器)
+Liquid Update Detector(LUD)-流体更新检测器
+Loader-打包机
+Local-局部的, 非全局的
+Locational-位置性
+Main Storage(ms)-全物品分类仓库
+Merger-潜影盒合并器
+Mixed-混杂的
+Mixed Box-混杂盒
+Multi Box Sorter(MBS)-多种类潜影盒分类
+Mixed Loader(同Hybrid Loader)-混杂打包机
+Multi Item Sorter(MIS)-多物品分类
+OSS(同HSS)-强模
+Pair Searcher-潜影盒配对器
+Pair Optimizer-潜影盒最优配对器
+Paraller Codes-并行码
+PEIS-并行卸货阵列(整流器)
+Peripheral-其他的
+Pistonless-无活塞的
+Precision-精密的
+Precision Hopper-精密漏斗
+Precision Loader-精密打包机
+Pure Box-纯净盒
+Quad Bulk-四边形大宗
+Quasi Connectivity(QC)-半连接性
+RAM-读写存储器
+Redstone Tick(rt)-红石刻(1rt = 2gt)
+Redcoder-红石信号解码器
+Remote Bulk-远程访问大宗
+ROM-只读存储器
+Safe-安全的
+Self Selected-自喷盒
+Sequential-顺序的
+Set Based-首位检测
+Serial Codes-串行码
+Serializer-串行信号发生器
+Shift Register(同Fifo)-移位寄存器
+Silent-静音
+Slice-单片
+Slice Preservation(Local Output)-单片输出
+Smart-智能的
+Smart (Shulker) Box Display-可反悔潜影盒展示
+Smart (Shulker) Box Sorter-单片解锁潜影盒分类
+Snow-细雪
+Sorter-分类器
+(Box) Splitter-分盒器
+Singal Strength(SS)-信号强度
+SS_Sorter-潜影盒填充度分类
+Stack Separator-堆分离
+Stack Sorter-堆分类
+Storage Input System(SIS)-无实体输入系统
+Svar-自适应潜影盒分类
+Temp Storage-临时存储(缓存)
+Tile Entity(Expand)-方块实体
+Tile Entity (Data) Update Detector(DUD/TEUD)(同CUD)-方块实体更新检测器
+Tile Tick Priority(ttp)-计划刻优先级
+Transcoder-转码器
+Unloader-拆包机
+Unstackable Filter(Unstackable Sparator)-不可堆叠分离
+Unstackable Sorter-不可堆叠分类
+User Interface(UI)-用户面板
+Variable(var)-自适应的
+Variable Loader-自适应打包机
+Wanker(同Keygen)-物盒分离(潜影盒取样器)
+X Wide Tileable-X宽堆叠
+X Wide AB Tileable-X宽ab堆叠
+(Cart) Yeeter-矿车卸货机(烧车)

@@ -1,0 +1,21 @@
+{
+  "id": "1454753707530129576",
+  "terms": [
+    "Mixed Box"
+  ],
+  "definition": "A shulker box with multiple item types.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753707530129576",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753707530129576/1454753708247089184",
+  "status": "APPROVED",
+  "statusMessageID": "1454753708247089184",
+  "updatedAt": 1766910712655,
+  "references": [],
+  "referencedBy": [
+    "MIS003",
+    "AC002",
+    "TG001",
+    "SSU001",
+    "LS005",
+    "ML007"
+  ]
+}

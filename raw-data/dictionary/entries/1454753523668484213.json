@@ -1,0 +1,51 @@
+{
+  "id": "1454753523668484213",
+  "terms": [
+    "Bulk Storage"
+  ],
+  "definition": "At it's simplest, a bulk storage is just a system that stores a lot of items, usually a single type per module and in box form. The challenge usually comes in trying to make the system compact, extremely lag friendly (through Hopper-locked storage and other techniques), and adding features like Item Call and Encoded storage.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753523668484213",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753523668484213/1454753524637499577",
+  "status": "APPROVED",
+  "statusMessageID": "1454753524637499577",
+  "updatedAt": 1766910668807,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Hopperlocking",
+      "id": "1454753660625227895",
+      "url": "https://discord.com/channels/1375556143186837695/1454753660625227895/1454753661765947422",
+      "matches": [
+        "Hopper-locked"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Item Call",
+      "id": "1454753667562475656",
+      "url": "https://discord.com/channels/1375556143186837695/1454753667562475656/1454753669236002850",
+      "matches": [
+        "Item Call"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Encoded",
+      "id": "1454753595424505866",
+      "url": "https://discord.com/channels/1375556143186837695/1454753595424505866/1454753596133605426",
+      "matches": [
+        "Encoded"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "FS002",
+    "MIS003",
+    "MIS004",
+    "MIS006",
+    "RD001",
+    "LS005",
+    "LS006",
+    "MIS011"
+  ]
+}

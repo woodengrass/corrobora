@@ -1,0 +1,47 @@
+{
+  "id": "1455675378931728598",
+  "terms": [
+    "cart yeet"
+  ],
+  "definition": "A cart yeeter is a device which breaks a cart with an inventory, emptying its contents in item entity form. The cart item is also collected separately for recycling. Cart yeeting was introduced in 1.19, before which hoppercarts/chestcarts dropped the cart separately from the hopper/chest, making it impossible to recycle them automatically.\n\n## Mechanics\nWhen a cart is broken, the contents of the cart drops first, the cart item drops afterwards. The cart item however, drops with a slightly different position and momentum, allowing for them to be separated with clever alignment techniques  [video explanation](https://www.youtube.com/watch?v=MhY2mIdV7NM).\n\nNote that the contents of a cart can become fragmented, with full stacks breaking up into smaller ones randomly. Perfect merge yeeters such as CT001 can reliably merge the fragments with special timings. \n\n### Details\nLet xm, ym, zm equal the minecart entity position, and w be the width of the item (0.25F)\n\nThe contents of the cart will drop [[see code]](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/Containers):\n- at: x = floor(xm) + random([0, 1]) x (1 - w) + w/2\n- at: y = floor(ym) + random([0, 1]) x (1 - w)\n- at: z = floor(zm) + random([0, 1]) x (1 - w) + w/2\n- Random vertical momentum `triangular(mode: 0.2, deviation: 0.11485000171139836)`\n- Random x and z momentum `triangular(mode: 0.0, deviation: 0.11485000171139836)`\n\nThe minecart item will drop [[see code]](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/entity/Entity#L2140-2149):\n- at exactly xm, ym, zm\n- fixed vertical momentum of 0.2\n- Random x and z momentum U[-0.1, 0.1]",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1455675378931728598",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1455675378931728598/1455675380160659517",
+  "status": "APPROVED",
+  "statusMessageID": "1455675380160659517",
+  "updatedAt": 1771902126388,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "item entity",
+      "id": "1456908472384884879",
+      "url": "https://discord.com/channels/1375556143186837695/1456908472384884879/1456908473844502594",
+      "matches": [
+        "item entity"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1450267939461922957",
+      "code": "CT001",
+      "name": "Perfect Merge Cart Yeeter",
+      "url": "https://discord.com/channels/1375556143186837695/1450269963242705040",
+      "path": "Archive/CT_cart-tech/CT001_Perfect_Merge_Cart_Yeeter",
+      "matches": [
+        "CT001"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "DH004",
+    "CT001",
+    "CT002",
+    "CT003",
+    "CT004",
+    "CT005",
+    "VBS003",
+    "PU003",
+    "MIS008",
+    "MIS011",
+    "PI005"
+  ]
+}

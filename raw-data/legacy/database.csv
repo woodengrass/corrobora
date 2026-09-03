@@ -1,0 +1,4288 @@
+topic,content
+整流,整流是指不同种类物品分别按照漏斗速度实现并行输入，每类物品输入速度上限为漏斗速，不同种类物品之间可以并行输入，整流器就是实现这个过程的一个处理系统。英文对应 rectification，在中文TMC社群中指按类型并行的通用概念（每类型1x），而parallel unloading是一种具体实现方法。
+车头,车头并不单指盒子类机器，它可以是任何机器。车头是指机器中物品输入部分的总称，它的作用是对输入的物品进行预处理使其能够适配后续处理流程，例如盒分类单片需要把key和取了key的盒子异步发往单片，则车头要做的就是取key等等。车头还包括堆分类车头、矿车类车头等，是一个广义的概念。车头不仅包括物品处理部分，很多时候也包括输入部分的主控线路。
+实体分盒器,实体分盒器是一种特殊的自适应打包机，它是输入实体掉落物输出纯净盒，而不是传统分盒。
+不可堆叠打包,不可堆叠打包接在不可堆叠分类的输出端，一般常用可访问打包和缓存打包这两种，因为这两种打包兼顾了打包和取散货的需求，用于替换大宗流程的打包机+盒分类+箱盒展示。不可堆叠打包一般是1wt的，这两种打包理论上不可能满速，所以需要对不可堆叠分类输入进行限速否则有溢出的风险。不可堆叠分类本身不会带有任何打包，需要额外添加。
+大宗,Bulk=Bulk Storage，即大宗存储。全物品=Main Storage，并非主存储。
+漏斗机制,漏斗在TE阶段先后执行5个主要操作：1.若CD时长非0则CD-1，若减后CD仍不为0则跳过后续。2.若漏斗物品栏不为空且输出端有可接受漏斗输入的容器则尝试输出1个物品。3.若漏斗上方有可接受漏斗输出的容器则尝试吸取1个物品。4.若漏斗上方无可接受漏斗输出的容器（1.21+还需上方方块无DOES_NOT_BLOCK_HOPPERS标签）。5.若2/3/4中至少成功1次则增加CD时长，一般加8gt，特殊情况下加7gt以保证时序一致。
+漏斗哈希,漏斗哈希是一个抽象知识点。假设区块C中先后放下漏斗H1和H2（未卸载区块），则在区块C被卸载前每gt的TE阶段先执行H1再执行H2。当区块C重载后H1和H2的运算顺序由哈希算法（伪随机）确定，该顺序在区块卸载前保持不变直到下一次重载。
+crain解码器,crain解码器通过红石粉与0/1侦测器的时差进行解码。如果码正确会有1gt窗口延迟熄灭底下铁轨被侦测器检测。码错误则铁轨常亮不被检测。dreams解码器是用了bud投掷器的crain魔改。floppy解码器是另一种独立方案。
+BED,BED（方块事件延迟）并非是gt级的解码，而是在一个gt内不同的更新顺序的差异。BED绝对不是被用于crain/dreams/floppy或者其他16进制解码。
+编码全物品类型,编码全物品的类型指处理流程和实现方式的区别而非编码元件。常见的有：传统二进制线编码全物品（多条水道一个线程）、矩阵编码全物品（传统编码拓展，每条水道一个线程）、高速编码流水线全物品（物品流与编码信号同步）、并行编码全物品（消除线程抑制，不同种类物品可同时段输入）。
+打包机速度,打包机的速度是固定的，自适应除非是堆分，不然永远是单倍速，无法通过任何手段提升速度。更高倍速的理论上适应6倍速需求但无法手动降速。打包机的速度是定死的。
+Accessible,可访问的
+Accessible Loader,可交互打包机
+Aligner,矫正器
+Array,阵列
+Based,基于
+Binary(bin),二进制
+Bit,位
+Blocker,"填充物, 占位物"
+Blockerless,"防填充物的, 防占位物的"
+Block Event Delay(BED),方块事件深度
+Block Update Detector(BUD),方块更新检测器
+(Shulker) Box Comparer,盒子比对器
+(Shulker) Box Detection,盒子扫描器
+(Shulker) Box Display,潜影盒展示
+(Shulker) Box Grouper,盒子分组器
+(Shulker) Box Processor,潜影盒处理
+(Shulker) Box Separator,盒子分离器
+(Shulker) Box Sorter,潜影盒分类
+Bufferless,无缓存
+Bulk (Storage),大宗存储
+Chest Hall,全物品单片
+Comparator Update Detector(CUD)(同DUD/TEUD),比较器更新检测器
+Crosstalk,串线
+Cyclical(cyc),循环的
+Decimal,十进制
+Decoder,解码器
+Deserializer,串行信号接收器
+Directional,方向性
+(Shulker Box) Disk Driver,盒子硬盘
+Dropper Speed(HS; 1/2x; 1x; 2x),投掷器速
+Dropperline,投掷器链
+Dust Updateless,无红石粉能量变化;无粉(广义)
+Dustless,无粉(狭义)
+Dynamic,动态的
+Encoded,编码的
+Encoder,编码器
+Fifo(同Shift Register),移位寄存器
+Fill (level) Sorter,填充度分类器
+Flitered,分类的
+Filtered Loader,分类打包机
+Fully Hopper Locked(FHL),全锁
+Game Tick(gt),游戏刻(2gt = 1rt)
+Global,全局的
+Hexadecimal(Hex),十六进制
+Hopper Speed(HS),单倍漏斗速
+Hopper Locked,锁漏斗
+HSS(同OSS),强模
+Hybrid,复合的(缓存打包)
+Item Call,物品呼叫
+Item Wanker(同Keygen),潜影盒取样器
+Keygen(同Wanker),物盒分离(潜影盒取样器)
+Liquid Update Detector(LUD),流体更新检测器
+Loader,打包机
+Local,"局部的, 非全局的"
+Locational,位置性
+Main Storage(ms),全物品分类仓库
+Merger,潜影盒合并器
+Mixed,混杂的
+Mixed Box,混杂盒
+Multi Box Sorter(MBS),多种类潜影盒分类
+Mixed Loader(同Hybrid Loader),混杂打包机
+Multi Item Sorter(MIS),多物品分类
+OSS(同HSS),强模
+Pair Searcher,潜影盒配对器
+Pair Optimizer,潜影盒最优配对器
+Paraller Codes,并行码
+PEIS,并行卸货阵列(整流器)
+Peripheral,其他的
+Pistonless,无活塞的
+Precision,精密的
+Precision Hopper,精密漏斗
+Precision Loader,精密打包机
+Pure Box,纯净盒
+Quad Bulk,四边形大宗
+Quasi Connectivity(QC),半连接性
+RAM,读写存储器
+Redstone Tick(rt),红石刻(1rt = 2gt)
+Redcoder,红石信号解码器
+Remote Bulk,远程访问大宗
+ROM,只读存储器
+Safe,安全的
+Self Selected,自喷盒
+Sequential,顺序的
+Set Based,首位检测
+Serial Codes,串行码
+Serializer,串行信号发生器
+Shift Register(同Fifo),移位寄存器
+Silent,静音
+Slice,单片
+Slice Preservation(Local Output),单片输出
+Smart,智能的
+Smart (Shulker) Box Display,可反悔潜影盒展示
+Smart (Shulker) Box Sorter,单片解锁潜影盒分类
+Snow,细雪
+Sorter,分类器
+(Box) Splitter,分盒器
+Singal Strength(SS),信号强度
+SS_Sorter,潜影盒填充度分类
+Stack Separator,堆分离
+Stack Sorter,堆分类
+Storage Input System(SIS),无实体输入系统
+Svar,自适应潜影盒分类
+Temp Storage,临时存储(缓存)
+Tile Entity(Expand),方块实体
+Tile Entity (Data) Update Detector(DUD/TEUD)(同CUD),方块实体更新检测器
+Tile Tick Priority(ttp),计划刻优先级
+Transcoder,转码器
+Unloader,拆包机
+Unstackable Filter(Unstackable Sparator),不可堆叠分离
+Unstackable Sorter,不可堆叠分类
+User Interface(UI),用户面板
+Variable(var),自适应的
+Variable Loader,自适应打包机
+Wanker(同Keygen),物盒分离(潜影盒取样器)
+X Wide Tileable,X宽堆叠
+X Wide AB Tileable,X宽ab堆叠
+(Cart) Yeeter,"矿车卸货机(烧车),方块事件叫Block Event，简称BE"
+BE的全称是Black Event,BE的全称是Block Event
+二进制解码器,二进制解码器分别有crain，floppy和dreams
+关于十六和二进制解码器,二进制和十六进制并不相等
+Appendix/专有名词解释,"# 专有名词解释
+
+## 概述
+
+本章旨在详细讲解以帮助读者理解GTMC中出现的各种专用词汇。
+
+## 目录
+
+- [#00](./00-专有名词解释.md) 导论
+- [#01](./01-栈.md) 栈的概念"
+Appendix/栈,"# 1 栈的概念  
+本章将介绍栈与调用栈的概念，这将帮助读者更好地理解方块更新。  
+
+## 1.1 理解栈
+
+> **栈（Stack）** 是一种 **先进后出（FILO, First In Last Out）** 的数据结构，它的特点是：元素只能在表的一端被操作。  
+### 1.1.1 先进后出
+想象一个 **薯片桶**：  
+- 薯片只能从桶口放入，也只能从桶口拿出。  
+- 因此，**最先放入桶底的那片薯片，将会是最后才能拿出来的**。  
+
+这就是“先进后出”的概念。  
+
+### 1.1.2 栈
+栈即是一个薯片桶。
+而在数据结构的术语里：  
+- “往桶里放薯片”对应 **压入栈（Push）**；  
+- “从桶口取薯片”对应 **弹出栈（Pop）**。  
+
+此外：  
+- **桶口** 就相当于 **栈顶（Top）**  
+- **桶底** 则相当于 **栈底（Bottom）**  
+
+这便是栈的概念。
+
+## 1.2 调用栈的概念
+
+> **调用栈（Call Stack）** 是程序在运行时管理函数调用的一种机制，它依赖栈的“先进后出”规则来保证函数能够正确返回。  
+
+## 1.2.1 调用栈
+想象你打电话问问题：  
+1. 你打电话给朋友 A，询问一个问题。  
+2. A 不知道答案，于是他打电话询问他的朋友 B。  
+3. B 也不清楚，再去询问问朋友 C。  
+
+这次，C 找到了答案，他先告诉 B；  
+B 再将答案告诉 A；  
+最后 A 将答案告诉你。  
+
+这里的顺序就是 **调用栈的行为**：
+
+- 每一次电话都向“调用栈”中压入一个新的“调用任务”。  
+- C 寻找答案时，**栈顶的任务**就是“C寻找答案”。  
+- C 找到答案后，**最后被调用的任务最先完成**，然后逐层返回给调用者（B → A → 你）。  
+- 而你最初的电话，是最先压入调用栈的任务，因此它位于**栈底**。
+
+而在程序中：  
+- “打电话” 相当于 **调用函数**；  
+- “得到答案并回传” 相当于 **函数返回结果**。  
+
+这样，程序便可以在函数嵌套调用时，确保每个函数都能完成并正确返回到调用点。"
+BlockUpdate/更新概念与不同类型的更新,"# #01 更新概念与不同类型的更新
+![缺少更新的非法方块们](./img/Updates.jpg)
+
+本部分是更新理论的入门。
+
+**基础部分**
+
+- 更新理论的认识
+- NC更新、PP更新、比较器更新等不同类型的更新
+- 方块放置时的自检行为
+
+**进阶部分**（源码分析）
+
+- 简要的NC更新与PP更新的调用与响应
+- 方块自检的调用
+
+## 1.1 广义更新
+
+在Minecraft中，方块与方块通过互相“通知”来建立相互的联系。
+
+有一天，你突发奇想——在地上放置了一个音符盒。然后，你又紧邻着音符盒放置了一个红石块，音符盒发出了悦耳的声音。那么，音符盒是怎么知道自己应该恰好在这个时候发出声音的吗？难道音符盒会一直给玩家发消息：我要发出声音吗？我要发出声音吗？我要发出声音吗……这显然是不合理的。实际上，音符盒能够发出声音，是因为红石块在被放置时，“通知”了音符盒：嘿，这里有点变化，你注意一下。
+
+这种**通知**行为就称为广义上的**更新**。
+
+需要注意的是，红石块并不会通知“我是一个红石块”或者“这里从空气变成了红石块”，而是非常简单地通知：这里有点变化。也就是说，在Minecraft中，更新行为并不包含行为的具体信息。
+
+## 1.2 更新的类型
+
+在Minecraft中，更新有不止一种类型。
+
+让我们继续上文中的例子。这天，你又灵光一现——在地上先放置了一个红石块，然后间隔一个方块放置了一个栅栏门，在红石块和栅栏门的中间放置了音符盒。你突然发现，音符盒怎么没有发出声音呢？于是，你右键栅栏门，把栅栏门打开了，但音符盒还是没有发出声音。按理来说，上文中的“放置红石块”和“栅栏门打开”都是某种变化，它们都应该“通知”音符盒，为什么音符盒没有如愿地发出声音呢？带着疑惑，你直接把栅栏门破坏掉了，此时音符盒又发出声音了。
+
+<!-- 这里应该有个动图 -->
+
+——这是为什么呢？
+
+你于是猜想：“放置红石块”和“栅栏门打开”的“通知”也许有什么差别。
+
+实际上，这两个通知的确是不同的。现如今我们分别称之为**NC更新**和**PP更新**。
+
+此时你又思考：为什么音符盒被放置的时候，不会立即发出声音呢？它难道在“出生”的时候不会看一看“自己要不要说两句话”吗？——没错，音符盒比较懒，它确实不会“检查自己要不要发出声音”。
+
+这种在被放置等情况下检查自身的行为，被称为**自检**。**自检**可以被视作一种**特殊的更新**。而音符盒不会进行自检。
+
+你在先前的学习中又了解到：比较器是一种能够检测容器中物品数量的红石元件，根据容器中物品数量的多少输出0-15的不同强度高低的红石信号。你想到：当容器中物品数量发生变化时，容器并没有必要发出**NC更新**或**PP更新**，毕竟只是内部物品多少改变了，并不会对周围方块产生什么太大影响。但你知道比较器却能够及时地改变自身输出的红石信号强度，说明比较器还是能够收到这种变化的“通知”。这是因为容器在容器中物品数量发生变化时，也会发出一种特殊的通知。
+
+这样的通知被称为**比较器更新**。
+
+## 1.3 NC更新
+
+### 1.3.1 NC更新的概念与行为
+
+方块在被放置、破坏、或发生能够显著影响周围方块的变化时，会发出**NC更新**。例如：
+
+- 方块的放置与破坏
+- 红石粉能量等级发生变化
+- 活塞的推拉*
+- ...
+
+> 官方提供的反混淆中NC更新为`neighborChanged`，与mcp反混淆相同。yarn反混淆中则称为`updateNeighbors`
+
+但一些变化不会发出**NC更新**，最为常见的有：
+
+- 可连接方块的连接状态改变，例如玻璃板与其他方块连接、各种墙与其他方块连接
+- 红石粉的连接状态发生变化，例如一个与它南北侧红石粉相连的红石粉又与东侧的一个红石粉相连接
+- 活板门、栅栏门的开关
+- 发射器、投掷器的激活状态改变（**！重要**）
+- 漏斗的激活状态改变
+- ...
+
+> 活塞的具体行为不在本篇讨论范围内。
+
+一个发出NC更新的“方块”称为**更新核**[^1]，大部分方块发出更新时，更新核是它本身。
+
+[^1]: 有关**更新核**的理解在基础部分不作过多解释，且并非所有NC更新都存在更新核。参见[进阶部分](#172-nc更新的调用与响应)。
+
+更新核发出NC更新时，按照**西东下上北南**的顺序，依次对更新核西侧紧邻、东侧紧邻……的方块发出NC更新。这样的更新就是通常意义上的更新。
+
+部分方块在发出NC更新时不只有一个更新核，它们具有特殊的更新核与范围：
+
+- 红石粉的能量等级变化为二阶毗邻更新[^2]。
+- 带有指向的红石元件，例如红石中继器、比较器、侦测器，它们在激活状态发生变化时先单独更新它们输出端指向的方块，再以输出端指向的方块为更新核发出NC更新，并且在NC更新时不会更新它们自身方块。
+- 平放的动力铁轨切换激活状态时，先以自身为更新核产生NC更新，再以下方方块为更新核产生NC更新。
+- 斜放的动力铁轨切换激活状态时，更新顺序为上、中、下、中、下、上（以自身为更新核产生NC更新简写为**中**、以上方方块为更新核简写为**上**、以下方方块为更新核简写为**下**，详细解读参见[斜向铁轨的更新行为](./03-特殊的更新行为.md#3.2-【进阶】斜侧铁轨的更新行为)）。
+
+以上是常见且较为典型的例子。更多的特殊情况可以参见[Wiki-方块更新](https://zh.minecraft.wiki/w/%E6%96%B9%E5%9D%97%E6%9B%B4%E6%96%B0#NC%E6%9B%B4%E6%96%B0)
+
+[^2]: 红石粉具有更加复杂的更新行为，本篇中不作展开。~~可能后续会追加红石粉专题DLC~~
+
+### 1.3.2 NC更新的性质、QC激活、BUD装置
+
+NC更新最典型的性质是能够使**BUD装置**响应。
+
+一个方块当前的状态与它**本应该的状态**不同时，这个方块就可以称作是一个**BUD装置**，即**方块更新检测器（Block Update Detector）**。这种方块状态也可以称作是**BUD态**。
+
+最典型的BUD装置是一个被充能（受到红石信号）但未被激活（未伸出）的活塞。活塞具有特殊的充能范围，当活塞本身和活塞上方的一个方块（可以为空气）被充能时，活塞就可以被认为被充能。通过充能活塞上方的空气充能活塞，这种充能方式就称为**QC充能**。这样被充能的活塞在受到NC更新后伸出，就称作**QC激活**。
+
+**QC (quasi connectivity)** 称为**半连接性**，活塞、粘性活塞、投掷器、发射器都具有这种性质。
+
+想象一个活塞的斜上方放置了一个红石块，此时这个活塞被QC充能。而红石块的放置只会更新它毗邻的六个方块，无法更新到活塞，所以没有任何方块通知活塞“这里有一个红石信号”。此时这个活塞本应伸出，但却因为没有受到NC更新而没有伸出。也就是*当前的状态与它本应该的状态不同*，即此时这个活塞处于**BUD态**，该活塞就构成了一个**BUD装置**。
+
+此时，如果在活塞边上放置一个方块，方块放置就会发出NC更新。活塞受到NC更新，解除BUD态。
+
+一个最简单常用的可以自行复位的BUD装置如下：
+
+![示例](./img/01-budexample1.gif)
+
+图中的红石块**QC充能**下方粘性活塞，当粘性活塞受到NC更新后伸出，红石块不再充能，而后粘性活塞收回，红石块再次QC充能粘性活塞。[^3]
+
+[^3]: 此处对1.3.2中的BUD装置涉及活塞原理部分作简单展开，读者仅作了解即可。粘性活塞在伸出时没有受到任何NC更新，因此不会中途丢下方块。粘性活塞伸出到位后触发自检，发现没有被充能于是执行收回。收回时由于粘性活塞的方块到位顺序，粘性活塞先到位，此时触发自检但红石块还未到位（处于方块实体状态），红石块后到位。因此粘性活塞不会由于自检而再次伸出。
+
+## 1.4 PP更新
+
+### 1.4.1 PP更新的概念与行为
+
+几乎所有的变化都会发出**PP更新**。除了：
+
+- 使用命令放置方块
+- 使用调试棒改变方块状态
+
+等极其特殊的情况；但还是有一个特例：
+
+- 粘性活塞推动正在激活的侦测器，到位时侦测器不发出PP更新。
+
+> 官方提供的反混淆中PP更新为`updateShape`，即更新形状（例如，各种墙的形状、活板门的开关、红石元件的激活状体改变，都可以称作这里的“形状”），该反混淆名更有益于理解PP更新。PP更新的命名来源于mcp反混淆中是`postPlacement`方法。yarn反混淆中则称为`getStateForNeighborUpdate`
+
+和NC更新不同，PP更新的顺序为**西东北南下上**。
+
+在上文中提到的*不会发出**NC更新***的行为，都是较为典型的发出**PP更新**但不发出**NC更新**的行为。同样，上文中的**BUD装置**无法用来检测**PP更新**。
+
+例如这里的栅栏门状态发生变化，发出pp更新，但并不会被活塞BUD装置检测到
+
+![示例](./img/01-budexample2.gif)
+
+需要注意的是，除了放置与破坏方块外，大部分红石元件的NC更新范围和PP更新范围是不一样的。例如中继器的NC更新范围是输出端及输出端的毗邻（除中继器自身），而其PP更新范围是自身的毗邻。
+
+PP更新可以理解为**自身发生变化**的更新，而NC更新可以理解为**通知可能需要改变状态的方块**的更新。
+
+同样以中继器为例，中继器的亮灭属于**自身发生了变化**，通过PP更新通知自身毗邻的方块。而中继器亮起会充能它输出端的方块，如果输出端的方块能够传递红石信号，这个方块还会再向它的毗邻传递红石信号；所以说中继器的亮起有可能会影响它输出端的方块以及输出端毗邻的方块，因此中继器通过NC更新**通知可能受到影响的方块检查是否要改变状态**。
+
+又例如，当投掷器被激活，投掷物品时，投掷物品这一行为并不会对周围方块造成影响[^4]，因此投掷器激活并不发出NC更新。但是投掷器的确改变了激活状态，这种状态改变使得投掷器发出了PP更新。
+
+[^4]: 不考虑投掷的物品被漏斗吸取。漏斗吸取属于漏斗自身的行为，不受更新控制。
+
+这样，PP更新与NC更新的差异以及它们更新范围的不同就易于理解了。
+
+### 1.4.2 PP更新的性质
+
+既然上文中的BUD装置无法检测PP更新，那么什么装置能够检测（响应）PP更新呢？
+
+答案是——侦测器。侦测器长得像脸的一面为检测PP更新的一面，有红色小点的一面为输出红石信号的一面。
+
+侦测器响应、且仅响应PP更新。[^5]但由于大多数情况NC更新总是伴随PP更新的，所以这里的“仅”可能体现的并不明显。不过我们还是可以通过一些方法来体现：当侦测器直接面向中继器时，中继器亮灭会激活侦测器；但如果侦测器面向中继器输出端指向的方块（空气），中继器的亮灭则不会激活侦测器。这里也很好理解：当中继器指向一个空气时，空气不会有任何变化，因此侦测器自然也不会响应了。
+
+通过BUD装置与侦测器的配合使用，我们可以很方便的在不翻阅源码的情况下测出各个红石元件的NC更新范围和PP更新范围。
+
+[^5]: 消歧义：此处仅从更新类型的角度考虑，侦测器仅在受到PP更新时判断自身是否应当发生变化并执行特定的行为。若认为“响应”指广义的“侦测器发生变化”，那么除侦测器的计划刻行为外，当侦测器被活塞推到位时，它会调用自身的`onBlockAdded`方法，仅当到位位置无侦测器计划刻，并且侦测器原先的状态为亮起时，侦测器会继续在其中调用`setBlockstate`方法，最终状态变为熄灭（不存在计划刻），而原先状态为熄灭的侦测器则不产生任何变化。熄灭的侦测器被活塞到位时添加的计划刻来自于TE对侦测器的“更新”`postProcessState`，实际上最终仍旧调用的是侦测器响应PP的函数`getStateForNeighborUpdate`。
+
+## 1.5 比较器更新
+
+### 1.5.1 比较器更新的概念与行为
+
+顾名思义，比较器更新是专用于更新比较器的更新。
+
+以下行为会发出比较器更新：
+
+- 一般的容器，如箱子、木桶、漏斗等中的物品数量发生变化。信号强度计算方式见下。
+- 更广义上的容器，有“容量”概念的方块例如堆肥桶（信号强度与堆肥等级相等，范围为0\~9）、炼药锅（信号强度与装液体的等级相等，范围为0\~3）。
+- 物品展示框，物品展示框输出的比较器信号强度取决于展示物品的旋转角度，仅输出强度为1\~8的信号。不放置物品时信号强度为0。
+- 讲台，信号强度计算方式见下。
+- 探测铁轨上方有掉落物。
+- 探测铁轨上有带有容器的矿车，如运输矿车（箱子矿车）、漏斗矿车时，矿车内物品数量发生变化时会在20gt后发出比较器更新。信号强度计算方式与一般容器相同。
+- 雕纹书架（1.20+），信号强度与最后一次放置或取出的书的位置相等，第一排为1\~3，第二排为2\~6。
+
+比较器既可以直接检测容器容量，也可以间隔一个可传递红石信号的方块检测容器容量。因此比较器更新的范围为容器水平方向的毗邻范围内的比较器，或二阶毗邻范围内间隔一个可传递红石信号的方块的比较器。比较器更新不会对比较器以外的方块造成更新。
+
+### 1.5.2 比较器信号强度计算
+
+对一般的容器：
+
+- 输出信号强度=对`每个物品槽位填充比例的平均值*14`向下取整，如果容器不是空的，那么输出信号强度再`+1`。即：当容器为空，输出0。当容器不为空，输出容器的平均填充比例到1~15的映射并向下取整。
+
+对讲台：
+
+- 当讲台上不放置书时，输出信号强度为0。
+- 当讲台上放置书且书只有一页时，输出信号强度为15。
+- 当讲台上放置书且书不只有一页时，输出信号强度为`当前页码/总页码*14`向下取整再`+1`。
+- 即：当讲台为空，输出0。当讲台不为空，输出当前页码占总页码的比例到1~15的映射并向下取整。
+
+### 1.5.3 比较器更新检测器（CUD）
+
+一个比较器当前的状态与它**本应该的状态**不同时，这个比较器就构成了一个比较器更新检测器（CUD，Comparator Update Detector）。一个最简单的例子是用比较器间隔一个方块检测一个有填充的堆肥桶，然后用活塞将堆肥桶推走。此时比较器依然有输出信号。
+
+由于其他可复位的CUD结构与涉及原理较为复杂，在此处仅作展示，不作展开。
+
+![粉转向CUD](./img/01-cudexample.png)
+![粉转向CUD的实际运行](./img/cud_running.gif)
+
+> *图为基于红石粉粉转向的CUD。*
+> 
+> 可以看到BUD并未启动，而CUD检测到了漏斗发出的比较器更新。
+
+## 1.6 方块自检
+
+红石元件在被放置时会进行**自检**，即检查自身是否应当改变状态。例如放置一个红石块，然后放置一个中继器，并且这个中继器的输入端紧邻着红石块。此时中继器没有受到更新，但还是亮起了，这就是因为中继器在被放置时进行了**自检**，发现自己应该亮起，于是亮起。
+
+活塞自身到位也可以视作一种“被放置”，因此活塞自身在伸出后到位和拉回后到位也都会进行一次**自检**。
+
+## 1.7【进阶】NC更新与PP更新的调用与响应
+
+### 1.7.1 `setBlockState`函数
+
+`setBlockState`通过一个`bitflags`即`FLAG`控制更新行为，在`World.java`的`World`类中：
+```java
+public boolean setBlockState(BlockPos pos, BlockState state, int flags, int maxUpdateDepth) {
+        ...
+        BlockState blockState = worldChunk.setBlockState(pos, state, (flags & Block.MOVED) != 0);
+        if (blockState != null) {
+            BlockState blockState2 = this.getBlockState(pos);
+            if (blockState2 == state) {
+                ...
+                // 由FLAG控制的NC更新的调用
+                if ((flags & Block.NOTIFY_NEIGHBORS) != 0) {
+                    this.updateNeighbors(pos, blockState.getBlock());
+                    if (!this.isClient && state.hasComparatorOutput()) {
+                        this.updateComparators(pos, block);
+                    }
+                }
+                // 由FLAG控制的PP更新的调用
+                if ((flags & Block.FORCE_STATE) == 0 && maxUpdateDepth > 0) {
+                    int i = flags & ~(Block.NOTIFY_NEIGHBORS | Block.SKIP_DROPS);
+                    blockState.prepare(this, pos, i, maxUpdateDepth - 1);
+                    state.updateNeighbors(this, pos, i, maxUpdateDepth - 1);
+                    state.prepare(this, pos, i, maxUpdateDepth - 1);
+                }
+                ...
+            }
+            return true;
+        }
+        return false;
+    }
+```
+
+### 1.7.2 NC更新的调用与响应
+
+在源码中，NC更新主要通过两种方式调用：
+- `updateNeighbor`及其衍生
+- `flag`中`bit0 = 1`的`setBlockState`
+
+`updateNeighbor`及其衍生，即`updateNeighbor` `updateNeighborsExcept` `updateNeighborsAlways`。
+
+其中`updateNeighbor`是最根本的方法，传入`pos, sourceBlock, sourcePos`三个参数，分别为要更新的方块坐标`pos`，发出更新的方块类型`sourceBlock`和发出更新的方块坐标`sourcePos`。
+
+`updateNeighborsAlways`和`updateNeighborsExcept`通过调用`NeighborUpdater.updateNeighbors`进行更新，在`NeighborUpdater.java`的`NeighborUpdater`实例中：
+```java
+public static final Direction[] UPDATE_ORDER = new Direction[]{Direction.WEST, Direction.EAST, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH};
+
+default public void updateNeighbors(BlockPos pos, Block sourceBlock, @Nullable Direction except) {
+    for (Direction direction : UPDATE_ORDER) {
+        if (direction == except) continue;
+        this.updateNeighbor(pos.offset(direction), sourceBlock, pos);
+    }
+}
+```
+因此NC更新顺序为西东下上北南。
+
+其中在`Block.java`中定义：
+```java
+// 向周围方块广播方块更新事件
+public static final int NOTIFY_NEIGHBORS = 1;
+
+// 提醒需要对此方块改变做出反应的监听器和客户端
+public static final int NOTIFY_LISTENERS = 2;
+
+// 默认的方块变更时行为：与一起启用上述 NOTIFY_NEIGHBORS 和 NOTIFY_LISTENERS同效。
+public static final int NOTIFY_ALL = 3;
+
+// 跳过更新，强制设置方块状态。
+public static final int FORCE_STATE = 16;
+```
+
+对于以上的调用方法，只有调用`updateNeighborsAlways`和`updateNeighborsExcept`的`sourcePOS`和`setBlockState`的`pos`可以称作“更新核”，即以一个方块为中心对毗邻六个方块（或除去某个方向的方块）进行更新的“核”。而`updateNeighbor`是简单直接的“更新”。
+
+仅PP更新时，`FLAG`通常为`NOTIFY_LISTENERS`；同时发出PP更新和NC更新时，`FLAG`通常为`NOTIFY_ALL`。部分覆写了`onBlockAdded`方法的方块具有不同的调用方式，见[下文](#174-红石元件的nc更新与pp更新的调用)
+
+在各个方块中，NC更新由方块的`neighborUpdate`函数响应。
+
+### 1.7.3 PP更新的调用
+
+在源码中，PP更新通过`setBlockState`调用。当`FLAG`的`bit4 = 0`时会产生PP更新。
+
+`state.updateNeighbors`定义在`AbstractBlock.java`的`AbstractBlockState`类中：
+```java
+public final void updateNeighbors(WorldAccess world, BlockPos pos, int flags, int maxUpdateDepth) {
+    BlockPos.Mutable mutable = new BlockPos.Mutable();
+    for (Direction direction : DIRECTIONS) {
+        mutable.set((Vec3i)pos, direction);
+        world.replaceWithStateForNeighborUpdate(direction.getOpposite(), this.asBlockState(), mutable, pos, flags, maxUpdateDepth);
+    }
+}
+```
+其中在`AbstractBlock`中有：
+```java
+protected static final Direction[] DIRECTIONS = new Direction[]{Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH, Direction.DOWN, Direction.UP};
+```
+因此PP更新为西东北南下上。
+
+其中`world.replaceWithStateForNeighborUpdate`：
+```java
+default public void replaceWithStateForNeighborUpdate(Direction direction, BlockState neighborState, BlockPos pos, BlockPos neighborPos, int flags, int maxUpdateDepth) {
+    NeighborUpdater.replaceWithStateForNeighborUpdate(this, direction, neighborState, pos, neighborPos, flags, maxUpdateDepth - 1);
+}
+```
+调用了`NeighborUpdater`中的`replaceWithStateForNeighborUpdate`方法：
+```java
+public static void replaceWithStateForNeighborUpdate(WorldAccess world, Direction direction, BlockState neighborState, BlockPos pos, BlockPos neighborPos, int flags, int maxUpdateDepth) {
+    BlockState blockState = world.getBlockState(pos);
+    BlockState blockState2 = blockState.getStateForNeighborUpdate(direction, neighborState, world, pos, neighborPos);
+    Block.replace(blockState, blockState2, world, pos, flags, maxUpdateDepth);
+}
+```
+最后调用了各个方块`blockState`的`getStateForNeighborUpdate`方法。也就是方块响应PP更新的方法。
+
+### 1.7.4 红石元件的NC更新与PP更新的调用
+
+而对于大多数的红石元件，它们在调用`setBlockState`时通常传入`FLAG=2`，NC更新实际是由`setBlockState`中的`worldChunk.setBlockState`方法调用覆写`@Override`后的`onBlockAdded`方法发出NC更新：
+
+在`worldChunk.setBlockState`中：
+```java
+public BlockState setBlockState(BlockPos pos, BlockState state, boolean moved) {
+    ...
+    if (!this.world.isClient) {
+        state.onBlockAdded(this.world, pos, blockState, moved);
+    }
+    ...
+    return blockState;
+}
+```
+
+而PP更新受`FLAG`控制正常由`setBlockState`调用。
+
+以红石中继器为例，在红石中继器继承的`AbstractRedstoneGateBlock.java`的`AbstractRedstoneGateBlock`中：
+```java
+public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+    if (this.isLocked(world, pos, state)) {
+        return;
+    }
+    boolean bl = state.get(POWERED);
+    boolean bl2 = this.hasPower(world, pos, state);
+    if (bl && !bl2) {
+        world.setBlockState(pos, (BlockState)state.with(POWERED, false), Block.NOTIFY_LISTENERS);
+    } else if (!bl) {
+        world.setBlockState(pos, (BlockState)state.with(POWERED, true), Block.NOTIFY_LISTENERS);
+        if (!bl2) {
+            world.scheduleBlockTick(pos, this, this.getUpdateDelayInternal(state), TickPriority.VERY_HIGH);
+        }
+    }
+}
+
+
+@Override
+public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+    this.updateTarget(world, pos, state);
+}
+
+
+    protected void updateTarget(World world, BlockPos pos, BlockState state) {
+    Direction direction = state.get(FACING);
+    BlockPos blockPos = pos.offset(direction.getOpposite());
+    world.updateNeighbor(blockPos, this, pos);
+    world.updateNeighborsExcept(blockPos, this, direction);
+}
+```
+
+`scheduledTick`为中继器执行计划刻时调用的方法。在中继器执行计划刻时，它会调用`setBlockState`函数，而后由`setBlockState`调用`worldChunk.setBlockState`，在`worldChunk.setBlockState`调用了`@Override`的`onBlockAdded`，对中继器输出端指向的方块及指向方块的毗邻（除中继器自身）产生了NC更新。接着由`setBlockState`调用`state.updateNeighbors`产生了PP更新。
+
+### 1.7.5 NC更新与PP更新的顺序
+
+综上，对于大部分通过`setBlockState`发出更新的方块，都满足先NC更新、后PP更新的顺序。这一点极其重要，它影响了在后续更新中NC更新与PP更新的顺序问题。本篇不对“连续的方块更新”作展开。
+
+### 1.7.6 侦测器的NC与PP更新
+
+**侦测器是一个特例**。它并没有调用`onBlockAdded`方法中的NC更新，而是直接在`scheduledTick`中先调用`setBlockState`发出PP更新，再调用`updateNeighbors`发出NC更新。因此，侦测器在亮起和熄灭是遵循先PP后NC的顺序。
+
+在侦测器的`onBlockAdded`中：
+```java
+@Override
+public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+    if (state.isOf(oldState.getBlock())) {
+        return;
+    }
+    if (!world.isClient() && state.get(POWERED).booleanValue() && !world.getBlockTickScheduler().isQueued(pos, this)) {
+        BlockState blockState = (BlockState)state.with(POWERED, false);
+        world.setBlockState(pos, blockState, Block.NOTIFY_LISTENERS | Block.FORCE_STATE);
+        this.updateNeighbors(world, pos, blockState);
+    }
+}
+```
+其中第一个`if`中的`state.isOf(oldState.getBlock())`用于判断当前位置的方块在被改变状态之前是否还是当前的方块。例如，如果活塞推动了一个侦测器，那么侦测器到位的位置在改变前就是`air`，改变后就是`observer`，此时该函数返回`true`。而一个普通的侦测器在调用这一函数时总是返回`false`。
+
+所以，侦测器的`onBlockAdded`方法在通常情况下都不会执行后续的内容，也就不会由`onBlockAdded`发出NC更新，而是如上文中所说，“直接在`scheduledTick`中先调用`setBlockState`发出PP更新，再调用`updateNeighbors`发出NC更新。”
+
+## 1.8【进阶】方块自检的调用
+
+方块在被放置时会被调用`onPlaced`函数，红石元件在该函数中完成自检。例如红石中继器：
+```java
+@Override
+public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
+    if (this.hasPower(world, pos, state)) {
+        world.scheduleBlockTick(pos, this, 1);
+    }
+}
+```
+
+活塞自检的源码不在本篇讨论范围内。
+
+# 1.9【进阶】更新行为的控制
+ServerWorld.setBlockState方法中，一个整数参数被传入：flag
+这个flag实际上被视为一个9位二进制码，这9位中，每一位都控制了不同的行为
+
+<style>
+.binary {
+    font-family: monospace;
+}
+.binary-0 {
+    color: #888888; 
+}
+.binary-1 {
+    color: #FFFFFF;
+    background-color: #333333; 
+}
+</style>
+
+## 1.9.1 flag的9位标志定义
+- **Bit 0**: 发出邻居更新。
+- **Bit 1**: 通知监听器（服务器和客户端）。
+- **Bit 2**: 抑制客户端渲染。
+- **Bit 3**: 强制客户端同步重绘。
+- **Bit 4**: 强制状态存储。
+- **Bit 5**: 阻止物品掉落。
+- **Bit 6**: 标记活塞移动。
+- **Bit 7**: 光照更新。
+- **Bit 8**: 出发行为副作用。
+
+## 1.9.2 常量解释
+Block.java中定义了多个更新行为，他们分别是
+
+| 常量 | 值 | 二进制 (9 位) | 行为 | 用途 |
+|------|-----|---------------|------|------|
+| `NOTIFY_NEIGHBORS` | 1 | <span class=""binary""><span class=""binary-0"">00000000</span><span class=""binary-1"">1</span></span> | 触发周围方块更新 | 俗称NC更新|
+| `NOTIFY_LISTENERS` | 2 | <span class=""binary""><span class=""binary-0"">0000000</span><span class=""binary-1"">1</span><span class=""binary-0"">0</span></span> | 通知服务器和客户端监听器 | 同步状态 |
+| `NO_REDRAW` | 4 | <span class=""binary""><span class=""binary-0"">000000</span><span class=""binary-1"">1</span><span class=""binary-0"">00</span></span> | 阻止客户端重绘（与 `NOTIFY_LISTENERS` 配合） | 不可见更新|
+| `REDRAW_ON_MAIN_THREAD` | 8 | <span class=""binary""><span class=""binary-0"">00000</span><span class=""binary-1"">1</span><span class=""binary-0"">000</span></span> | 强制客户端同步重绘 | 方块外观变化 |
+| `FORCE_STATE` | 16 | <span class=""binary""><span class=""binary-0"">0000</span><span class=""binary-1"">1</span><span class=""binary-0"">0000</span></span> | 绕过虚拟状态，直接存储指定状态 | 强制更换方块|
+| `SKIP_DROPS` | 32 | <span class=""binary""><span class=""binary-0"">000</span><span class=""binary-1"">1</span><span class=""binary-0"">00000</span></span> | 阻止容器方块破坏时掉落物品 | 命令替换等 |
+| `MOVED` | 64 | <span class=""binary""><span class=""binary-0"">00</span><span class=""binary-1"">1</span><span class=""binary-0"">000000</span></span> | 标记方块由活塞移动 | 活塞推动/拉动逻辑 触发|
+| `SKIP_REDSTONE_WIRE_STATE_REPLACEMENT` | 128 | <span class=""binary""><span class=""binary-0"">0</span><span class=""binary-1"">1</span><span class=""binary-0"">0000000</span></span> | 跳过红石线状态替换 | - |
+| `SKIP_BLOCK_ENTITY_REPLACED_CALLBACK` | 256 | <span class=""binary""><span class=""binary-1"">1</span><span class=""binary-0"">00000000</span></span> | 跳过方块实体替换回调 | -|
+| `SKIP_BLOCK_ADDED_CALLBACK` | 512 | <span class=""binary""><span class=""binary-1"">1</span><span class=""binary-0"">000000000</span></span> | 跳过自检 | 不触发 `onBlockAdded` |
+| `SKIP_REDRAW_AND_BLOCK_ENTITY_REPLACED_CALLBACK` | 260 | <span class=""binary""><span class=""binary-1"">1</span><span class=""binary-0"">00000</span><span class=""binary-1"">1</span><span class=""binary-0"">00</span></span> | 组合 `NO_REDRAW` 和 `SKIP_BLOCK_ENTITY_REPLACED_CALLBACK` | 最小化更新，跳过渲染和实体回调 |
+| `NOTIFY_ALL` | 3 | <span class=""binary""><span class=""binary-0"">0000000</span><span class=""binary-1"">11</span></span> | 组合 `NOTIFY_NEIGHBORS` 和 `NOTIFY_LISTENERS` | 默认完整服务器端更新 |
+| `NOTIFY_ALL_AND_REDRAW` | 11 | <span class=""binary""><span class=""binary-0"">00000</span><span class=""binary-1"">1</span><span class=""binary-0"">0</span><span class=""binary-1"">11</span></span> | 组合 `NOTIFY_ALL` 和 `REDRAW_ON_MAIN_THREAD` | 服务器更新并强制客户端重绘 |
+| `FORCE_STATE_AND_SKIP_CALLBACKS_AND_DROPS` | 816 | <span class=""binary""><span class=""binary-1"">11</span><span class=""binary-0"">00</span><span class=""binary-1"">11</span><span class=""binary-0"">0000</span></span> | 组合 `FORCE_STATE`, `SKIP_DROPS`, `MOVED`, `SKIP_BLOCK_ADDED_CALLBACK` | 强行变更，跳过自检和掉落 |"
+BlockUpdate/连续的方块更新及其分析方法,"# #02 连续的方块更新及其分析方法
+![一条奇怪的更新链](./img/UpdateOrder.jpg)
+本部分将教学Minecraft中更深层次的更新机制，以及如何分析更新顺序
+
+**基础部分**
+- 方块的一般更新行为
+- 理解栈、认识深度优先搜索
+- 将三维空间的DFS抽象为树结构的DFS的分析方法
+- 铁轨的更新顺序实例分析
+
+**进阶部分**
+- 一般栈（1.18及以前）和人工栈（1.19及以后）
+- CCE更新抑制的原理
+- 粉板更新抑制的原理
+- OOM更新抑制的原理
+
+## 2.1 方块的一般更新行为
+
+一般情况下，方块总是以**先NC更新、后PP更新**的顺序发出更新。要深入理解更新理论，必须清楚一个概念：**更新不是一个单一的事件，而是一段“过程”**。
+
+示意图如下：
+```
+方块A：
+├── 发出NC更新
+│   ├── NC更新触发了一些事件
+│   │   └── 这些事件又触发了一些事件
+│   └── 这些事件运行结束了
+│   * NC更新完成 *
+└── 发出PP更新
+    ├── PP更新触发了一些事件
+    └── 这些事件运行结束了
+    * PP更新完成 *
+```
+例如，当方块A发出NC更新后，更新到方块B，此时B改变状态，又发出NC更新。更新过程如下：
+```
+├── 方块A 发出NC更新
+│   ├── 方块B 受到NC更新
+│   ├── 方块B 状态改变
+│   ├── 方块B 发出NC更新
+│   │   └── 什么都没有发生
+│   │   * 方块B NC更新完成 *
+│   └── 方块B 发出PP更新
+│       └── 什么都没有发生
+│       * 方块B PP更新完成 *
+│   * 方块A NC更新完成 *
+└── 方块A 发出PP更新
+    └── 什么都没有发生
+    * 方块A PP更新完成 *
+```
+一般讨论的**NC更新顺序**指的是**发出NC更新的先后次序**，**PP更新顺序**同理，也是**发出PP更新的顺序**。从上文中的示意和例子我们可以看出，在较为复杂的更新中，PP更新顺序也可以近似认为是**方块NC更新过程结束的先后次序**。
+
+## 2.2 Minecraft中的更新方法
+
+我们将通过一些生动形象的简单例子，让你循序渐进地理解更新这一复杂过程是如何发生的。
+
+例如下面这串bud铁轨为例，更新其中的A1会怎样发生什么样的事情呢
+
+![示例](./img/02-example0.png)
+
+### 2.2.1  更新顺序的分析方法
+
+~~想要理解更新，我们就需要先抛开更新不谈~~
+
+想象一下，你是一个强迫症，此时此刻你正拿着许多火把在一个矿洞。
+
+由于你是强迫症，你将完全遵循以下规则：
+
+1. 你走到每一格都会插一根火把
+2. 每走一个格就按照**西东下上北南**的顺序寻找有没有格子
+3. 如果有格子可走，就立刻进入
+4. 无路可走的时候就往回走
+5. 走回头路的时候会捡回放下火把
+6. 走回岔路口的时候如果还有**其他方向**没检查完就继续检查
+
+按照上面的规则，我们来看一下下面这个矿洞你会如何探索
+
+![矿洞类比](./img/02-example.png)
+
+<style>
+NC{ color: Red }
+PP{ color: Lightblue}
+</style>
+
+1. 最开始，你位于在A1，于是你在A1<NC>插下火把</NC>
+2. 你开始按照**西东下上北南**的顺序寻找岔路，你发现西方有一格可走
+3. 你进入这个格子（B1），<NC>插下火把</NC>，继续检查→发现西方有路，进入C1，<NC>插火把</NC>，检查→西方有路，进入D1，<NC>插火把</NC>
+4. 哎，这个时候你按照西东下上北南的顺序检查完发现没路了，于是你收起火把往回走（进入C1）
+5. 西你检查过了，于是检查东下上北南，发现没路，<PP>收火把</PP>，回到B1
+6. 东下上都没路可走，但是当你检查到北的时候你发现有路，于是进入（C2），<NC>插火把</NC>
+7. 检查完发现没路，<PP>收火把</PP>回到B1
+8. B1检查完没路，<PP>收火把</PP>回到A1,你开始检查其他方向
+9. ！东方有路，进入B3插火把→东方有路，进入C3插火把
+10. 无路可走了，<PP>收火把</PP>回B3 →没路，<PP>收火把</PP>回A1
+11. 检查剩余方向，南方有路，进入B4，插火把
+12. 无路，<PP>收火把</PP>回A1
+13. A1无剩余岔路，<PP>收起火把</PP>，探索完毕
+
+这个探索矿洞的过程就是更新的过程，其中<NC>“插火把”</NC>是发出NC更新（入栈），<PP>收火把</PP>是发出PP更新（出栈）。至于这个“栈”是什么意思，你可以参阅[附录-专有名词解释→栈与调用栈](../Appendix/01-栈.md),而这种更新方法就是深度优先搜索（DFS）
+
+**推荐搭配 [BiliBili-tanh_Heng：NC更新×深度优先搜索.exe](https://www.bilibili.com/video/BV1p481z4EBi) 食用**
+
+让我们用一种更加形象的方式理解例子中的更新过程。我们可以将NC更新的入栈看作“逐步深入”，NC更新的出栈，也就是PP更新看作“逐步返回”。那么，让我们将上文中的图画得更加形象一些，并且再多加入一些节点：
+
+![节点图](./img/02-DFS.png)
+
+*图中为A1发出更新后的更新链。上方为北侧。*
+
+从图中就能够很好地看出：
+
+NC更新顺序：`A1->B1->C1->D1->C2->B3->C3->B4`
+
+PP更新顺序：`D1->C1->C2->B1->C3->B3->B4->A1`
+
+将更新行为想象为一个点，这个点从A1出发，按照一定的更新顺序移动，并且“不撞南墙不回头”。那么，这个点的移动路径就构成了图示的箭头。逐步深入的过程就是入栈或NC更新，“回头”的过程就是出栈或PP更新。
+
+需要注意的是，这里的分析将PP更新简化了。因为通常情况下，PP更新并不会导致**连续的方块更新**[^1]。要分析PP更新，方法和NC更新是类似的，从栈的角度分析即可。
+
+[^1]: 墙、栅栏等元件在受到PP更新后改变状态，并发出PP更新，这类方块可能会触发由PP更新导致的连续的方块更新。但这不在通常需要分析的情况内。
+
+## 2.3 常见的更新顺序分析
+
+## 2.3.1 BUD铁轨链更新顺序分析
+
+让我们以一个实例来尝试分析更新顺序
+
+![铁轨实例](./img/02-example1.png)
+
+已知铁轨在状态改变时，先发出NC更新，后发出PP更新。图中是一串处于BUD状态的铁轨链，1-5铁轨位于东西走向。问：**音符盒按下后，铁轨熄灭的NC更新和PP更新顺序分别是？**
+
+当音符盒按下后，发出NC更新。毗邻的1号铁轨受到NC更新，改变自身状态，发出NC更新，更新到2号、再到3和4。在4号铁轨处，4号铁轨先对东西侧的5号铁轨更新。5号铁轨受到更新后改变自身状态，发出NC更新，不再有后续NC更新，于是5号铁轨此时发出PP更新。退回到4号铁轨，4号铁轨再更新南北侧6、7号铁轨。深入到6号铁轨，6号铁轨发出NC更新；再深入到7号铁轨，7号铁轨发出NC更新。7号铁轨更新结束，发出PP更新。退回到6号铁轨，6号铁轨发出PP更新。退回到4号铁轨，4号铁轨发出PP更新。再退回到3、2、1号铁轨，3、2、1号铁轨发出PP更新。
+
+所以，
+
+NC更新顺序为：<hidden>1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7<hidden>
+
+PP更新顺序为：<hidden>5 -> 7 -> 6 -> 4 -> 3 -> 2 -> 1<hidden>
+
+## 2.3.2 考虑NC更新方向的分析*
+
+此部分并不常用，读者可选择性跳过。
+
+![铁轨实例2](./img/02-example2.png)
+
+图中铁轨链方向如标注所示，铁轨链为南北向。我们以最北端的铁轨为例分析其不同方向的NC更新顺序。
+
+NC更新按照西东下上北南的方向顺序发出。当最北侧铁轨熄灭时，它先发出西侧、东侧更新，无事发生；再发出下侧、上侧更新，无事发生；然后发出北侧更新，无事发生；最后发出南侧更新，更新到南侧铁轨，后续更新即可按上文中的方法分析。
+
+假如我们在该铁轨北侧制作一个BUD装置，那么这个BUD装置会先被更新，然后南侧铁轨再进行连续的NC更新。
+
+而如果我们考虑**对六个方向的NC更新中，对上侧方块的NC更新**的顺序，那么它就是**自北向南**，即**由近到远**。
+
+让我们再考虑到2.3.1中的例子
+
+![铁轨实例](./img/02-example1.png)
+
+音符盒为1-5铁轨链的最西侧，仅考虑1-5铁轨链的NC更新。
+
+当音符盒按下后，1号铁轨受到更新而熄灭，先发出西侧更新，无事发生；再发出东侧更新，更新到2号铁轨，2号铁轨开始更新……等到2、3、4……铁轨更新结束后，1号铁轨的**东侧NC更新**完成，1号铁轨继续更新下侧、上侧、北侧、南侧。
+
+此时如果我们考虑**对上侧方块的NC更新**的顺序，它就变成了5、4、3、2、1，也就是**由远到近**。
+
+那么读者可能就会想问：既然NC更新的顺序还要考虑方向性，我们学习2.3.3的发出NC更新顺序又有什么用呢？
+
+用处有二：
+
+1. 用于分析PP更新。通常我们使用铁轨链时，多用侦测器来观测，因此这实际上是为了帮助我们分析PP更新的。
+2. NC更新的方向性是在2.3.3的基础之上的，只有理解了2.3.3才能更好的理解方向性。
+
+## 2.3.3 练习
+
+上文中的第二个例子我们并没有考虑6、7号铁轨。读者可尝试分析考虑6、7号铁轨时，整个BUD铁轨链对**对上侧方块的NC更新**的顺序。
+
+答案：<hidden>5 -> 4 -> 6 -> 7 -> 3 -> 2 -> 1</hidden>"
+BlockUpdate/特殊的更新行为,"# #03 特殊的更新行为
+![部分特殊的更新范围](./img/SpecialUpdates.jpg)
+本部分将介绍一些方块的特殊的更新行为
+
+**基础部分**
+
+- 红石粉的更新简述
+- 斜侧铁轨的更新
+
+**进阶部分**
+
+- 详谈红石粉的更新及其代码解析
+- 铁轨链的递归检查行为
+
+## 3.1 红石粉的更新行为
+
+### 3.1.1 二阶毗邻更新的概念
+
+在[#01](./01-更新概念与不同类型的更新.md)中，我们引入了NC更新的“更新源”的概念，最普通常见的方块更新：例如放置、破坏方块产生的更新，都是以变化方块的位置为更新源，向六个方向发出NC更新的，这种就可以称作“一阶毗邻更新”。
+
+而红石粉则不然。举例来说，在红石粉的能量等级发生变化时，会发出“二阶毗邻更新”，指的是：红石粉以自身位置和自身毗邻的六个方块分别为更新源，分别向六个方向发出NC更新。
+
+“一阶”与“二阶”的命名，是由最远受到NC更新的方块距离发出更新方块的曼哈顿距离[^1]得来的。一阶毗邻更新即最远受到NC更新的方块距离发出更新方块的曼哈顿距离为1，二阶毗邻更新即该距离为2。
+
+[^1]: 曼哈顿距离，即两坐标在各坐标轴上的距离的和，在Minecraft的三维空间中有`d=|x|+|y|+|z|`
+
+### 3.1.2 红石粉二阶毗邻更新的更新源顺序（红石粉更新的位置性）
+
+红石粉在发出二阶毗邻更新时，7个更新源的先后顺序是基于红石粉坐标的哈希信息随机排列的，其顺序见下表。这也就是红石粉更新具有位置性的由来。这些更新源有97%的概率被分为三组（`-Y, +Z, +X`、`O`、`+Y, -Z, -X`），并以如下顺序发出更新：
+
+*注：表中O表示源红石粉，-X等表示更新源相对于源红石粉的方位*
+
+| 先 | 然后 | 最后 | 这种顺序的概率 |
+| :---: | :---: | :---: | :---: |
+| -Y, +Z, +X | O | +Y, -Z, -X | 24.267% |
+| +Y, -Z, -X | O | -Y, +Z, +X | 24.267% |
+| O | -Y, +Z, +X | +Y, -Z, -X | 12.133% |
+| O | +Y, -Z, -X | -Y, +Z, +X | 12.133% |
+| -Y, +Z, +X | +Y, -Z, -X | O | 12.133% |
+| +Y, -Z, -X | -Y, +Z, +X | O | 12.133% |
+||其他各项||<0.2%|
+
+各组别内的更新顺序是固定的，但组别排列顺序随机。除此之外，还有一些其他的概率极低的排列选项。
+
+## 3.2 【进阶】斜侧铁轨的更新行为
+
+### 3.2.1 简述
+
+斜放的动力铁轨（`PoweredRailBlock`）的激活状态（`powered=true|false`）变化时，它会按如下顺序依次发出两组更新：
+1. 第一组：依次以上方方块、自身、下方方块为更新核发出NC更新。
+2. 第二组：依次以自身、以下方方块、以上方方块为更新核发出NC更新。
+
+### 3.2.2 代码走读
+
+#### 调用栈如下：
+```perl
+PoweredRailBlock.updateBlockState(...)
+├── world.setBlockState(pos, ..., 3) // pos, flags=3
+│   ├── worldChunk.setBlockState(...)
+│   │   └── PoweredRailBlock.onStateReplaced(...)
+│   │         ├── world.updateNeighborsAlways(pos.up(), this)   // 1.1 上方
+│   │         ├── world.updateNeighborsAlways(pos, this)        // 1.2 自身
+│   │         └── world.updateNeighborsAlways(pos.down(), this) // 1.3 下方
+│   └── world.updateNeighbors()     // 2.1 自身
+├── world.updateNeighborsAlways(pos.down(), this)   // 2.2 下方
+└── world.updateNeighborsAlways(pos.up(), this)     // 2.3 上方
+```
+
+#### 源码简析如下：
+```java
+protected void updateBlockState(BlockState state, World world, BlockPos pos, Block neighbor) {
+    boolean bl = (Boolean)state.get(POWERED);
+    boolean bl2 = world.isReceivingRedstonePower(pos) || this.isPoweredByOtherRails(world, pos, state, true, 0) || this.isPoweredByOtherRails(world, pos, state, false, 0);
+    if (bl2 != bl) {
+        world.setBlockState(pos, (BlockState)state.with(POWERED, bl2), 3); // 2.1 自身
+        world.updateNeighborsAlways(pos.down(), this); // 2.2 下方
+        if (((RailShape)state.get(SHAPE)).isAscending()) {
+            world.updateNeighborsAlways(pos.up(), this); // 2.3 仅斜铁轨 上方
+        }
+    }
+}
+
+// 见调用栈，由于setBlockState先调用到onStateReplaced然后再updateNeighbors
+// 所以先执行这一组NC更新，然后再以自身为更新源发出NC更新，即上文中标注的2.1
+public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+    if (!moved) {
+        super.onStateReplaced(state, world, pos, newState, moved);
+        if (((RailShape)state.get(this.getShapeProperty())).isAscending()) {
+            world.updateNeighborsAlways(pos.up(), this); // 1.1 仅斜铁轨 上方
+        }
+
+        if (this.forbidCurves) { // 所有不能弯曲的铁轨 也就是除了普通铁轨
+            world.updateNeighborsAlways(pos, this); // 1.2 自身
+            world.updateNeighborsAlways(pos.down(), this); // 1.3 下方
+        }
+
+    }
+}
+```
+
+## 3.3【进阶】红石粉的更新及其代码解析
+
+## 3.4【进阶】铁轨链的递归检查行为
+
+### 3.4.1 简述
+
+铁轨在接受到NC更新时会检测自身充能状态。当满足以下两个条件之一时，它将会判断自己被激活`powered=true`：
+1. 直接接收到红石信号，即被直接充能
+2. 由相连的其他铁轨充能，即被间接充能
+
+铁轨检查自身是否被间接充能并不是检测相连铁轨是否被充能，而是递归寻找整条铁轨链上距离自身8个铁轨及以内的 *(若认为直接相连的两个铁轨的距离为1个铁轨)*、被直接充能的铁轨，过程如下： 
+1. 初始时距离变量为`0`。若`距离=8`，则终止检查并返回`False`，即不被间接充能。
+2. 铁轨具有两个方向，当开始检查时，铁轨先检查哪一个方向由一个布尔值控制。当布尔值为`True`时，且当铁轨形状为南北/东西朝向时，它检查南/西侧铁轨；当铁轨形状是上下斜向`shape=ascending_*`时，它检查南侧上方/西侧上方的铁轨。当布尔值为`False`时反之。此布尔值在开始检查时先为`True`，后为`False`。且由于逻辑运算短路[^2]：若第一次布尔值为`True`时检查成功，则不会进行第二次布尔值为`False`的检查。在递归检查过程中 *(见步骤6)* 此布尔值不会改变。
+3. 移动坐标`(i, j, k)`到接下来要检查的铁轨位置。
+4. 判断当前铁轨能否可能在当前检查方向上与当前方向的下方的一个铁轨相连。若当前铁轨为向东/西/南/北侧向上，且检查方向为东/西/南/北，则认为不能。此步骤是为步骤8准备的。例如：当前铁轨为北侧向上，此时在向南侧检查，则此铁轨可能与南侧下方的铁轨相连；当前铁轨为北侧向上，此时在向北侧检查，则此铁轨不可能与南侧下方的铁轨相连。
+5. 若当前铁轨形状为南侧向上/北侧向上或东侧向上/西侧向上，则认为当前铁轨形状为南北朝向或东西朝向——这一形状更改是为下一步骤 *(6.b.)* 准备的。
+6. 检查坐标`(i, j, k)`：
+    1. 检查当前位置是否是一个铁轨，如果不是，则返回`False`，结束当前步骤检查。
+    2. 检查当前位置是否与原铁轨相连。此步骤并不检查“相连”，而是检查“不相连”：若原铁轨形状为东西朝向，则若当前铁轨形状为南北/北侧向上/南侧向上，则不相连，返回`False`，结束步骤6检查。若原铁轨为南北朝向，则若当前铁轨形状为东西/东侧向上/西侧向上，则不相连，返回`False`，结束当前步骤检查。
+    3. 步骤i.ii.实际都是iii.iv.的前置条件。此步骤检查当前位置的铁轨是否被直接充能，如果是，则返回`True`，结束当前步骤检查。  
+    4. 跳至步骤1，距离增加`1`，并按照开始检查的布尔值进行下一个铁轨的检查 *(递归)* 。
+7. 若步骤6返回`True`，则终止检查并返回`True`。
+8. *(见步骤4判断)* 若当前铁轨可能在当前检查方向上与当前方向的下方的一个铁轨相连，那么检查坐标`(i, j, k)`下方的方块，即跳至步骤6，但检查的坐标为`(i, j-1, k)`。在步骤4的例子中，若步骤3返回`False`，那么此时将检查原铁轨南侧下方的铁轨。
+
+[^2]: 逻辑运算短路，计算机进行逻辑判断语句时的一种“熔断”机制。例如`A and B`中，若A不成立，则逻辑判断熔断，返回`False`，不再判断B是否成立；`A or B`中，若A成立，则逻辑判断熔断，返回`True`，不再判断B是否成立。
+
+### 3.4.2 代码走读
+
+```java
+// 这是起始点
+@Override
+protected void updateBlockState(BlockState state, World world, BlockPos pos, Block neighbor) {
+    boolean bl2;
+    boolean bl = state.get(POWERED);
+    boolean bl3 = bl2 = world.isReceivingRedstonePower(pos) || this.isPoweredByOtherRails(world, pos, state, true, 0) || this.isPoweredByOtherRails(world, pos, state, false, 0);
+    // 逻辑运算短路说的是这里bl3。
+    // 如果被直接充能，那么直接结束。否则先bl=true，后false。见后
+    if (bl2 != bl) {
+        world.setBlockState(pos, (BlockState)state.with(POWERED, bl2), Block.NOTIFY_ALL);
+        world.updateNeighborsAlways(pos.down(), this);
+        if (state.get(SHAPE).isAscending()) {
+            world.updateNeighborsAlways(pos.up(), this);
+        }
+    }
+}
+
+// 便于区分，这块函数标记为isPoweredByOtherRails（01）
+protected boolean isPoweredByOtherRails(World world, BlockPos pos, BlockState state, boolean bl, int distance) {
+    // bl, 即上文中控制“先检查哪一方向”的布尔值
+    if (distance >= 8) {
+        return false;
+    }
+    int i = pos.getX();
+    int j = pos.getY();
+    int k = pos.getZ();
+    boolean bl2 = true;
+    RailShape railShape = state.get(SHAPE);
+    switch (railShape) { // 根据当前铁轨形状移位检查，由bl可知铁轨递归检查总是先检查-x（西）或+z（南）方向
+        case NORTH_SOUTH: {
+            if (bl) {
+                ++k; // 铁轨南北向，则先z增（向南）
+                break;
+            }
+            --k; // 若南侧检查失败则z减（回过来向北），若南侧成功则熔断不再向北
+            break;
+        }
+        case EAST_WEST: {
+            if (bl) { // 同上，铁轨东西向，则先x减（向西）
+                --i;
+                break;
+            }
+            ++i; // 同上，x增（向东）
+            break;
+        }
+        case ASCENDING_EAST: { // 铁轨东侧上升，即东高西低的斜铁轨
+            if (bl) {
+                --i; // 因为西低，所以-x西侧可能存在同y的铁轨连接
+            } else {
+                ++i; // 因为东高，所以+x东侧不可能存在同y的铁轨连接
+                ++j; // 所以y+1，东侧若有连接那么铁轨必然高1格
+                bl2 = false; // 上文中步骤4的“当前铁轨能否可能在当前检查方向上与当前方向的下方的一个铁轨相连”的判断，这一判断默认是成立的。
+                // 举例来说，一个y=1的平放铁轨，如果边上有一个下降的铁轨与它相连，那么这个铁轨一定比它低一格。
+                // 而此时检查东侧，因为东高，所以不可能东侧有低一格的铁轨相连。判断变为false
+            }
+            railShape = RailShape.EAST_WEST; // 上文种步骤5的形状更改
+            break;
+        }
+        case ASCENDING_WEST: { // 同理
+            if (bl) {
+                --i;
+                ++j;
+                bl2 = false;
+            } else {
+                ++i;
+            }
+            railShape = RailShape.EAST_WEST;
+            break;
+        }
+        case ASCENDING_NORTH: { // 同理
+            if (bl) {
+                ++k;
+            } else {
+                --k;
+                ++j;
+                bl2 = false;
+            }
+            railShape = RailShape.NORTH_SOUTH;
+            break;
+        }
+        case ASCENDING_SOUTH: { // 还是同理
+            if (bl) {
+                ++k;
+                ++j;
+                bl2 = false;
+            } else {
+                --k;
+            }
+            railShape = RailShape.NORTH_SOUTH;
+        }
+    }
+    if (this.isPoweredByOtherRails(world, new BlockPos(i, j, k), bl, distance, railShape)) {
+        return true;
+        // 注意这里调用的不是当前代码块的这一函数。java有通过入参类型匹配不同函数的性质。
+        // 这里调用的是下文中的isPoweredByOtherRails（02）
+    }
+    return bl2 && this.isPoweredByOtherRails(world, new BlockPos(i, j - 1, k), bl, distance, railShape);
+    // 同上，调用的也是（02）
+    // 这里的bl2也就对应上文中步骤8。j-1也就是y坐标向下移了一格。
+}
+
+// 便于区分，这块函数标记为isPoweredByOtherRails（02）
+protected boolean isPoweredByOtherRails(World world, BlockPos pos, boolean bl, int distance, RailShape shape) {
+    // 这里RailShape shape是调用这一函数的铁轨的shape，也就是上一个铁轨的shape
+    BlockState blockState = world.getBlockState(pos);
+    if (!blockState.isOf(this)) { // 略
+        return false;
+    }
+    RailShape railShape = blockState.get(SHAPE); // 略
+    if (shape == RailShape.EAST_WEST && (railShape == RailShape.NORTH_SOUTH || railShape == RailShape.ASCENDING_NORTH || railShape == RailShape.ASCENDING_SOUTH)) {
+        return false; // 上一个铁轨与当前铁轨不相连，那么不可能被简介充能。对应步骤6.ii.
+        // 在isPoweredByOtherRails（01）中也就是上文步骤5有形状更改，形状更改的影响在这里就体现了
+        // 盲猜本意是为了便于检查，但是这导致斜铁轨由于被改变形状了，导致一个平铁轨可能与看似不相连的斜铁轨判断为相连
+        // 而且这种判断是单向的，因为铁轨递归判断不存在+y的行为。例子见后图
+    }
+    if (shape == RailShape.NORTH_SOUTH && (railShape == RailShape.EAST_WEST || railShape == RailShape.ASCENDING_EAST || railShape == RailShape.ASCENDING_WEST)) {
+        return false; // 同上
+    }
+    if (blockState.get(POWERED).booleanValue()) { // 如果铁轨是亮的（这里不是“被直接/间接”充能的判断，而是只要铁轨是亮的就行（nbt中powered=true）
+        if (world.isReceivingRedstonePower(pos)) {
+            return true; // 一直到找到被直接充能的铁轨才结束。这里就是整个递归判断为true的返回点
+        }
+        return this.isPoweredByOtherRails(world, pos, blockState, bl, distance + 1);
+        // 这里回到isPoweredByOtherRails（01），distance+1，递归。
+    }
+    return false;
+}
+```
+![图](./img/03-poweredrailblock.png)
+
+*一个平铁轨可能与看似不相连的斜铁轨判断为相连。同样的结构若红石块直接充能平铁轨则斜铁轨不会被充能*
+
+## 3.5 【进阶】亮起侦测器到位无毗邻NC更新
+
+当活塞推动一个亮起的侦测器到位、且到位位置无侦测器计划刻时，它不会对毗邻方块（除输出端指向的方块）发出常规意义上由活塞推动触发的NC更新（*指通常情况下活塞推动一般方块到位后，会在方块到位位置发出由`flags=3`的`setBlockState`触发的NC更新*），原理如下：
+
+1. 到位分两种情况：
+    1. 一般到位：调用`PistonBlockEntity.tick`，其中调用`setBlockState`，`flags=67`
+    2. 强制到位：调用`PistonBlockEntity.finish`，其中调用`setBlockState`，`flags=3`
+2. 在`setBlockState`中调用`worldChunk.setBlockState`，然后调用`onBlockAdded`
+3. 在`ObserverBlock.onBlockAdded`中：
+    1. 判断当前位置的旧方块是否为侦测器，由于旧方块是b36，判断`true`，下一步
+    2. 判断自身是否激活且当前位置无侦测器计划刻，由于自身亮起`powered=true`且当前位置无侦测器计划刻，判断`true`，下一步
+    3. `setBlockState`，`flags=18`，将自身激活状态变为`powered=true -> powered=false`，且发出PP更新
+    4. 发出常规的侦测器的NC更新，即对输出端指向的方块及指向方块的毗邻方块发出NC更新
+4. 由于在步骤3.iii.中，侦测器`powered`属性改变，此时继续步骤1的`setBlockState`，但由于`blockState2 == state`即前后状态是否一致为`false`，`setBlockState`不再发出常规的NC更新，而是直接结束
+
+调用栈如下：
+```perl
+PistonBlockEntity.tick(...) | PistonBlockEntity.finish(...)
+└── world.setBlockState(pos, state, flags=67) | world.setBlockState(pos, state, flags=3)
+    ├── // state: Block{minecraft:observer}[facing=..., powered=true]
+    ├── worldChunk.setBlockState(pos, state, (flags & 64) != 0)
+    │   ├── BlockState blockState = chunkSection.setBlockState(j, k, l, state); // Block{minecraft:moving_piston}[..]
+    │   └── state.onBlockAdded(this.world, pos, blockState, moved)
+    │       └── ObserverBlock.onBlockAdded(state, this.world, pos, oldState, moved)
+    │           ├── if (!state.isOf(oldState.getBlock())): // true
+    │           │   // state: Block{minecraft:observer}[...], oldState: Block{minecraft:moving_piston}[..]
+    │           │   └── if (!world.isClient() && (Boolean)state.get(POWERED) && !world.getBlockTickScheduler().isQueued(pos, this)): // true
+    │           │       ├── world.setBlockState(pos, state.with(powered=false), flags=18)
+    │           │       │   ├── 状态变为 powered=false
+    │           │       │   └── 发出PP更新
+    │           │       └── this.updateNeighbors(world, pos, blockState) // 对输出端指向及指向的毗邻发出NC更新
+    │           └── return
+    ├── BlockState blockState2 = getBlockState(pos) // Block{minecraft:observer}[facing=..., powered=false]
+    └── if (blockState2 == state): // false，powered不同
+        └── 跳过NC更新和PP更新，结束
+
+```"
+BlockUpdate,"# #00 引言
+
+## 概述
+
+本章旨在深入浅出地从表现和代码两方面分析Minecraft中的更新行为，主要解释包括NC更新、PP更新、其他类型更新、深度优先搜索与更新链等概念。每一部分都将分为基础解释与进阶的源码分析。
+
+## 目录
+
+- [#00](./00-导论.md) 导论
+- [#01](./01-更新概念与不同类型的更新.md) 更新概念与不同类型的更新
+- [#02](./02-连续的方块更新及其分析方法.md) 连续的方块更新及其分析方法
+- [#03](./03-特殊的更新行为.md) 特殊的更新行为"
+Components&Features/铁轨,"# #01 铁轨
+
+## 1.1 铁轨的更新
+
+除普通铁轨外，特殊铁轨（动力铁轨、激活铁轨、探测铁轨）都具有特殊的更新范围。
+
+### 1.1.1 动力铁轨/激活铁轨的更新
+
+动力铁轨和激活铁轨的更新行为是完全一致的。[^1]
+
+[^1]: 动力铁轨和激活铁轨都由`PoweredRailBlock`类实现，因此它们在源码层面的行为完全相同。两者对矿车产生的不同效果，是由矿车自身进行判断和处理的，而不是由铁轨决定的。
+
+当动力铁轨/激活铁轨的激活状态改变时，它将以这些位置为更新核按序发出NC更新：
+1. 上方一格（如果铁轨是倾斜的）
+2. 自身
+3. 下方一格
+4. 自身
+5. 下方一格
+6. 上方一格（如果铁轨是倾斜的）
+
+也就是说，对平放的动力铁轨/激活铁轨而言，它以**自身->下方->自身->下方**方块为更新核发出4次NC更新；
+
+对倾斜的动力铁轨/激活铁轨而言，它以**上方->自身->下方->自身->下方->上方**方块为更新核发出6次NC更新。
+
+### 1.1.2 探测铁轨的更新
+
+*暂未完成*
+
+## 1.2 铁轨激活条件检测
+
+**此段落中的所有“铁轨”皆指动力铁轨或激活铁轨**
+
+### 1.2.1 激活方式
+
+有两种条件能够使铁轨激活：
+- 直接与红石信号源相邻，称为**直接激活**
+- 与自身**相连**的8个铁轨中（不含自身）有1个铁轨直接与红石信号源相邻，称为**间接激活**
+
+例如，一个铁轨直接与一个红石块相邻，它就是被**直接激活**的；
+
+而一个铁轨与另外几个铁轨相连，构成一条铁轨链，在铁轨链上有一个相邻的红石块，且这一红石块在该铁轨的8格内，这个铁轨就是被**间接激活**的。
+
+### 1.2.2 “相连”的判断条件
+
+一个未被直接激活的铁轨会通过一种“寻找”机制，判断自己是否被间接激活。具体来说，它会在上查找是否有距离自身8格以内的、与自身**相连**的、**直接激活**的铁轨。
+
+通俗来讲，想象你正要去一个餐厅。你会打开地图，搜索餐厅，看看自己能不能走过去；餐厅不会飞到你的面前，告诉你“我距离你800m，你可以走过来”。
+
+铁轨也是这样。每个铁轨都会自己“寻找”符合条件的信号源——也就是说，铁轨会尝试沿着铁轨链“走”最多8格，看自己能不能找到信号源——也就是能不能找到和信号源直接相连的铁轨。
+
+而一个十分朴素的想法是：如果铁轨“走”到一半，铁轨链“断了”，那么它肯定就走不下去了。
+
+铁轨在某一位置寻找相连的铁轨时，会根据自身的**形状**（即是否为倾斜的），查找**特定位置**的、与自身**方向相同**的铁轨，即铁轨判断下一个铁轨是否与自身相连，只与这三个因素有关：
+- 自身的形状（自身是否是倾斜的）
+- 下一个铁轨的位置
+- 下一个铁轨的方向
+
+而与**下一个铁轨的形状**无关。
+
+平铁轨会检查这些位置：
+- 铁轨两端的、和自身相同高度的位置
+- 铁轨两端的、比自身低一格的位置
+
+范围如图中红色玻璃位置所示：
+
+![平铁轨连通](img/01-平铁轨的相连范围.png)
+
+例如，图中最右侧的平铁轨在向左侧“寻找”直接激活的铁轨时，会判断左侧的铁轨铁轨与自身相连。图中前三种情况是“符合直觉”的，而最后一种则是**铁轨检查相连时不考虑下一个铁轨的形状**导致的。：
+
+![平铁轨连通例](img/01-平铁轨的相连例.png)
+
+斜铁轨会检查这些位置：
+- 斜铁轨较低一端的、和自身相同高度的位置
+- 斜铁轨较低一端的、比自身低一格的位置
+- 斜铁轨较高一端的、比自身高一格的位置
+
+范围如图中红色玻璃位置所示：
+
+![斜铁轨连通](img/01-斜铁轨的相连范围.png)
+
+例如，图中最右侧的斜铁轨在向左侧“寻找”直接激活的铁轨时，会判断左侧的铁轨铁轨与自身相连。图中前三种情况是“符合直觉”的，而最后一种则是**铁轨检查相连时不考虑下一个铁轨的形状**导致的。
+
+![斜铁轨连通例](img/01-斜铁轨的相连例.png)
+
+结合以上两点，我们可以发现：铁轨“相连”具有单向性：即铁轨A判断铁轨B和自己相连时，铁轨B不一定判断铁轨A和自己相连:
+
+![单向性](img/01-相连的单向性.png)
+
+从直观上来看，图中铁轨链红石信号可以从右侧传向左侧，但不能从左侧传向右侧；从“寻找”的视角来看，就是：左侧的斜铁轨判断右侧的平铁轨和自身不相连，而右侧的平铁轨判断左侧的斜铁轨和自身相连。
+
+分析这两个铁轨的各自检查相连的位置：上图中橙色玻璃对应的水平位置为斜铁轨检查相连的位置，红色玻璃对应的水平位置为平铁轨检查相连的位置。也就是说，斜铁轨在平铁轨的检查位置上；而平铁轨不在斜铁轨的检查位置上，导致了**铁轨相连具有单向性**。
+
+这可以用于制作一些只能单向传递铁轨信号的铁轨链。
+
+### 1.2.3 “寻找”的方向
+
+铁轨在寻找相连的铁轨时遵循固定的顺序：对两端分别进行独立搜索，且每次搜索都是单向的（不会折返）。
+
+- **搜索流程：** 先从一端沿该方向连续向外搜索，搜索过程中不会改变方向（即只“进”不“退”）；该端搜索结束后，再对另一端重复相同的搜索过程。
+- **方向规则：** 南北走向的铁轨总是先向南搜索，再向北；东西走向的铁轨先向西搜索，再向东。
+
+因此，多个铁轨是否能被判定为“相连”不仅取决于距离，还取决于搜索的方向顺序。这就能解释图示中的差异：在第一种情况，红石块两侧的铁轨都能被找到并激活；在第二种情况，只有红石块左侧的铁轨能够被激活，因为右侧的搜索方向无法经过中间的某个铁轨去到目标位置，从而找不到直接激活的铁轨。
+
+![单向性](img/01-寻找的单向性.png)
+
+如图，在第一种情况中，红石块左右两侧的铁轨都可以被激活。
+
+而在第二种情况中，只有红石块左侧的铁轨可以被激活。红石块左侧的铁轨在**向右**寻找直接激活的铁轨时，会先寻找到2号铁轨，然后**向右**（下）寻找到3号铁轨。
+
+红石块右侧的铁轨在**向左**寻找直接激活的铁轨时，同样会先找到2号铁轨；但由于此时的寻找方向为**向左**，而3号铁轨在2号铁轨的**右侧**，于是就不能寻找的3号铁轨，也就找不到直接激活的铁轨，无法激活。"
+Components&Features/活塞,"# #02 活塞
+
+## 2.1 机制
+
+**基础部分**
+
+- 活塞的组成与组成
+- 无头活塞的创建
+- 活塞的自检触发方式与红石信号判定(QC半连接性)
+- 活塞尝试移动方块的结构分析与通俗逻辑
+- 活塞的更新顺序与方块事件响应
+
+**进阶部分**
+
+- 活塞自检与信号判定的源码调用
+- b36转化顺序与推拉结构分析
+- 方块移动底层实现与哈希表运用
+- b36到位与实体运算
+
+### 2.1.1 活塞的组成
+
+完整意义上的活塞由两部分组成，分别是**活塞底座**与**活塞头**。
+
+活塞底座完全控制活塞头，并且活塞由两种状态：`收回`与`伸出`。通常情况下，当活塞处于被激活状态时，其会同时更改活塞底座为伸出状态，并出现活塞头。当活塞处于收回状态时，其活塞头也随即消失。也有部分手段可以创造出只有活塞底座，没有活塞头的**无头活塞**；也可以通过某些手段创造出只有活塞头没有活塞底座的活塞。
+
+### 2.1.2 无头活塞
+
+#### 2.1.2.1 无头活塞的创建
+
+![img.png](./img/headless.png)
+
+所有无头活塞的创建本质上只有两种办法，分别是：
+
+1. 在活塞伸出时，活塞头处于b36状态时使用TNT等手段移除b36
+2. 通过特定手段让未伸出的活塞触发收回事件。本内容会在后续更详细的阐述
+
+#### 2.1.2.2 无头活塞的基本机制
+
+活塞头其实在活塞底座看来依然存在，它就位于活塞底座的正前方。注意，活塞底座认为自己正前方是活塞头与自己正前方是否真的是活塞头无关。如果更新未被充能的无头活塞，无头活塞就会自检并收回。
+
+### 2.1.3 活塞的自检机制
+
+#### 2.1.3.1 触发方式
+
+活塞当且仅当以下两种情况发生时触发自检：
+
+1. 被放置(包括被玩家放置，或被其他活塞推拉到位放置)
+2. 受到NC更新
+
+必须强调的是，活塞的自检是可以发生在任意阶段的。换言之，其自检是瞬时的。当上述情况发生时，活塞会立即自检并通过一定的逻辑尝试推出或收回。这里的“尝试”并不代表一定会成功执行。
+
+#### 2.1.3.2 红石信号的检查与QC充能
+
+自检的本质是为了确认活塞是否需要动作，因此它会先判断自己是否被充能。
+
+![活塞检查红石信号的范围](./img/BlockEvent_PistonShouldExtend.png)
+
+活塞检查信号的范围包括：
+
+- 自身一阶毗邻(除推动方向外)的所有方块是否正在输出红石信号
+- 自身**正上方一格方块为核心**的一阶毗邻方块是否正在输出红石信号
+
+由于活塞会检查其上方方块的毗邻充能情况，这就导致了活塞可以通过上方的空间被“隔空”充能。这种充能无法直接对活塞发出NC更新，因此需要额外的NC更新来更新它，这就是活塞的半连接性(Quasi-Connectivity, 简称QC)的来源。这也是为什么BUD只能检查NC更新。
+
+#### 2.1.3.3 自检逻辑通俗解释
+
+活塞自检时，总是会遵循以下行为树：
+
+1. 应伸出且未伸出：创建一个分析实例尝试分析前方的推动结构。如果分析失败(超过推动上限，有不可推动方块阻挡等)，则不动作；如果分析成功，则给自己当前位置添加一个**伸出**的方块事件
+2. 不应伸出且已伸出：活塞需要收回
+
+   - 如果前方是一个正在伸出的同向移动的""移动的活塞""(Moving_Piston, 或称B36,36号方块, 后续均简称b36)，且当前刻不会到位(进度<50%)，则触发**瞬推收回**，添加对应方块事件
+   - 否则，执行**普通收回**，添加对应方块事件。
+
+### 2.1.4 活塞的推拉与可推动方块
+
+#### 2.1.4.1 可推动方块判定
+
+一个方块要是能被活塞推动，必须同时满足以下要求:
+
+1. 在世界有效高度范围内
+2. 不能是黑曜石，哭泣的黑曜石，重生锚，或强化深板岩等硬编码不可推动方块
+3. 方块硬度不能为-1
+4. 如果是带釉陶瓦，被推动方向必须与活塞推动方向一致
+5. 该方块不能带有方块实体(如箱子、熔炉、漏斗)
+
+#### 2.1.4.2 尝试移动方块与结构分析
+
+活塞在尝试推动时，会动态维护两个列表：**推动方块列表**与**破坏方块列表**。
+
+它会以一定的顺序去顶前方将要推动的方块和将要破坏的方块结构。活塞只会注意在推动轴方向的可破坏方块，若方块附着在推动结构的侧面，则会在稍后被更新并掉落，而不会进入破坏列表。
+
+> 提示：由于结构分析极其复杂(直线分析与分支分析交替入栈)，人工分析极为困难。强烈建议使用[Fallen_Breath的](https://fallenbreath.me/)[PistOrder模组](https://github.com/Fallen-Breath/pistorder)来直接在游戏内查看活塞尝试推动的方块到位顺序。
+
+### 2.1.5 活塞的更新顺序
+
+活塞的更新顺序总的来说分为五种情况：
+
+- 活塞/粘性活塞只伸出
+    1. 同活塞/粘性活塞推动方块，只是移动方块为空
+- 活塞/粘性活塞只收回
+   1. 创建活塞底座b36，发出PP更新和NC更新
+   2. 移除活塞头，发出PP更新和NC更新
+- 活塞/粘性活塞推动方块
+   1. 移除破坏方块位置的方块
+   2. 在移动的目标位置创建b36，发出PP更新
+   3. 创建活塞头b36，发出红石粉prepare更新与PP更新
+   4. 在破坏方块位置发出红石粉prepare更新和NC更新
+   5. 在移动原位置发出NC更新
+   2. 在活塞头位置发出NC更新
+   7. 在活塞底座发出PP更新和NC更新。
+- 粘性活塞收回方块
+   1. 创建活塞底座b36，发出PP更新和NC更新
+   2. 移除破坏方块位置的方块
+   3. 在移动目标位置创建b36，发出PP更新
+   4. 移除未被覆盖的方块，发出红石粉prepare更新，PP更新
+   5. 移动原位置，发出NC更新
+- 粘性活塞收回失败
+   1. 创建活塞底座b36方块，发出PP更新和NC更新
+
+我们发现，这个行为中不具备任何在活塞头的更新，也就是我们常说的粘性收回方块失败无更新。这里给几个实例：
+
+![PistonNoUpdates.jpg](./img/PistonNoUpdates.jpg)
+![PistonNoUpdates2.gif](./img/PistonNoUpdates2.gif)
+
+### 2.1.6 b36与方块到位
+
+#### 2.1.2.1 常规到位
+
+在每个游戏刻的方块时阶段，b36会给自己的推动进度+0.5
+
+- 0gt BE：开始推动，创建b36，此时进度为0
+- 0gt TE：进度+0.5，进行实体位移运算
+- 1gt TE：进度+0.5，进行实体位移运算，此事总进度达到1.0
+- 2gt TE：发现进度已经大于等于1.0，b36变回原来方块，发出最终的PP和NC更新。
+
+若我们从0gt AT开始观测的话，在3gt AT才算完全完成方块到位，因此就有了所谓活塞3gt延迟的说法
+
+#### 2.1.2.2 瞬时到位
+
+当活塞触发瞬推收回时，方块不会经理常规的TE阶段累加，而是直接强制到位。触发条件为：
+
+- 收回事件，且活塞头位置当前方块时b32.
+- 收回事件，粘性活塞伸出方向一格外为b36且该b36正在朝活塞推动轴同方向移动。
+
+这里举两个例子做演示：
+
+**活塞头位置为b36**
+
+我们看如下的一个实例：
+
+![活塞头位置为b36](./img/BlockEvent_InstanceRetract_Eg1.gif)
+
+在这个实例中，红色玻璃被瞬间到位，这是从观测角度而言的，而从理论上，我们给出如下解释：
+
+中继器的优先级高于红石火把，所以普通活塞先添加方块事件，无头粘性活塞再添加方块事件，尝试拉回更前方1格的方块（实际上此时actionType=1）
+
+但是，在BE阶段，由于b36的插入，粘性活塞拉回受阻，并不会破坏这个b36，此时活塞头位置为b36，触发瞬时收回，红色玻璃瞬时到位。
+
+**粘性活塞伸出方向一格外为b36且b36移动方向与活塞移动方向一致**
+
+![伸出位置为b36](./img/BlockEvent_InstanceRetract_Eg2.gif)
+
+在以上实例中，红色玻璃被瞬时到位，是因为：
+
+活塞推动粘液棒子，红色玻璃被移动，发出NC更新，触发无头粘性活塞的自检。此时，粘性活塞可以成功拉回，并且在伸出方向一格外存在b36，该b36推动方向与粘性活塞推动方向是一致的，因此被瞬时到位。
+
+---
+当然，值得注意的是，这种瞬时到位只会影响一格方块，也就是粘性活塞面前的方块，其余方块仍然会被转化为b36，所以，我们可以利用这一点稍微解读一下一种在许多人看来是魔法的装置：
+
+![方块流增长](./img/BlockEvent_InstanceRetract_Eg3.gif)
+
+在这个装置中，当拉杆被拉下，粘性活塞会在方块到位1gt后移动它侧翼的方块，此时这个方块被粘液块带着向前推动，但由于粘性活塞是被侦测器激活的，该粘液块被提前到位，被活塞回推，而此时这个方块尚处于b36的状态，因此被留在了被带过去的位置，这样就实现了对方块流的延长。
+
+瞬时到位会将进度直接设为1.0，移除b36方块实体，直接替换为原本的方块并发出更新。值得注意的是，瞬推不会附带对周围实体的位移推拉运算。
+
+值得注意的是，由于笨蛋麻将并没有在这部分写任何实体运算或对含水方块的特殊判断，所以瞬推不会影响实体，也不会消除含水状态。但是值得注意的是，如果在此前经历了TE阶段的实体运算，在此前的实体运算会被保留，仅有当前gt的TE阶段的实体运算会被忽略。
+
+![Piston_Teleport_Waterlogged_Blocks.gif](./img/Piston_Teleport_Waterlogged_Blocks.gif)
+
+---
+
+### 2.1.7 [进阶] 活塞自检逻辑与源码分析
+
+#### 2.1.7.1 活塞的自检函数
+
+活塞的自检由以下方法触发，其核心在于它们只在服务(`!world.isClient`)端且满足特定条件时，调用统一的`trymove`方法:
+
+```java
+//被玩家放置
+public void onPlaced(World world, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
+    if (!world.isClient) {
+        this.tryMove(world, pos, state);
+    }
+}
+//被NC更新
+public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    if (!world.isClient) {
+        this.tryMove(world, pos, state);
+    }
+}
+//被其他东西放置
+public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+    if (!oldState.isOf(state.getBlock())) {
+        if (!world.isClient && world.getBlockEntity(pos) == null) {
+            this.tryMove(world, pos, state);
+        }
+    }
+}
+```
+
+#### 2.1.7.2 信号判定的源码`shouldExtend`
+
+活塞检查两个核心位置的一阶毗邻。遍历顺序时严格先检查活塞本身再检查上方核心的一阶毗邻，检查毗邻的顺序严格符合NC更新顺序。
+
+```java
+private boolean shouldExtend(RedstoneView world, BlockPos pos, Direction pistonFace) {
+    // 遍历所有方向（上、下、北、南、东、西）
+    for (Direction direction : Direction.values()) {
+        if (direction != pistonFace && world.isEmittingRedstonePower(pos.offset(direction), direction)) {
+            return true;// 如果活塞所在的一格接受到红石信号，活塞应当伸展
+        }
+    }
+    if (world.isEmittingRedstonePower(pos, Direction.DOWN)) {
+        return true;  // 如果下方有红石信号，活塞应当伸展
+    } else {
+        // 如果下方没有红石信号，检查活塞上方的方块
+        BlockPos blockPos = pos.up(); // 获取活塞上方的方块位置(这是为了QC充能准备的)
+        for (Direction direction2 : Direction.values()) {
+            // 如果当前方向不是向下（活塞本体所在的位置），并且该方向的方块发出红石信号
+            if (direction2 != Direction.DOWN && world.isEmittingRedstonePower(blockPos.offset(direction2), direction2)) {
+                // 如果活塞上方的一格接受到红石信号，活塞应当伸展
+                return true;
+            }
+        }
+        // 如果没有任何方向的方块发出红石信号，活塞不应伸展
+        return false;
+    }
+}
+```
+
+#### 2.1.7.3 尝试移动的源码`tryMove`
+
+`tryMove`决定了方块事件的种类(`actionType`), 0为伸出, 1为收回, 2为瞬推收回
+
+```java
+private void tryMove(World world, BlockPos pos, BlockState state) {
+    // 获取活塞的朝向（通过状态中的FACING属性）
+    Direction facing = (Direction)state.get(FACING);
+    
+    // 判断是否有红石信号
+    boolean shouldExtend = this.shouldExtend(world, pos, facing);
+    
+    // 如果应该伸出且活塞当前没有伸出（EXTENDED属性为false）
+    if (shouldExtend && !(Boolean)state.get(EXTENDED)) {
+        // 创建一个PistonHandler对象来尝试推动方块
+        // 如果成功推动，则添加一个方块事件
+        if ((new PistonHandler(world, pos, facing, true)).calculatePush()) {
+            world.addSyncedBlockEvent(pos, this, 0, facing.getId());
+        }
+    }
+    // 如果不应该伸出且活塞当前处于伸出状态（EXTENDED属性为true）
+    else if (!shouldExtend && (Boolean)state.get(EXTENDED)) {
+        // 计算活塞头前方的位置（当前活塞位置向活塞推出朝向进行2个单位的偏移）
+        BlockPos pistonHeadFront = pos.offset(facing, 2);
+        
+        // 获取目标位置的方块状态
+        BlockState headFrontState = world.getBlockState(pistonHeadFront);
+        
+        // 初始化状态码（默认为1）
+        // 状态码的代表状态：
+        // 0：伸出
+        // 1：收回
+        // 2：瞬推收回
+        int actionType = 1;
+        
+        
+        if (headFrontState.isOf(Blocks.MOVING_PISTON) // 如果目标方块是一个正在移动的活塞
+                && headFrontState.get(FACING) == facing //并且其朝向与当前活塞相同
+                && world.getBlockEntity(pistonHeadFront) 
+                        instanceof PistonBlockEntity pistonBlockEntity // 如果方块实体是移动的活塞（b36）
+                && pistonBlockEntity.isExtending()// 如果目标b36正在伸出
+                && (pistonBlockEntity.getProgress(0.0F) < 0.5F //如果伸出进度小于50%
+                        || world.getTime() == pistonBlockEntity.getSavedWorldTime() 
+                        || ((ServerWorld)world).isInBlockTick())
+        ) {
+            actionType = 2;// 应该瞬推收回
+        }
+
+        // 添加方块事件
+        world.addSyncedBlockEvent(pos, this, actionType, facing.getId());
+    }
+}
+```
+
+### 2.1.8 [进阶] b36转化与结构分析源码
+
+> 温馨提示，这部分是本章节最为复杂的一部分之一，如果比较懒可以直接使用pistOrder模组而并不需要真正学习本部分在说的内容
+
+```java
+public boolean calculatePush() {
+    // 清空已移动的方块和已破坏的方块列表，以便重新计算
+    this.movedBlocks.clear();
+    this.brokenBlocks.clear();
+
+    // 获取活塞将要推动的起始点
+    BlockState pistonHeadFrontState = this.world.getBlockState(this.posTo);
+
+    // 如果起始点不能推动
+    if (!PistonBlock.isMovable(pistonHeadFrontState, this.world, this.posTo, this.motionDirection, false, this.pistonDirection)) {
+        // 如果方块不可推动且当前处于缩回状态，并且方块行为为DESTROY，则将其标记为破坏
+        if (this.retracted && pistonHeadFrontState.getPistonBehavior() == PistonBehavior.DESTROY) {
+            this.brokenBlocks.add(this.posTo); // 添加到破坏列表
+            return true; // 活塞仍然可以进行操作（通过破坏方块）
+        } else {
+            return false; // 活塞无法推动且无法破坏目标方块
+        }
+    }
+    // 如果目标方块可推动，但无法添加直线结构，无法推动
+    else if (!this.tryMove(this.posTo, this.motionDirection)) {
+        return false;
+    } 
+    else {
+        // 遍历所有被标记为需要移动的方块
+        for (int i = 0; i < this.movedBlocks.size(); ++i) {
+            BlockPos posToValidate = (BlockPos) this.movedBlocks.get(i);
+            
+            // 如果当前方块是粘性方块，尝试移动它周围的粘连方块
+            if (isBlockSticky(this.world.getBlockState(posToValidate)) && !this.tryMoveAdjacentBlock(posToValidate)) {
+                return false; // 如果移动周围粘连方块失败，则整体推动失败
+            }
+        }
+
+        return true; // 所有方块都成功移动或处理
+    }
+}
+
+```
+
+当活塞需要推动时，会先执行以上代码，这段代码是用于分析移动结构的。这里需要更多更为详细的表述以辅助各位读者理解：`movedBlocks`和`brokenBlocks`实际是两个`arrayList`。没有了解过`Java`语言的读者可以简单理解为一个可以随意插入，取出的列表。这段代码本质在按照以下顺序执行操作：
+
+1. 清空`movedBlocks`和`brokenBlocks`两个列表。
+2. 检查其起始位置是否可以推动
+   - 如果不可推动，则检查其对活塞行为的响应
+     - 如果可破坏，则将该方块添加至`brokenBlocks`列表，推动成功
+     - 如果不可破坏，则推动失败
+   - 如果可推动，则尝试添加其直线结构（我们稍后会解析活塞是如何分析直线结构的）
+     - 如果无法添加其直线结构，则推动失败
+     - 如果成功添加其直线结构，则遍历所有需要推动的方块
+       - 如果存在粘性方块（粘液块和蜂蜜块），则尝试添加分支
+         - 若添加失败，则推动失败
+     - 如果以上均没有失败，则推动成功
+
+Mojang在这里通过两个方法实现了对直线结构的分析和对分支结构的分析。分别称为`tryMove`[^1]和`tryMoveAdjacentBlock`。
+
+[^1]:这里的`tryMove`是需要消歧义的，在`Java`中，两个在不同类的方法是可以被赋予相同名字。这里的`tryMove`是在`PistonHandler.java`里的
+
+#### 2.1.8.1 直线结构分析`tryMove`
+
+首先先明确这个方法会在何种情况下被调用：
+
+1. 这个方块直接被方块推动
+2. 这个方块直接被粘性方块带动
+
+值得注意的是，这两种方法是严格互相独立的，这意味着这两种情况之间不会有任何重复。
+
+当因第一种情况被调用时，这个方块本身一定不是一个不可推动的方块，详情可以回看上文5.4.2部分。当因为第二种情况调用时，这个方块本身如果是一个不可推动的方块，考虑到尝试带动它的方块是一个粘性方块，则没有必要考虑对其进行分析。(实际上也就是下图中的这种情况)
+
+在进行了以上分析后，我们就可以正式的看看本方法的第一部分代码。
+
+```java
+BlockState stateToValidate = this.world.getBlockState(posToValidate);
+
+// 如果方块是空气方块，直接返回true，因为不需要处理空气
+if (stateToValidate.isAir()) {     
+    return true;
+} 
+// 如果方块不可移动，根据当前条件直接返回true
+else if (!PistonBlock.isMovable(stateToValidate, this.world, posToValidate, this.motionDirection, false, dir)) {
+    return true;
+} 
+// 如果方块位置是活塞的初始位置，直接返回true
+else if (posToValidate.equals(this.posFrom)) {
+    return true;
+} 
+// 如果方块已经在已移动列表中，直接返回true，避免重复计算
+else if (this.movedBlocks.contains(posToValidate)) {
+    return true;
+} 
+```
+
+这段代码的逻辑如下：
+
+1. 如果活塞在试图推动空气，那么可以推动
+2. 如果这个方块不可移动，那么可以推动（看看上文我论证了这部分代码的合理性）
+3. 如果这个方块就是活塞本身，那么可以推动
+4. 如果这个方块已经在推了，那么可以推动
+
+---
+
+```java
+while (isBlockSticky(stateToValidate)) {
+// 获取黏性方块在相反方向上的下一个方块
+    BlockPos blockBehind = posToValidate.rearBlockCount(this.motionDirection.getOpposite(), rearBlockCount);
+    BlockState currentStateSaved = stateToValidate; // 当前方块状态
+    stateToValidate = this.world.getBlockState(blockBehind); // 下一个方块状态
+    
+    // 如果下一个方块是空气、不粘连、不可移动或是活塞初始位置，结束循环
+    if (stateToValidate.isAir() 
+    || !isAdjacentBlockStuck(currentStateSaved, stateToValidate)  
+    || !PistonBlock.isMovable(stateToValidate, this.world, blockBehind, this.motionDirection, false, this.motionDirection.getOpposite())
+            || blockBehind.equals(this.posFrom)) 
+    {
+            break;
+    }
+    
+    ++rearBlockCount; // 增加偏移距离
+    if (rearBlockCount + this.movedBlocks.size() > 12) {
+        // 如果移动的方块总数超过12个，返回false
+        return false;
+    }
+}
+
+```
+
+接下来，游戏首先定义了一个变量`offset`，它实际上表示了活塞正在尝试推动的方块。如果此时`movedBlocks`列表的大小+1已经大于最大推动数量上限，则推动失败。（算上这个方块就超出可推动大小的上限了）
+
+游戏会从这个方块开始朝着推动方向的相反方向开始递推方块，寻找直线拉动中断的位置，当这个位置是空气或者与此粘块不互粘的或者无法移动的方块，或者是活塞本身的一列方块便是粘块拉动的部分(这部分存在的意义是处理以下这种情况：)
+
+如果寻找到新直线结构的拉动部分加上原来的`movedBlocks`列表大小已经大于12，则推动失败。
+
+接下来，将这部分拉动的部分添加至移动方块列表中，添加方向为推动方向的反向，即最前方的方块先添加，最后方的方块后添加。
+
+---
+
+```java
+while (true) {
+    BlockPos blockFront = posToValidate.offset(this.motionDirection, frontBlockCount); // 下一个方块的位置
+    int l = this.movedBlocks.indexOf(blockFront); // 检查方块是否已在移动列表中
+    if (l > -1) {
+        // 如果方块已经在移动列表中，调整移动列表的顺序
+        this.setMovedBlocks(succeededCount, l);
+    
+        // 遍历调整后的列表，检查所有黏性方块并处理其连接方块
+                        for (int m = 0; m <= l + succeededCount; ++m) {
+        BlockPos stuckBlock = (BlockPos) this.movedBlocks.get(m);
+        if (isBlockSticky(this.world.getBlockState(stuckBlock)) 
+            && !this.tryMoveAdjacentBlock(stuckBlock)) {
+                return false;
+            }
+        }
+        return true; // 所有相关方块处理成功
+    }
+    
+    // 获取当前偏移位置的方块状态
+    stateToValidate = this.world.getBlockState(blockFront);
+    
+    // 如果当前方块是空气，推动成功
+                    if (stateToValidate.isAir()) {
+            return true;
+            }
+    
+            // 如果当前方块不可移动或是活塞的初始位置，返回false
+            if (!PistonBlock.isMovable(stateToValidate, this.world, blockFront, this.motionDirection, true, this.motionDirection) 
+                        || blockFront.equals(this.posFrom)) {
+            return false;
+            }
+    
+            // 如果当前方块是可破坏的，将其添加到破坏列表
+            if (stateToValidate.getPistonBehavior() == PistonBehavior.DESTROY) {
+            this.brokenBlocks.add(blockFront);
+                        return true;
+                                }
+    
+                                // 如果移动列表已达到12个方块，返回false
+                                if (this.movedBlocks.size() >= 12) {
+            return false;
+            }
+
+        // 将当前方块添加到移动列表
+        this.movedBlocks.add(blockFront);
+                ++succeededCount; // 增加移动计数
+                ++frontBlockCount; // 增加偏移量
+}
+```
+
+在完成拉动部分的分析后，游戏会接着处理推动部分。从我们一开始开始分析的方块沿移动方向向前寻找会被推动的方块，如果被被遍历的方块已经在推动列表中时，意味着这个直线结构结束。再往前遍历会与前面已分析的结构发生碰撞，此时将重新排列推动方块列表。
+
+遍历已经走完的方块（取决于添加顺序），如果其是粘性方块，进入分支结构的检查，寻找侧面粘动的方块，如果侧面粘动使其推动失败，返回推动失败的结果。
+
+如果正前方移动的方块是空气，直线结构结束。如果正前方方块是不可移动方块或活塞本身，推动失败。如果正前方移动的方块是可破坏方块，将该方块加入可破坏方块列表，直线结构结束。
+
+将所有方块加入移动方块列表，检查移动方块列表，若其大小大于12，则达到推动上限，推动失败。
+
+#### 2.1.8.2 尝试添加分支`tryMoveAdjacentBlock`
+
+```java
+private boolean tryMoveAdjacentBlock(BlockPos pos) {
+    // 获取指定位置的方块状态
+    BlockState targetBlockState = this.world.getBlockState(pos);
+    // 遍历所有方向
+    for (Direction direction : Direction.values()) {
+        // 只处理与推动方向轴线不同的方向
+        if (direction.getAxis() != this.motionDirection.getAxis()) {
+            // 获取相邻位置的方块
+            BlockPos adjacentBlockPos = pos.offset(direction);
+            BlockState adjacentBlockState = this.world.getBlockState(adjacentBlockPos);
+
+            // 如果当前方块和相邻方块是粘性方块，尝试移动相邻方块
+            if (isAdjacentBlockStuck(adjacentBlockState, targetBlockState) && !this.tryMove(adjacentBlockPos, direction)) {
+                return false; // 如果相邻方块无法移动，返回false
+            }
+        }
+    }
+
+    // 如果所有相邻方块都成功移动，返回true
+    return true;
+}
+```
+
+这里的形参输入的方块总是可粘方块，因此执行以下逻辑：
+
+1. 遍历其周围所有方块，这是通过遍历方向实现的，顺序和NC更新一致
+2. 由于与推动轴方向相同方向的两个相邻方块的分析是不必要的，故在这里排除。侧面的方块如果与此方块互粘，则尝试分析其直线结构，如果直线结构添加失败，逐级返回失败结果。
+
+#### 2.1.8.3 移动方块列表处理
+
+`movedBlocks`和`brokenBlocks`直接倒过来就是b36到位顺序和破坏顺序。原因我们会在稍后详细解释。
+
+#### 2.1.8.4 b36到位顺序的分析
+
+我们来分析一下如下实例:
+
+![实例](./img/BlockEvent_PushStructure_Analysis.png)
+
+本图的推动轴是+z向-z方向
+
+首先分析直线结构，活塞头前的两格粘液块最先被添入移动方块列表。
+
+由于两格均为可粘方块，最贴近活塞的粘液块尝试分析其-x方向的普通方块，并将其添加进推动方块列表，再分析+y方向的粘液块，将其加入推动方块列表，其会有下一次调用，但此时这个调用任务会被压入系统栈。直线方块的第二格压栈分析其-x方向的粘液块，这个粘液块发现自己和后面的普通方块冲突了，于是处理碰撞，合成的新列表分别是普通方块下标为为3，粘液块下标为4。粘液块检查周围方块的任务被压入系统栈，等待下一轮调用。最后以此类推，最终可以得到整个结构的推动顺序。
+
+当然你要是比较懒不如直接pistorder。
+
+### 2.1.9 [进阶] 活塞响应事件与移动方块源码
+
+#### 2.1.9.1 事件的统一入口`onSyncedBlockEvent`
+
+```java
+public boolean onSyncedBlockEvent(BlockState state, World world, BlockPos pos, int actionType, int directionData) {
+    // 获取方块的方向（例如，活塞朝向的方向）
+    Direction facing = (Direction)state.get(FACING);
+    
+    // 获取激活的方块状态（表示方块正在扩展）
+    BlockState extendedState = (BlockState)state.with(EXTENDED, true);
+    
+    // 如果当前不是客户端，进行一些服务器端操作
+    if (!world.isClient) {
+        // 检查是否需要扩展活塞（是否有红石信号）
+        boolean shouldExtend = this.shouldExtend(world, pos, facing);
+        
+        // 如果需要扩展并且事件类型是收缩，更新方块状态并返回
+        if (shouldExtend && (actionType == 1 || actionType == 2)) {
+            world.setBlockState(pos, extendedState, 2);
+            return false;
+        }
+
+        // 如果不需要扩展并且事件类型是0，直接返回false
+        if (!shouldExtend && actionType == 0) {
+            return false;
+        }
+    }
+
+    // 事件类型为0：活塞伸展事件
+    if (actionType == 0) {
+        // 如果移动方块失败，返回false
+        if (!this.move(world, pos, facing, true)) {
+            return false;
+        }
+
+        // 设置方块为扩展状态，并播放伸展声音
+        world.setBlockState(pos, extendedState, 67);
+        world.playSound((PlayerEntity)null, pos, SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.5F, world.random.nextFloat() * 0.25F + 0.6F);
+        world.emitGameEvent(GameEvent.BLOCK_ACTIVATE, pos, Emitter.of(extendedState));
+    } 
+    // 事件类型为1或2：活塞收缩事件
+    else if (actionType == 1 || actionType == 2) {
+        // 获取活塞前方的方块实体
+        BlockEntity blockEntityInFront = world.getBlockEntity(pos.offset(facing));
+        
+        // 如果该位置有活塞方块实体，完成收缩操作
+        if (blockEntityInFront instanceof PistonBlockEntity) {
+            ((PistonBlockEntity)blockEntityInFront).finish();
+        }
+
+        // 创建移动的活塞方块状态
+        BlockState pistonHeadState = Blocks.MOVING_PISTON.getDefaultState().with(PistonExtensionBlock.FACING, direction)
+                .with(PistonExtensionBlock.TYPE, this.sticky ? PistonType.STICKY : PistonType.DEFAULT);
+        
+        // 设置新的活塞方块状态，并创建新的方块实体
+        world.setBlockState(pos, pistonHeadState, 20);
+        world.addBlockEntity(PistonExtensionBlock.createBlockEntityPiston(pos, pistonHeadState, (BlockState)this.getDefaultState().with(FACING, Direction.byId(directionData & 7)), direction, false, true));
+        world.updateNeighbors(pos, pistonHeadState.getBlock());
+        pistonHeadState.updateNeighbors(world, pos, 2);
+
+        // 如果是粘性活塞，执行特殊逻辑
+        if (this.sticky) {
+            // 计算目标位置
+            BlockPos targetpos = pos.add(facing.getOffsetX() * 2, facing.getOffsetY() * 2, facing.getOffsetZ() * 2);
+            BlockState targetState = world.getBlockState(targetpos);
+            boolean hasMovingPistonInFront = false;
+            
+            // 如果目标位置已有移动活塞方块，尝试完成它的扩展
+            if (targetState.isOf(Blocks.MOVING_PISTON)) {
+                BlockEntity blockEntity2 = world.getBlockEntity(targetpos);
+                if (blockEntity2 instanceof PistonBlockEntity) {
+                    PistonBlockEntity pistonBlockEntity = (PistonBlockEntity)blockEntity2;
+                    if (pistonBlockEntity.getFacing() == facing && pistonBlockEntity.isExtending()) {
+                        pistonBlockEntity.finish();
+                        hasMovingPistonInFront = true;
+                    }
+                }
+            }
+
+            // 如果没有特殊情况，移除目标方块或继续移动
+            if (!hasMovingPistonInFront) {
+                if (actionType != 1 || targetState.isAir() || !isMovable(targetState, world, targetpos, facing.getOpposite(), false, direction) 
+                        || targetState.getPistonBehavior() != PistonBehavior.NORMAL && !targetState.isOf(Blocks.PISTON) && !targetState.isOf(Blocks.STICKY_PISTON)) {
+                    world.removeBlock(pos.offset(facing), false);
+                } else {
+                    this.move(world, pos, facing, false);
+                }
+            }
+        } 
+        // 如果不是粘性活塞，直接移除目标方块
+        else {
+            world.removeBlock(pos.offset(facing), false);
+        }
+
+        // 播放收缩声音
+        world.playSound(null, pos, SoundEvents.BLOCK_PISTON_CONTRACT, SoundCategory.BLOCKS, 0.5F, world.random.nextFloat() * 0.15F + 0.6F);
+        world.emitGameEvent(GameEvent.BLOCK_DEACTIVATE, pos, Emitter.of(pistonHeadState));
+    }
+
+    // 返回true表示事件成功处理
+    return true;
+}
+```
+
+**服务端**
+
+如果不是客户端，那么会执行几个服务端特有的事件：
+
+- 检查激活情况，如果激活，并且方块事件为收回或者瞬推收回，将活塞设置为伸出状态，并进行寻路更新，方块事件执行失败。
+- 如果没有激活并且方块事件为伸出，方块事件执行失败。
+
+**伸出事件**
+
+> 注意，本部分无论客户端，服务端都必须执行
+
+活塞会尝试移动前方方块，这是通过`move`方法实现的，我稍后会补充这个方法的细节。如果移动失败，则活塞执行事件失败。
+
+接下来，将活塞设置为伸出状态，此处`bitflag`为`0b01000011`放置移除更新，寻路更新，NC更新
+
+最后，播放活塞伸出的声音，方块事件执行成功
+
+**瞬间收回与收回事件**
+
+首先获取活塞头的方块实体，如果是b36，那么使其瞬间到位。
+
+接下来，将活塞设置为b36，此处`bitflag`为`0b00010100`，无PP更新，寻路更新
+
+再将活塞设置成b36方块实体，先发出NC更新，再发出PP更新
+
+如果这个活塞是一个粘性活塞，那么将活塞头伸出1格外的地方，如果它试图放置活塞头的位置的一格外是一个b36，并且该b36的推动方向与活塞同向，那么让方块瞬间到位。
+
+如果活塞行为不为瞬推收回，并且该方块不是空气，活塞可以移动前方一格的方块，而且这个方块可以被正常拉回或者这个方块是活塞或者粘性活塞，那么尝试拉回前方方块。如果前方一格的方块无法被拉动，那么删除活塞头位置的方块。
+
+如果是普通活塞，直接删除活塞头位置的方块。
+
+无论何种情况，播放活塞收回的声音。方块事件执行成功。
+
+#### 2.1.9.2 活塞移动方块`move`
+
+```java
+// retract=0：收回
+// retract=1：伸出
+private boolean move(World world, BlockPos pos, Direction dir, boolean retract) {
+    // 活塞头的位置
+    BlockPos headPos = pos.offset(dir);
+
+    // 如果是收缩动作并且目标位置是活塞头
+    if (!retract && world.getBlockState(headPos).isOf(Blocks.PISTON_HEAD)) {
+        // 将活塞头设为空气
+        // flag=0b00010100, 无PP更新，寻路更新 客户端
+        world.setBlockState(headPos, Blocks.AIR.getDefaultState(), 20);
+    }
+
+    // 创建 PistonHandler 实例，用于计算推动或拉回操作的合法性
+    PistonHandler pistonHandler = new PistonHandler(world, pos, dir, retract);
+
+    // 如果无法执行推动/拉回操作，则无法移动
+    if (!pistonHandler.calculatePush()) {
+        return false;
+    } else {
+        // 使用哈希表存储需要移动的方块及其状态，便于后续处理
+        Map<BlockPos, BlockState> map = Maps.newHashMap();
+
+        // 创建移动方块列表并获取移动方块列表
+        List<BlockPos> blocksToMove = pistonHandler.getMovedBlocks();
+
+        // 用于记录需要移动的方块的原始状态
+        List<BlockState> blocksOriginal = Lists.newArrayList();
+
+        // 遍历需要移动的方块，将其原始状态保存到列表中，并存储到 map 中
+        for (int i = 0; i < blocksToMove.size(); ++i) {
+            BlockPos blockPos2 = (BlockPos) blocksToMove.get(i);
+            BlockState blockState = world.getBlockState(blockPos2);
+            blocksOriginal.add(blockState);
+            map.put(blockPos2, blockState);
+        }
+
+        // 获取所有需要破坏的方块位置列表
+        List<BlockPos> list3 = pistonHandler.getBrokenBlocks();
+
+        // 用于记录被破坏方块的状态
+        BlockState[] blockStates = new BlockState[blocksToMove.size() + list3.size()];
+
+        // 确定移动方向
+        Direction direction = retract ? dir : dir.getOpposite();
+
+        // 处理被破坏的方块，从后到前
+        int j = 0;
+        for (int k = list3.size() - 1; k >= 0; --k) {
+            BlockPos blockPos3 = (BlockPos) list3.get(k);
+            BlockState blockState2 = world.getBlockState(blockPos3);
+
+            // 如果方块有方块实体，则先处理掉落逻辑
+            BlockEntity blockEntity = blockState2.hasBlockEntity() ? world.getBlockEntity(blockPos3) : null;
+            dropStacks(blockState2, world, blockPos3, blockEntity);
+
+            // 将方块设置为空气并触发销毁事件
+            world.setBlockState(blockPos3, Blocks.AIR.getDefaultState(), 18);
+            world.emitGameEvent(GameEvent.BLOCK_DESTROY, blockPos3, Emitter.of(blockState2));
+
+            // 如果方块不是火类方块，则添加破坏粒子效果
+            if (!blockState2.isIn(BlockTags.FIRE)) {
+                world.addBlockBreakParticles(blockPos3, blockState2);
+            }
+
+            // 保存被破坏方块的状态
+            blockStates[j++] = blockState2;
+        }
+
+        // 处理需要移动的方块
+        for (int k = blocksToMove.size() - 1; k >= 0; --k) {
+            BlockPos targetPos = (BlockPos) blocksToMove.get(k);
+            BlockState targetState = world.getBlockState(targetPos);
+
+            // 移动到目标位置
+            targetPos = targetPos.offset(direction);
+            map.remove(targetPos);
+
+            // 设置目标位置为 MOVING_PISTON 状态，用于动画处理
+            BlockState blockState3 = (BlockState) Blocks.MOVING_PISTON.getDefaultState().with(FACING, dir);
+            world.setBlockState(targetPos, blockState3, 68);
+
+            // 创建b36方块实体，用于控制移动动画
+            world.addBlockEntity(PistonExtensionBlock.createBlockEntityPiston(targetPos, blockState3, (BlockState) blocksOriginal.get(k), dir, retract, false));
+            blockStates[j++] = targetState;
+        }
+
+        // 如果是伸出操作，添加活塞头
+        if (retract) {
+            PistonType pistonType = this.sticky ? PistonType.STICKY : PistonType.DEFAULT;
+            BlockState blockState4 = (BlockState) ((BlockState) Blocks.PISTON_HEAD.getDefaultState().with(PistonHeadBlock.FACING, dir)).with(PistonHeadBlock.TYPE, pistonType);
+            BlockState targetState = (BlockState) ((BlockState) Blocks.MOVING_PISTON.getDefaultState().with(PistonExtensionBlock.FACING, dir)).with(PistonExtensionBlock.TYPE, this.sticky ? PistonType.STICKY : PistonType.DEFAULT);
+            map.remove(headPos);
+
+            // 设置当前活塞位置为 MOVING_PISTON 状态
+            world.setBlockState(headPos, targetState, 68);
+
+            // 添加b36方块实体，用于控制动画
+            world.addBlockEntity(PistonExtensionBlock.createBlockEntityPiston(headPos, targetState, blockState4, dir, true, true));
+        }
+
+        // 将 map 中剩余的方块设置为空气
+        BlockState blockState5 = Blocks.AIR.getDefaultState();
+        for (BlockPos blockPos4 : map.keySet()) {
+            world.setBlockState(blockPos4, blockState5, 82);
+        }
+
+        // 更新邻居方块状态
+        for (Map.Entry<BlockPos, BlockState> entry : map.entrySet()) {
+            BlockPos blockPos5 = entry.getKey();
+            BlockState blockState6 = entry.getValue();
+            blockState2.prepare(world, blockPos5, 2);
+            blockState5.updateNeighbors(world, blockPos5, 2);
+            blockState5.prepare(world, blockPos5, 2);
+        }
+
+        // 更新被破坏方块的邻居状态
+        for (int l = list3.size() - 1; l >= 0; --l) {
+            BlockState targetState = blockStates[j++];
+            BlockPos blockPos5 = (BlockPos) list3.get(l);
+            targetState.prepare(world, blockPos5, 2);
+            world.updateNeighborsAlways(blockPos5, targetState.getBlock());
+        }
+
+        // 更新移动方块的邻居状态
+        for (int l = blocksToMove.size() - 1; l >= 0; --l) {
+            world.updateNeighborsAlways((BlockPos) blocksToMove.get(l), blockStates[j++].getBlock());
+        }
+
+        // 如果是收缩动作，更新活塞位置邻居
+        if (retract) {
+            world.updateNeighborsAlways(headPos, Blocks.PISTON_HEAD);
+        }
+
+        return true; // 如果执行成功，返回 true
+    }
+}
+
+```
+
+活塞尝试移动方块时，会区分两种情况，伸出和收回。这里的`retract`布尔值代表了活塞的动作，当其值为`false`时，活塞收回，当其值为`true`时，活塞伸出，接下来，活塞会区分两种活塞动作，分别处理。
+
+当活塞**尝试**收回时，游戏会首先检查**预期是**活塞头的位置是不是活塞头，如果是活塞头才执行收回。每次执行收回时，游戏都会先将活塞头的位置设置为空气（删除活塞头）。此时的`setBlockState`的传入`bitflag`为`0b00010100`，即无PP更新，和客户端的寻路更新。
+
+在正式开始移动前，无论收回或伸出，游戏都会调用[5.4.2](#进阶542-移动结构分析)部分分析的`calculatePush`方法，再次分析是否可以移动，如果不能成功移动，则活塞执行推动/拉动失败。
+
+接下来，游戏会正式开始移动方块，它首先会逆序地处理破坏方块列表(`brokenBlocks`)，如果被破坏的方块具备掉落物品的方块实体，那么掉落物品，再将被锚定破坏的方块（也就是当前正在处理的方块）设置为空气，此时无PP更新，发出寻路更新。
+
+破坏了应该破坏的方块后，游戏会开始移动方块。从后往前遍历移动方块列表(`movedBlocks`)，将该方块设置为b36，`bitflag`为`0b01101000`，也就是放置移除更新，再向该方块添加b36的方块实体，并添加到`blockStates`列表中备用。
+
+如果是伸出，就在活塞头位置创建b36，放置移除更新，再向活塞头位置添加b36方块实体。
+
+完成以上操作后，将未被覆盖到的方块全部设置为空气，并放置移除更新，寻路更新。此时无PP更新。再统一发出更新，对于哈希表中所有的方块，都先统一发出红石粉prepare更新，再给出方块更新（在方块原位置），如果是伸出，活塞头完成方块更新。
+
+以上代码很好的解读了b36的添加为何是倒序与`movedBlocks`列表。另外由于哈希表是乱序的，所以这也解释了为什么在有些依赖b36到位顺序的机器卸载后会坏掉。（卸载后会丢失本来的索引）
+
+### 2.1.10 [进阶] 到位的源码解析
+
+#### 2.1.10.1 普通到位`tick`
+
+>这东西太简单了没什么好讲的，所以通俗解释都扔到前面去了(笑)，因此这里只放个代码供参考
+
+```java
+public static void tick(World world, BlockPos pos, BlockState state, PistonBlockEntity blockEntity) {
+        //记录当前gt
+    blockEntity.savedWorldTime = world.getTime();
+    blockEntity.lastProgress = blockEntity.progress;
+    //如果推动已完成
+    if (blockEntity.lastProgress >= 1.0F) {
+        //如果是客户端且当前deathTick没有超过5
+        if (world.isClient && deathTicks < 5) {
+            //增加deathTicks计数
+            ++deathTicks;
+        } else {
+            //移除方块实体
+            world.removeBlockEntity(pos);
+            blockEntity.markRemoved();
+            //如果该方块为b36
+            if (world.getBlockState(pos).isOf(Blocks.MOVING_PISTON)) {
+                //给出PP更新
+                BlockState blockState = Block.postProcessState(blockEntity.pushedBlock, world, pos);
+                //如果为空气
+                if (blockState.isAir()) {
+                    //设置为对应方块，无更新，bitflag=0b01010100;
+                    world.setBlockState(pos, blockEntity.pushedBlock, 84);
+                    //更新或破坏该方块
+                    Block.replace(blockEntity.pushedBlock, blockState, world, pos, 3);
+                } else {
+                    //如果是含水方块
+                    if (blockState.contains(Properties.WATERLOGGED) && (Boolean)blockState.get(Properties.WATERLOGGED)) {
+                        //移除含水方块中的水
+                        blockState = (BlockState)blockState.with(Properties.WATERLOGGED, false);
+                    }
+                    //设置为对应方块，给出NC更新，PP更新，客户端更新，bitflag=0b01000011
+                    world.setBlockState(pos, blockState, 67);
+                    //自身受到NC更新
+                    world.updateNeighbor(pos, blockState.getBlock(), pos);
+                }
+            }
+        }
+    } 
+    //如果推动未完成
+    //推动进度+0.5
+    else {
+        float f = blockEntity.progress + 0.5F;
+        //进行实体运算
+        pushEntities(world, pos, f, blockEntity);
+        moveEntitiesInHoneyBlock(world, pos, f, blockEntity);
+        blockEntity.progress = f;
+        //如果推动进度>=1，取为1
+        if (blockEntity.progress >= 1.0F) {
+            blockEntity.progress = 1.0F;
+        }
+    }
+}
+```
+
+#### 2.1.10.2 瞬时到位`finish`
+
+```java
+public void finish() {
+    // 存在世界且进度未满或客户端运算
+    if (this.world != null && (this.lastProgress < 1.0F || this.world.isClient)) {
+        // 将进度设置为完成
+        this.progress = 1.0F;
+        this.lastProgress = this.progress;
+        // 移除方块实体
+        this.world.removeBlockEntity(this.pos);
+        this.markRemoved();
+        //如果此处为b36方块
+        if (this.world.getBlockState(this.pos).isOf(Blocks.MOVING_PISTON)) {
+            // 如果是活塞臂
+            BlockState blockState;
+            if (this.source) {
+                // 设置为空气
+                blockState = Blocks.AIR.getDefaultState();
+            } else {
+                // 否则在PP更新后到位
+                blockState = Block.postProcessState(this.pushedBlock, this.world, this.pos);
+            }
+            // 设置方块，PP更新，寻路更新，NC更新
+            this.world.setBlockState(this.pos, blockState, 3);
+            // 自身受到方块更新
+            this.world.updateNeighbor(this.pos, blockState.getBlock(), this.pos);
+        }
+    }
+}
+```
+
+大部分内容前面也解释过了，所以这里直接略过。我们只看后半部分的b36特判看起。
+
+在1.20中，只有活塞臂的`source`属性是`true`，其它都是`false`。因此当该方法被调用时，若该位置是目标方块为活塞臂的b36，会直接变成空气。其余部分就不细说了，前面都讲过了。
+
+### 2.1.11 [进阶] 活塞头
+
+> 本章其实没什么难度，但是由于除了前阵子[Menggui233](https://space.bilibili.com/1725417238?spm_id_from=333.337.0.0)在[PetrisAFE](https://space.bilibili.com/397472062)的[视频](https://www.bilibili.com/video/BV19xchzfEBr/?share_source=copy_web&vd_source=a7c3c614e18f7d33800bde0d541328ca)中演示的装置外，未见得其它用途，故在这里放在了进阶的位置。
+
+我们首先观察如下装置：
+
+![ObserverNTRPiston](./img/ObserverNTRPiston.png)
+
+现在，拉下拉杆
+
+![ObserverNTRPiston2](./img/ObserverNTRPiston2.png)
+
+观察到活塞底座被换成了侦测器，而活塞头被保留。为什么？
+
+我们首先回顾一下b36到位时发生了什么：
+
+- 给出自身位置的PP更新
+- 给出自身位置的一阶毗邻的NC，PP更新
+- 给出自身位置的NC更新
+
+因此，我们分别查看活塞头受到PP更新和NC更新会发生什么
+
+#### 2.1.11.1 活塞头存在的条件判定`canSurvive`
+
+```java
+private boolean isFittingBase(BlockState baseState, BlockState extendedState) {
+    Block block = baseState.getValue(TYPE) == PistonType.DEFAULT ? Blocks.PISTON : Blocks.STICKY_PISTON;
+    return extendedState.is(block) && extendedState.getValue(PistonBaseBlock.EXTENDED) && extendedState.getValue(FACING) == baseState.getValue(FACING);
+}
+
+@Override
+public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
+    BlockState blockState = level.getBlockState(pos.relative(state.getValue(FACING).getOpposite()));
+    return this.isFittingBase(state, blockState) || blockState.is(Blocks.MOVING_PISTON) && blockState.getValue(FACING) == state.getValue(FACING);
+}
+```
+
+`isFittingBase`方法本质上说明，当且仅当一个活塞头的后方(更确切地说，是推动方向的反方向1格，后续均以后方简称)是正在伸展的活塞，且该活塞的伸出方向与活塞头一致活塞头可以被称之为`适配`。而`canSurvive`则要求一个活塞头的存在是合法的，当且仅当该活塞头是`适配`的，或其后方是一个与活塞头推动方向相同的b36。
+
+#### 2.1.11.2 活塞头的移除`onRemove`
+
+```java
+@Override
+public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+    if (!state.is(newState.getBlock())) {
+        super.onRemove(state, level, pos, newState, isMoving);
+        BlockPos blockPos = pos.relative(state.getValue(FACING).getOpposite());
+        if (this.isFittingBase(state, level.getBlockState(blockPos))) {
+            level.destroyBlock(blockPos, true);
+        }
+    }
+}
+```
+
+一句话总结：移除时如果状态为`适配`，则连带着底座一起移除，并掉落活塞。
+
+#### 2.1.11.3 活塞头受到PP更新，NC更新
+
+```java
+@Override
+public BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
+    return facing.getOpposite() == state.getValue(FACING) && !state.canSurvive(level, currentPos)
+        ? Blocks.AIR.defaultBlockState()
+        : super.updateShape(state, facing, facingState, level, currentPos, facingPos);
+}
+@Override
+public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos fromPos, boolean isMoving) {
+    if (state.canSurvive(level, pos)) {
+        level.neighborChanged(pos.relative(state.getValue(FACING).getOpposite()), block, fromPos);
+    }
+}
+```
+
+**PP更新**
+
+活塞头实际上只关心来自后方的PP更新。当后方发生PP更新时，活塞头会调用`canSurvive`来检查自己是否合法，若不合法则立刻消失。
+
+**NC更新**
+
+在任何情况下，活塞头均不会因受到NC更新而消失。当受到NC更新时，若自身合法，则将更新视为后方方块收到的NC更新。
+
+#### 2.1.11.4 案例分析
+
+因此，对于在章首提到的案例：
+
+- 0gt AT: 玩家拉下拉杆，活版门触发
+- 2gt BE 深度0: 粘性活塞被激活，更新无头活塞
+- 2gt BE 深度1: 无头活塞吃掉粘性活塞底座，粘液块&亮起侦测器被推动
+- 4gt TE: 粘性活塞头先到位，此时检查后方是和自己同方向的b36，自检通过。随后亮起侦测器b36到位，无更新。
+
+因此侦测器成功取代了原本的活塞底座。
+
+### 2.1.12 [进阶] b36相关的实体运算
+
+```java
+//该方法用于处理活塞对实体的推动。它会获取b36在当前游戏刻的移动方向和距离，并找出路径上所有可能接触的实体。然后，它会精确计算每个实体与b36在移动方向上的最大重叠部分，并据此推动实体（同时增加微小位移0.01防卡入）。此过程还会特殊处理黏液块的弹射效果以及b36收回时对实体的影响。    
+private static void pushEntities(World world, BlockPos pos, float f, PistonBlockEntity blockEntity) {
+    //获取b36移动的方向
+    Direction direction = blockEntity.getMovementDirection();
+
+    //计算在当前tick，b36需要移动的距离
+    double d = f - blockEntity.progress;
+
+    //获取b36的碰撞箱体素模型
+    VoxelShape voxelShape = blockEntity.getHeadBlockState().getCollisionShape(world, pos);
+
+    //检查b36是否有实际的碰撞体积。如果没有，就什么也不做
+    if (!voxelShape.isEmpty()) {
+
+    //获取b36该tick移动后的包围盒
+    Box box = offsetHeadBox(pos, voxelShape.getBoundingBox(), blockEntity);
+
+        //根据b36移动前后扫描过的区域，粗略筛选可能被推动的实体
+        List<Entity> list = world.getOtherEntities(null, Boxes.stretch(box, direction, d).union(box));
+
+        //如果扫描区域内有实体，则开始处理
+        if (!list.isEmpty()) {
+
+            //获取组成b36体素模型的所有子包围盒列表
+            List<Box> list2 = voxelShape.getBoundingBoxes();
+
+            //检查b36是否是黏液块
+            boolean bl = blockEntity.pushedBlockState.isOf(Blocks.SLIME_BLOCK);
+            Iterator var12 = list.iterator();
+
+            //遍历所有可能被影响的实体
+            while (true) {      
+                Entity entity;
+                while (true) {
+                    if (!var12.hasNext()) {
+                        return;
+                    }
+
+                    entity = (Entity)var12.next();
+                    //检查实体是否忽略b36推动
+                    if (entity.getPistonBehavior() != PistonBehavior.IGNORE) {
+                        if (!bl) {
+                            break;
+                        }
+
+                        //如果是黏液块在推动，对于除服务端玩家外的实体，将其沿移动轴向的速度分量强制设为1.0
+                        if (!(entity instanceof ServerPlayerEntity)) {
+                            Vec3d vec3d = entity.getVelocity();
+                            double e = vec3d.x;
+                            double g = vec3d.y;
+                            double h = vec3d.z;
+                            switch (direction.getAxis()) {
+                                case X:
+                                    e = direction.getOffsetX();
+                                    break;
+                                case Y:
+                                    g = direction.getOffsetY();
+                                    break;
+                                case Z:
+                                    h = direction.getOffsetZ();
+                            }
+
+                            entity.setVelocity(e, g, h);
+                            break;
+                        }
+                    }
+                }
+                    
+                //记录实体与b36在移动方向上的最大重叠距离
+                double i = 0.0;
+
+                //遍历b36模型的每一个子包围盒
+                for (Box box2 : list2) {
+
+                    //检查b36的子包围盒的移动路径是否与实体的碰撞箱相交
+                    Box box3 = Boxes.stretch(offsetHeadBox(pos, box2, blockEntity), direction, d);
+                    Box box4 = entity.getBoundingBox();
+                        
+                    //如果相交，计算重叠的距离
+                    if (box3.intersects(box4)) {
+                        i = Math.max(i, getIntersectionSize(box3, direction, box4));
+
+                        //重叠的距离大于实际推动距离，这是最坏的情况，不需要进行多余检查了
+                        if (i >= d) {
+                            break;
+                        }
+                    }
+                }
+                    
+                //如果最终计算出的最大重叠距离大于0，进行推动
+                if (!(i <= 0.0)) {
+
+                    //确定最终的推动距离。这个距离不能超过b36本身在这一刻的移动距离
+                    //并额外增加0.01防止下一tick实体被卡在b36里
+                    i = Math.min(i, d) + 0.01;
+
+                    //沿移动方向，将实体推动计算出的距离
+                    moveEntity(direction, entity, i, direction);
+
+                    //如果是b36在收回，则特殊处理被其影响的实体
+                    if (!blockEntity.extending && blockEntity.source) {
+                        push(pos, entity, direction, d);
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+//此方法用于解决实体卡在b36内的问题。它会检查实体是否与b36所在位置的方块存在重叠，如果存在，则计算出沿反方向将实体推出的最小距离。通过一次精细的重叠深度比较后，它会校准并执行这个位移，确保实体被平滑地推离b36。
+private static void push(BlockPos pos, Entity entity, Direction direction, double amount) {
+
+    //获取实体的包围盒
+    Box box = entity.getBoundingBox();
+        
+    //创建一个位于b36位置的、标准大小(1x1x1)的方块包围盒
+    Box box2 = VoxelShapes.fullCube().getBoundingBox().offset(pos);
+
+    // 如果实体与方块的包围盒没有重叠，则说明实体未被卡住，直接返回
+    if (box.intersects(box2)) {
+
+        //获取原始推动的相反方向
+        Direction direction2 = direction.getOpposite();
+
+        //计算要使实体脱离方块所需的最小推出距离
+        double d = getIntersectionSize(box2, direction2, box) + 0.01;
+
+        //计算实体与方块实际重叠区域的深度
+        double e = getIntersectionSize(box2, direction2, box.intersection(box2)) + 0.01;
+
+        // 如果两次计算的推出距离几乎相等（表明实体只是轻微接触），则进行位置校准(float align)
+        if (Math.abs(d - e) < 0.01) {
+            d = Math.min(d, amount) + 0.01;
+
+                //沿相反方向，将实体推动计算出的距离
+            moveEntity(direction, entity, d, direction2);
+        }
+    }
+}
+
+
+
+//该方法用于实现移动的蜂蜜块对上方实体的粘滞效果，且仅在b36水平推动时生效。其核心逻辑是：在蜂蜜块表面上方定义一个“粘滞区域”，然后将该区域内所有符合条件的实体，与蜂蜜块b36进行同步移动。
+private static void moveEntitiesInHoneyBlock(World world, BlockPos pos, float f, PistonBlockEntity blockEntity) {
+
+    //整个逻辑只在b36是蜂蜜块时才会触发
+    if (blockEntity.isPushingHoneyBlock()) {
+
+        //获取b36移动的方向
+        Direction direction = blockEntity.getMovementDirection();
+
+        //蜂蜜块的粘滞效果仅在水平方向推动时生效
+        if (direction.getAxis().isHorizontal()) {
+
+            //获取蜂蜜块b36碰撞箱的实际顶部高度
+            double d = blockEntity.pushedBlockState.getCollisionShape(world, pos).getMax(Direction.Axis.Y);
+
+            //定义一个位于蜂蜜块表面上方的粘滞区域(从其顶部到Y=1.5)，并使其随b36同步移动
+            Box box = offsetHeadBox(pos, new Box(0.0, d, 0.0, 1.0, 1.5000010000000001, 1.0), blockEntity);
+
+            //计算在当前tick，蜂蜜块b36需要移动的距离
+            double e = f - blockEntity.progress;
+
+            //遍历粘滞区域内所有符合移动条件的实体
+            for (Entity entity : world.getOtherEntities((Entity)null, box, entityx -> canMoveEntity(box, entityx, pos))) {
+
+                //沿移动方向，将所有符合条件的实体推动计算出的距离
+                moveEntity(direction, entity, e, direction);
+            }
+        }
+    }
+}
+```
+
+**`pushEntities`：处理活塞推动**
+
+该方法是活塞与实体交互的核心。它会获取b36在当前游戏刻的移动方向和距离，并找出路径上所有可能接触的实体。然后，它会精确计算每个实体与b36在移动方向上的最大重叠部分，并据此推动实体（同时增加微小位移0.01防卡入）。此过程还会特殊处理黏液块的弹射效果以及b36收回时对实体的影响。
+其工作流程如下：
+
+   1. 确定移动参数：首先，获取活塞头在当前游戏刻（tick）的移动方向和精确距离。
+   2. 粗略筛选实体：通过计算活塞头在这一帧内扫过的空间，快速找出所有可能被推动的实体。
+   3. 精确计算重叠：遍历每一个可能被影响的实体，并将其碰撞箱与活塞头模型的每一个子碰撞箱进行比较。它会精确计算出在活塞移动方向上，实体与活塞头之间发生的最大重叠距离。
+   4. 执行推动：根据计算出的最大重叠距离，对实体施加一个位移。为了防止实体在下一帧被卡住，推动的距离会额外增加一个极小值（0.01）。
+   5. 特殊情况处理：
+      - 黏液块：如果推动的方块是黏液块，它会对非玩家实体产生一个弹射效果，将其沿移动方向的速度设置为一个固定值。
+      - 活塞收回：如果活塞正在收回，它会调用 push 方法来特殊处理可能被拉动的实体，确保它们不会卡在活塞臂消失后的空间里。
+
+**`push`：解决实体卡入问题**
+
+这个方法是一个辅助函数，专门用于解决实体意外卡入活塞臂所在方块的问题。
+其工作流程如下：
+
+   1. 检查重叠：首先，检查实体的碰撞箱是否与活塞臂目标位置的方块碰撞箱有重叠。如果没有重叠，则说明实体没有卡住，方法直接结束。
+   2. 计算推出距离：如果检测到重叠，它会计算需要将实体沿反方向推出多远才能恰好分离。它会进行两次计算和比较，以确保推出的距离精确且最小，避免过度位移。
+   3. 执行位移：最后，它会沿活塞移动的相反方向，将实体推出计算好的距离，从而平滑地解决卡入问题。
+
+**`moveEntitiesInHoneyBlock`：实现蜂蜜块粘滞效果**
+
+这个方法专门用于实现移动中的蜂蜜块对上方实体的“粘滞”效果。
+其工作流程如下：
+
+   1. 条件检查：该功能只在活塞推动的是蜂蜜块，并且是水平移动时才会触发。
+   2. 定义粘滞区域：它会在移动的蜂蜜块表面上方定义一个特定的“粘滞区域”（从蜂蜜块顶部到Y=1.5的高度）。
+   3. 同步移动：系统会找出所有位于这个粘滞区域内的实体。
+   4. 施加位移：最后，将这些实体与蜂蜜块一起，沿着相同的方向移动相同的距离，从而实现了实体被“粘”在蜂蜜块上一起移动的效果。
+
+### 2.1.13 [进阶] 基于`Extended=False`的活塞收回事件的无头活塞制造办法
+
+我们先召回前面提到的`onSyncedBlockEvent`。值得注意的是，当服务端执行该方法并`return false`时，并不会向客户端发包，因此客户端也不会执行任何动画，或将任何东西变成b36。（也就是客户端并不会执行该方法）
+
+实际上在前文提到的`setBlockState`的传入形参`flag`仅仅在通常意义下是寻路更新，这里需要更为详细的解释。
+
+我们观察如下现象：
+
+1. 放置一个任意方向的任意种类的活塞。并在其除活塞面向方向的一阶毗邻位置放置红石块。这一步会激活这个活塞
+2. `/tick freeze`
+3. 移除红石块
+4. 将原本的活塞替换为任意方向的同一类型的活塞
+5. 放回红石块，红石块的位置要求等同与第一步提到的位置要求
+2. 在活塞面向方向放置一个不可推动方块
+7. `/tick freeze`解除时停
+
+如果操作完全没有错误，则该活塞变为无头活塞
+
+这是因为在`onSyncedBlockEvent`中
+
+```java
+if (!world.isClient) {
+    // 检查是否需要扩展活塞（是否有红石信号）
+    boolean shouldExtend = this.shouldExtend(world, pos, facing);
+        
+    // 如果需要扩展并且事件类型是收缩，更新方块状态并返回
+    if (shouldExtend && (actionType == 1 || actionType == 2)) {
+        world.setBlockState(pos, extendedState, 2);
+        return false;
+    }
+
+    // 如果不需要扩展并且事件类型是0，直接返回false
+    if (!shouldExtend && actionType == 0) {
+        return false;
+    }
+}
+```
+
+方块事件在执行时只会校验方块类型和位置，不会校验这个方块的朝向，因此在这个活塞的位置，我们得到了一个可以校验通过并执行的，活塞状态处于Extended=False的活塞，并且该活塞将执行收回事件。在服务端，活塞会被校验是否应该伸出。此时活塞因为被红石块激活，确实应该伸出，所以进入第一个if分支条件。这个分支条件首先调用了`setBlockState`，而我们查看一下`setBlockState`在`flag=2`时做了什么:
+
+```java
+public boolean setBlockState(BlockPos pos, BlockState state, int flags, int maxUpdateDepth) {
+    if (this.isOutOfHeightLimit(pos)) {
+        return false;
+    } else if (!this.isClient && this.isDebugWorld()) {
+        return false;
+    } else {
+        WorldChunk worldChunk = this.getWorldChunk(pos);
+        Block block = state.getBlock();
+        BlockState blockState = worldChunk.setBlockState(pos, state, (flags & 64) != 0);
+        if (blockState == null) {
+            return false;
+        } else {
+            BlockState blockState2 = this.getBlockState(pos);
+            if (blockState2 == state) {
+                if (blockState != blockState2) {
+                    this.scheduleBlockRerenderIfNeeded(pos, blockState, blockState2);
+                }
+
+                if ((flags & 2) != 0 && (!this.isClient || (flags & 4) == 0) && (this.isClient || worldChunk.getLevelType() != null && worldChunk.getLevelType().isAfter(ChunkLevelType.BLOCK_TICKING))) {
+                    this.updateListeners(pos, blockState, state, flags);
+                }
+
+                ...
+
+                this.onBlockChanged(pos, blockState, blockState2);
+            }
+
+            return true;
+        }
+    }
+}
+```
+
+我们发现在`if ((flags & 2) != 0 && (!this.isClient || (flags & 4) == 0) && (this.isClient || worldChunk.getLevelType() != null && worldChunk.getLevelType().isAfter(ChunkLevelType.BLOCK_TICKING)))`这个分支调用中，调用了一个方法`updateListeners`，我们会发现这个`updateListeners`有两个实现方法：
+
+1. `ServerWorld`
+2. `ClientWorld`
+
+在`ServerWorld`中，这里就是普通的寻路更新。这里寻路更新会假定活塞臂存在，当然这是题外话了。
+
+而在`ClientWorld`中，这个`updateListeners`负责了渲染。因此这里客户端抢跑了，直接渲染了伸出的活塞臂而没有渲染活塞头。
+
+接下来是第二个，由于活塞自检引起的伸出事件。这个伸出事件在执行时会直接失败。无论客户端还是服务端，在这里不做进一步解释。
+
+因此，这样就制造出了一个无头活塞。
+
+### 2.1.14 [进阶] 案例分析
+
+#### 2.1.14.1 案例1
+
+![Magic1](./img/pistonMagic/pistonMagic1.png)
+
+敲击音符盒，会发生什么？
+
+<hidden>活塞掉落</hidden>
+
+粘性活塞受到NC更新，自检。调用`trymove`，添加收回方块事件，调用`onSyncedBlockEvent`。进行下述判断：
+
+```java
+if (!hasMovingPistonInFront) {
+    if (actionType != 1 || targetState.isAir() || !isMovable(targetState, world, targetpos, facing.getOpposite(), false, direction) 
+            || targetState.getPistonBehavior() != PistonBehavior.NORMAL && !targetState.isOf(Blocks.PISTON) && !targetState.isOf(Blocks.STICKY_PISTON)) {
+        world.removeBlock(pos.offset(facing), false);
+    } else {
+        this.move(world, pos, facing, false);
+    }
+}
+```
+
+稍做判断，进入`move`方法。
+
+```java
+if (!retract && world.getBlockState(headPos).isOf(Blocks.PISTON_HEAD)) {
+    // 将活塞头设为空气
+    // flag=0b00010100, 无PP更新，寻路更新 客户端
+    world.setBlockState(headPos, Blocks.AIR.getDefaultState(), 20);
+}
+```
+
+由于目标位置是活塞头，且是收缩动作，将活塞头位置设为空气，触发活塞头的`onRemove`，活塞头连带着活塞底座掉落。
+
+#### 2.1.14.2 案例2
+
+![Magic2](./img/pistonMagic/pistonMagic2.png)
+
+敲击音符盒，会发生什么？
+
+<hidden>粘性活塞变回完整状态，除此之外无事发生</hidden>
+
+步骤如前一例所述，但这里进入`move`后不符合上文的移除活塞头的方法。于是进入下一步
+
+```java
+if (!pistonHandler.calculatePush()) {
+    return false;
+}
+```
+
+由于面前结构无法拉回，则直接`return false`，无事发生。
+
+#### 2.1.14.3 案例3
+
+![Magic3](./img/pistonMagic/pistonMagic3.png)
+
+敲击音符盒，会发生什么？
+
+<hidden>普通方块被移除</hidden>
+
+回到`onSyncedBlockEvent`，依旧是这个判断:
+
+```java
+if (!hasMovingPistonInFront) {
+    if (actionType != 1 || targetState.isAir() || !isMovable(targetState, world, targetpos, facing.getOpposite(), false, direction) 
+            || targetState.getPistonBehavior() != PistonBehavior.NORMAL && !targetState.isOf(Blocks.PISTON) && !targetState.isOf(Blocks.STICKY_PISTON)) {
+        world.removeBlock(pos.offset(facing), false);
+    } else {
+        this.move(world, pos, facing, false);
+    }
+}
+```
+
+但在此处，if分支成立(黑曜石不可移动,`!isMovable`是`true`)，因直接移除活塞面前的方块，普通方块被移除。
+
+#### 2.1.14.4 案例4
+
+![Magic4](./img/pistonMagic/pistonMagic4.png)
+
+敲击音符盒，会发生什么？
+
+<hidden>无事发生</hidden>
+
+同案例2，进入`move`方法。当活塞尝试计算是否可拉回时，它把自己检查到了，而激活的活塞底座本身又是不可推动的，于是`return false`，无事发生。
+
+#### 2.1.14.5 案例5
+
+![Magic5](./img/pistonMagic/pistonMagic5.png)
+
+拉下拉杆，会发生什么？
+
+<hidden>前面的活塞变为无头活塞，后面的活塞变回普通活塞</hidden>
+
+依旧考察`onSyncedBlockEvent`，在此处注意到这段代码：
+
+```java
+BlockPos targetpos = pos.add(facing.getOffsetX() * 2, facing.getOffsetY() * 2, facing.getOffsetZ() * 2);
+BlockState targetState = world.getBlockState(targetpos);
+boolean hasMovingPistonInFront = false;
+            
+// 如果目标位置已有移动活塞方块，尝试完成它的扩展
+if (targetState.isOf(Blocks.MOVING_PISTON)) {
+    BlockEntity blockEntity2 = world.getBlockEntity(targetpos);
+    if (blockEntity2 instanceof PistonBlockEntity) {
+        PistonBlockEntity pistonBlockEntity = (PistonBlockEntity)blockEntity2;
+        if (pistonBlockEntity.getFacing() == facing && pistonBlockEntity.isExtending()) {
+            pistonBlockEntity.finish();
+            hasMovingPistonInFront = true;
+        }
+    }
+}
+```
+
+拉下拉杆时，前方的活塞先在面前位置创建一个b36(注意活塞底座并未变为b36)，然后执行上述操作，调用了前一个活塞的活塞臂的`finish`方法。我在前面提到，该方法对于活塞臂的b36会有特判，直接将其变为空气。因此前一个活塞的活塞臂就被移除，变为无头活塞。后一个位置的粘性活塞收回，变为`Extended=False`的活塞。
+
+#### 2.1.14.6 案例6
+
+![Magic6](./img/pistonMagic/pistonMagic6.png)
+
+拉下拉杆会发生什么？
+
+<hidden>两个活塞换头</hidden>
+
+原理和案例5类似，但是调用的是这里的代码：
+
+```java
+BlockEntity blockEntityInFront = world.getBlockEntity(pos.offset(facing));
+        
+// 如果该位置有活塞方块实体，完成收缩操作
+if (blockEntityInFront instanceof PistonBlockEntity) {
+    ((PistonBlockEntity)blockEntityInFront).finish();
+}
+
+// 创建移动的活塞方块状态
+BlockState pistonHeadState = Blocks.MOVING_PISTON.getDefaultState().with(PistonExtensionBlock.FACING, direction)
+        .with(PistonExtensionBlock.TYPE, this.sticky ? PistonType.STICKY : PistonType.DEFAULT);
+        
+// 设置新的活塞方块状态，并创建新的方块实体
+world.setBlockState(pos, pistonHeadState, 20);
+world.addBlockEntity(PistonExtensionBlock.createBlockEntityPiston(pos, pistonHeadState, (BlockState)this.getDefaultState().with(FACING, Direction.byId(directionData & 7)), direction, false, true));
+world.updateNeighbors(pos, pistonHeadState.getBlock());
+pistonHeadState.updateNeighbors(world, pos, 2);
+
+```
+
+面前是b36就直接调用`finish`方法，将其变为空气。
+
+#### 2.1.14.7 案例7
+
+![Magic7](./img/pistonMagic/pistonMagic7_1.png)
+
+拉下拉杆会发生什么？
+
+<hidden>红石块消失，最左侧粘性活塞丢方块</hidden>
+
+拉下拉杆，无头活塞面前方块为b36，并被更新。红石块瞬间到位，造成NC更新，更新到中继器，添加TT事件
+
+```java
+BlockEntity blockEntityInFront = world.getBlockEntity(pos.offset(facing));
+        
+// 如果该位置有活塞方块实体，完成收缩操作
+if (blockEntityInFront instanceof PistonBlockEntity) {
+    ((PistonBlockEntity)blockEntityInFront).finish();
+}
+```
+
+但注意，这里`onSyncedBlockEvent`还没被return，继续执行如下操作:
+
+```java
+if (!hasMovingPistonInFront) {
+    if (actionType != 1 || targetState.isAir() || !isMovable(targetState, world, targetpos, facing.getOpposite(), false, direction) 
+            || targetState.getPistonBehavior() != PistonBehavior.NORMAL && !targetState.isOf(Blocks.PISTON) && !targetState.isOf(Blocks.STICKY_PISTON)) {
+        world.removeBlock(pos.offset(facing), false);
+    } else {
+        this.move(world, pos, facing, false);
+    }
+}
+```
+
+于是红石块就被移除掉了。发出NC更新。添加TT事件。
+
+中继器亮起2gt，于是最左侧粘性活塞丢方块。
+
+## 2.2 应用
+
+### 2.2.1 复制
+
+#### 2.2.1.1 亮起侦测器的移除运算
+
+亮起侦测器被移除时会向后方发出NC更新并熄灭自己。
+
+#### 2.2.1.2 基于侦测器的复制
+
+复制的本质实际上是这个方块添加进了移动列表，但是这个时候方块还没转化为b36。我以某种迅雷不及掩耳盗铃的姿势插入一个更新，这个时候这个更新导致了某些东西被激活/掉落，但是因为这个方块本身已经滚进移动方块列表，到位的时候又被以b36的形式放下来了。
+
+我们将复制分为两种，基于侦测器和基于附着性方块的。其中，基于侦测器的复制正利用了上述只要侦测器被移除（换成了b36）的时候就会瞬时产生NC更新。
+
+这里给出基于侦测器的铁轨复制：
+
+![铁轨复制机](./img/RailDuper.gif)
+
+在移动方块列表中，当粘性活塞推出时，会先移动左侧侦测器，在目标位置创建b36，再移动粘液块，覆盖了亮起侦测器，更新，铁轨发现下面居然是b36，掉落。移动铁轨，在目标位置创建b36。
+
+这样我们就完成了一次复制
+
+#### 2.2.1.3 基于附着方块破碎的复制
+
+##### 基于BUD的TNT复制
+
+![order.png](./img/TNTDuperOrder.png)
+![tnt-duper.gif](./img/TNTDuper.gif)
+
+附着方块的掉落同样会产生更新，但是由于附着方块通常会直接掉落而难以二次利用。例如：
+
+##### 基于粉导向的极简TNT复制
+
+![一次性tnt复制](./img/TNTDuper_Simple.gif)
+
+##### 地毯复制
+下图中是一种极为流行的地毯复制:
+
+![地毯复制](./img/CarpetDuper.gif)
+
+当活塞收回时其完成一次复制，我们在这里对其稍做分析：
+
+移动方块列表：
+
+1. 移动最下方的粘液块，在目标位置创建b36
+2. 移动失活的珊瑚扇，在目标位置创建b36，发出PP更新，自检发现自己应该掉落，发出PP更新和NC更新，引导上方地毯连锁掉落
+3. 移动其余粘液块和地毯
+
+这就完成了复制。
+
+### 2.2.2 信息不一致的方块事件
+
+根据5.1章节、2.1.5章节等，我们可以发现：活塞在执行方块事件时只对其`方块位置`和`方块类型`进行校对。尽管记录了`活塞朝向`，但它只管辖b36的方向。
+
+而活塞执行方块事件时的`真实方向`是即时采样的。
+
+这意味着，在一个活塞的方块事件实例被在方块事件阶段中执行前，存在一个时段：此时，我们可以随意改变其对应位置的活塞的属性，甚至对此活塞本生进行破坏，更换。
+
+![可更改方块事件对象的时间段](img/BlockEventModifiableTime.png)
+
+如图所示，从上一游戏刻的EU到当前游戏刻的BE，这段时间内我们可以修改某一方块事件的作用对象。
+同理，从当前游戏刻的EU到下一游戏刻的BE，也存在这样一段时间。
+但只要执行到这个活塞的方块事件实例时，如果执行位置有活塞，且活塞类型没有改变，那么活塞尝试推出/拉回的朝向就会由执行时的朝向决定，尽管这个朝向可能并不是方块事件添加时的朝向。
+
+>有趣的是，b36的收回时的动画仍然以方块事件传入的data参数为准，
+>所以，尽管方块事件执行时活塞朝向与添加时不同，活塞头的动画仍会面向方向方块事件添加时的活塞朝向（但碰撞箱是准确的）。
+>![piston.gif](img/piston.gif)
+
+#### 2.2.2.1 破基岩
+
+##### 跨越游戏刻的破基岩
+
+>活塞的逆袭之旅
+
+正如前面所提到的，我们可以在活塞的方块事件阶段前，偷偷摸摸地修改活塞的属性，包括朝向。
+这意味着我们可以在活塞推出时，将其朝向改为朝向基岩，然后在活塞收回时，就会将基岩当作活塞头摧毁。
+下面的展示动画是一个典型,在方块事件阶段前更改活塞朝向的破基岩例子。
+
+![BedrockBreaker](./img/BedrockBreaker.gif)
+
+在整个过程中，发生了如下重要事件
+
+#CECECE{gt0}-EU阶段
+
+- 左侧TNT爆炸。
+  - 爆炸破坏拉杆。
+  - 爆炸破坏圆石。
+
+  - 右侧TNT爆炸。
+    - 爆炸破坏活塞头,发出nc更新。
+    - 活塞基座被更新，由于拉杆已经被炸掉，活塞给自己添加**收回**的方块事件。
+        >可惜的是，它已经错过了这个游戏刻的BE阶段，所以只能在gt1的BE阶段默默等待了。。
+    - 活塞头破坏活塞基座。
+
+#CECECE{gt0}-AT阶段
+
+- 玩家放置朝下的活塞新活塞。
+
+#CECECE{gt0}-BE阶段
+
+- 活塞按照现有朝向收回，破坏基岩。
+
+以上便是破基岩的全部过程。
+
+但是，在破基岩机等结构内，由玩家放置活塞是不可能的，我们必须通过其他方式来实现这个效果。
+
+##### 在方块事件阶段完成的破基岩
+
+""在活塞的方块事件阶段前""的""前""不仅仅适用于其他的游戏阶段。就算在方块事件阶段内，你仍然可以在某个方块事件之前更改它对应的方块。
+![可更改方块事件对象的时间段](img/ModifiableTimeInBlockEvent.png)
+
+如你所见，下图是部分破基岩机中的破基岩结构的简化版本..
+
+![BedrockBreakerInBlockEvent.png](img/BedrockBreaker-2.png)
+![BedrockBreakerInBlockEvent.gif](img/BedrockBreaker-2.gif)
+
+如动图所示，在整个过程中，发生了如下重要事件
+
+>前提--上图面标记的数字是各个活塞的深度，他们按照这个顺序在BE阶段尝试伸出或收回。
+
+#CECECE{gt0}-BE阶段
+
+- 1号活塞收回，破坏活塞头,发出nc更新
+  - 1号活塞前方的活塞基座被更新，由于处于BUD状态，活塞给自己添加**收回**的方块事件。
+      >由于深度1，2，3已被占用，它将会被安排到4号，也就是目前情况下的""最后执行""。
+  - 活塞头破坏活塞基座。
+- 2号活塞伸出，创建了3个b36。
+- 3号粘性活塞收回，将正前方的朝下的活塞的b36强制瞬间到位。
+- 朝下的活塞现在的位置拥有先前1号活塞导致的方块事件，按照现有朝向收回，破坏基岩。
+
+### 2.2.3 欺骗活塞添加/取消添加方块事件
+
+#### 2.2.3.1 欺骗活塞取消添加方块事件:推动上限检测
+
+方块事件也会出现活塞觉得自己要执行的事件与实际状况不一致的情况，最典型的便是推动上限检测。
+
+![PushLimitDetector](./img/PushLimitDetector.gif)
+
+推动上限检测机制最初由玩家_Kayleigh和Landmining发现，其核心在于""欺骗""活塞。这里展示的是Bright_Observer制作的简化版本，便于分析理解。
+
+该装置虽具有方向性设计，但这并不影响其检测功能，因此可自由选择建造方向。
+
+运行现象：
+
+- 放下紫色羊毛(羊毛连接了一根很长很长的柱子...)后敲击音符盒，普通活塞会启动
+- 破坏紫色羊毛后敲击，普通活塞则保持不变
+
+原理分析：
+
+1. 上推活塞在被更新时自检
+2. 系统检查推动上限条件
+3. 若羊毛放下，因上方玻璃柱子已超出推动上限，活塞不会添加方块事件
+4. 此时激活两个普通活塞
+5. 粘性活塞被普通活塞更新，自检后伸出
+2. 羊毛不存在时：  
+   粘性活塞正常运作  
+   上方普通活塞的推出状态取决于朝向  
+   下方普通活塞因深度关系保持原位
+
+关键发现：  
+粘性活塞的计划动作与实际执行时推动结构可能存在差异，这种特性被巧妙地用于检测机制。
+
+#### 2.2.3.2 欺骗活塞添加方块事件
+
+遗憾的是，如果你试图复刻***5.10.1 破基岩***的布局和激活顺序"
+LoadingTicket/序,"# 00-序
+
+## 概述
+
+Mojang在Minecraft1.14引入了加载票系统来管理区块的加载和卸载，记录区块加载的目的，优化游戏性能。本章旨在从代码上了解minecraft中的加载行为。
+
+本文基于`Yarn Mapping 1.20.1+build.10`
+
+## 目录
+
+- [00](./00-序.md) 序
+- [01](./01-加载票系统中的类型.md) 加载票系统中的类型
+- [02](./02-加载票系统的运作细节.md) 加载票系统的运作细节
+- [a](./a-附页-辅助mod.md) 附页-辅助mod
+- [b](./b-附页-一些译名.md) 附页-一些译名
+
+## 参考文献
+
+* [聊聊区块和 Ticket](https://izzel.io/2020/09/09/chunks-and-tickets/) | IzzelAliz
+* [1.14.x Chunk Loading](https://gist.github.com/Drovolon/24bfaae00d57e7a8ca64b792e14fa7c6) | Drovolon
+* [区块管理系统及其动态分析](https://github.com/lovexyn0827/Discovering-Minecraft/tree/master/%E5%8C%BA%E5%9D%97%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F%E5%8F%8A%E5%85%B6%E5%8A%A8%E6%80%81%E5%88%86%E6%9E%90) | lovexyn
+* [区块](https://minecraft.fandom.com/zh/wiki/%E5%8C%BA%E5%9D%97) | mcwiki"
+LoadingTicket/加载票系统中的类型,"# 01加载票系统中的类型
+
+![img.png](img/01Ticket.png)
+
+本章将建立对加载票这一概念的基本认识。
+
+## 1.1加载票 Ticket
+
+一个加载票包含了 
+
+`net.minecraft.server.world.ChunkTicket`
+
+* `type` 加载票类型，记录加载的原因。
+* `level` 加载等级，决定区块的运算。
+* `tickCreated` 创建时间，用于判断加载票是否过期。
+
+## 1.2加载票类型 TicketType
+
+在Minecraft一共有8种加载票类型 
+
+`net.minecraft.server.world.ChunkTicketType`
+
+```java
+    public static final ChunkTicketType<Unit> START = create(""start"", (a, b) -> 0);
+    public static final ChunkTicketType<Unit> DRAGON = create(""dragon"", (a, b) -> 0);
+    public static final ChunkTicketType<ChunkPos> PLAYER = create(""player"", Comparator.comparingLong(ChunkPos::toLong));
+    public static final ChunkTicketType<ChunkPos> FORCED = create(""forced"", Comparator.comparingLong(ChunkPos::toLong));
+    public static final ChunkTicketType<ChunkPos> LIGHT = create(""light"", Comparator.comparingLong(ChunkPos::toLong));
+    public static final ChunkTicketType<BlockPos> PORTAL = create(""portal"", Vec3i::compareTo, 300);
+    public static final ChunkTicketType<Integer> POST_TELEPORT = create(""post_teleport"", Integer::compareTo, 5);
+    public static final ChunkTicketType<ChunkPos> UNKNOWN = create(""unknown"", Comparator.comparingLong(ChunkPos::toLong), 1);
+```
+
+* `start`：用于世界启动时加载出生点。加载距离是 11，即加载等级22 。`net.minecraft.server.MinecraftServer#prepareStartRegion`
+* `dragon`：用于进行龙战时加载末地主岛。加载 9 距离，即加载等级24。 `net.minecraft.entity.boss.dragon.EnderDragonFight#tick`
+* `player`：玩家加载。
+* `forced`：用于实现 `/forceload`指令与强加载出生点。
+* `light`：用于加载需要计算光照的区块。
+* `portal`：用于生物或玩家穿过传送门时加载目标维度的区块，300gt（15s）内没有使用过之后，移除与之相关的加载票，加载距离是 3 。`net.minecraft.world.PortalForcer#getPortalRect`
+* `post_teleport`：用于生物或者玩家传送时加载目标区块，比如 `/tp`，5gt后移除。
+* `unknown`：用于游戏内代码上使用了 `getChunk`后加载区块，1gt后移除。
+
+加载等级对应着加载距离，算法是：
+
+加载等级 = 33 - 加载距离 
+
+`net.minecraft.server.world.ChunkTicketManager#addTicket`
+
+```java
+  ChunkTicket<T> chunkTicket = new ChunkTicket<>(type, ChunkLevels.getLevelFromType(ChunkLevelType.FULL) - radius, argument); //ChunkLevelType.FULL = 33
+```
+
+需要注意的是，加载距离并不由 `ChunkTicketType`指定，比如 `post_teleport` 在 `/tp` 指令使用时加载距离为 1，而其他情况下为 0。
+
+## 1.3加载等级 Level
+
+加载等级被限制在[22-45]，至于为什么上限是这个数：
+
+```java
+public static final int INACCESSIBLE = 33 + ChunkStatus.getMaxDistanceFromFull();
+```
+
+在1.20.1中ChunkStatus.getMaxDistanceFromFull()会返回12，具体请看1.6小结。
+
+## 1.4加载等级类型 LevelType
+
+在加载等级决定了这个区块能运算什么,一共有四中类型 
+
+`net.minecraft.server.world.ChunkLevelType`
+
+```java
+public enum ChunkLevelType {
+    INACCESSIBLE,
+    FULL,
+    BLOCK_TICKING,
+    ENTITY_TICKING;
+}
+```
+
+加载等级与加载等级类型的关系:
+
+`net.minecraft.server.world.ChunkLevels#getType`
+
+```java
+    public static ChunkLevelType getType(int level) {
+        if (level <= 31) {
+            return ChunkLevelType.ENTITY_TICKING;
+        } else if (level <= 32) {
+            return ChunkLevelType.BLOCK_TICKING;
+        } else {
+            return level <= 33 ? ChunkLevelType.FULL : ChunkLevelType.INACCESSIBLE;
+        }
+    }
+```
+
+加载等级类型决定了区块运算。
+
+* 运算实体(强加载) `ENTITY_TICKING` ：当加载等级小于等于31时为运算实体，会计算全部的游戏流程，包括实体等等。
+* 基础运算(弱加载) `BLOCK_TICKING` : 当加载等级小于等于32时为基础运算，不会运算实体，其他正常运算，如红石原件。
+* 加载边界 `FULL` ：当加载等级为33时为加载边界，几乎不会有游戏流程运算，但是会记录实体，也就是说在加载边界的里的实体会被记录上刷怪上线。
+* 不可访问 `INACCESSIBLE` ：当加载等级在大于33时为不可访问，这些区块并没有真正地加载，只是进行了部分的部分的世界生成。
+
+## 1.5区块实例 ChunkHolder
+
+不在本文的讨论范围，但会简略的介绍ChunkHolder的作用。
+
+`ChunkHolder`是区块管理系统底层中区块的容器，存储了区块本身、区块加载等级、区块生成状态和区块的允许用途。大约可以看成区块在游戏内部的实例。
+
+## 1.6区块状态 ChunkStatus
+
+不在本文的讨论范围，但会简略的介绍ChunkStatus。
+
+`ChunkStatus`对应了区块生成阶段，1.20.1中有：
+
+* `empty`：空区块；
+* `structure_starts`：获取区块中可能起始生成器结构；
+* `structure_reference`：用于世界生成；
+* `biomes`：确定生物群系；
+* `noise`：生成地形的大致轮廓与基岩层；
+* `surface`：替换地表附近的方块；
+* `carvers`：生成洞穴和峡谷；
+* `features`：生成海底洞穴和峡谷；
+* `initialize_light`：计算区块的初始光照?；
+* `light`：计算区块的光照；
+* `full`：区块加载完成  `ProtoChunk`转换为 `WorldChunk`。
+
+加载等级对应的区块状态：
+
+* 34-：`full`；
+* 35：`initialize_light`；
+* 36：`carvers`；
+* 37：`biomes`；
+* 38~45：`structure_starts`。"
+LoadingTicket/加载票系统的运作细节,"# 02加载票系统的运作细节
+
+![img.png](img/02ChunkTicketManager.png)
+
+本章围绕ChunkTicketManager `net.minecraft.server.world.ChunkTicketManager`展开，了解其的运作。
+
+## 2.1ChunkTicketManager的基本架构和其作用
+
+## 2.2对于玩家的处理
+
+2.2.1玩家视野与模拟距离
+
+2.2.2玩家加载票的更新"
+LoadingTicket/附页-辅助mod,"# a-附页-辅助mod
+
+## Chunkdebug
+
+链接:[Modrinth](https://modrinth.com/mod/chunk-debug)
+
+一款可以查看服务器上个个地方区块加载情况。
+![演示](./img/chunkdebug.png)
+
+## Intricarpet
+
+链接:[Modrinth](https://modrinth.com/mod/intricarpet)
+
+一个carpet扩展，可以关闭玩家区块加载，方便调试。
+
+`/interaction chunkloading false`
+
+## MessMod
+
+链接:[Modrinth](https://modrinth.com/mod/messmod)
+
+一个有多种功能的工具箱。"
+LoadingTicket/附页-一些译名,"# b-附页-一些译名
+
+一些跟本文有关的译名，大部分取自于wiki。
+
+|                          全称                          | 译名          |
+| :-----------------------------------------------------: | ------------- |
+| **Lazy Processing Chunk/Lazy Load/Block Ticking** | 弱加载 |
+|    **Entity Processing Chunk/Entity Ticking**    | 强加载 |
+|       **Loading Border Chunk/Border Load**       | 加载边界      |
+|                 **Inaccessible**                 | 不可访问      |
+|          **RenderDistance/ViewDistance**          | 渲染距离      |
+|              **SimulationDistance**              | 模拟距离      |
+|                       **Ticket**                       | 加载票        |
+|                       **Level**                       | 加载等级      |"
+MicroTiming/刻与刻间时序,"# #01 刻与刻间时序
+
+![不同时间亮起的灯](./img/OrderBetweenTicks.jpg)
+
+> 我们在前文中已经学习了更新理论了，但是好奇的小B决定不止于此。他拿出了创造物品栏的~~雷石东直放站~~红石中继器，拉下了拉杆。
+>
+> 也许是小B太过敏感，当他拉下拉杆的时候，他发现红石中继器好像没有立刻亮起，他以为游戏出现了虫，便多尝试了几次。他很快意识到这是个稳定的，可复现的现象。很显然，与前文中我们探讨的大量瞬时现象不同，这里出现了所谓**异步**的现象，他称这种现象为**延迟**
+
+## 1.1 游戏刻，红石刻与延迟
+
+在Minecraft中有大量的事件需要处理，这些事件被按顺序放在一个大循环里，我们称这个循环为游戏主循环，在不使用 */tick* 命令，游戏正常运行的情况下，这个主循环总是以约 **每秒20次** 的间隔循环，我们称这个最短间隔为 **GameTick** ，简称 **gt**。由于历史遗留问题，当前部分情况下我们仍采用**红石刻RedstoneTick**的记号，简称**rt**。其与gt有如下换算关系：$1rt=2gt$。
+
+这意味着：
+
+1. 1gt = $\frac{1}{20}$秒 = $0.05$秒
+2. 即使Minecraft算力充足，在不到0.05秒内计算完了游戏在本gt需要计算的全部内容，也会停止计算直到下一gt到来。
+
+因此，玩家定义了两个指标以衡量游戏是否卡顿，分别是 **TPS** 和 **mspt**。TPS全称 Tick Per Second 指的是每秒钟游戏执行了多少游戏刻。通常而言，这个数值是20，但当游戏卡顿时，其将会低于20。而mspt，全称 Millisecond Per Tick，指的是当前游戏执行每一刻所需要花费的毫秒数，数值越低则游戏卡顿越低。
+
+值得注意的是，mspt总是与TPS保持着如下关系：
+
+- 当mspt低于50时，TPS为20
+- 当mspt大于50时，TPS = $\frac{1000}{mspt}$
+
+在游戏中，绝大部分红石元件的响应是有**延迟**的。元件的**宏观**延迟我们在此处将其单位定义为**gt**，部分元件的延迟如下：
+
+- 中继器：2-8gt
+- 比较器：2gt
+- 侦测器：2gt
+- ...
+
+## 1.2 中继器，比较器初步
+
+中继器和比较器具有宏观延迟。中继器的延迟和其设定档位有关，而比较器的延迟总是2gt。
+
+中继器的基本作用是增强信号。即将任何强度不为0的红石信号在延迟指定游戏刻后变为强度为15的信号。
+
+当中继器侧面被中继器或比较器直接贴脸输入时，则会进入“锁存”状态，此时，其输入端的任何改变均不影响其亮起或熄灭状态，直到其侧面输入结束，等待延迟对应gt后，若状态需要更改，则更改其状态。
+
+比较器总共有3个输入端，分别为前面和两个侧面输入。当侧面无任何输入时，其总是会直接输出等同于前面输入的信号强度的信号。当其侧面存在输入时，比较器的行为取决于其模式。比较器有两种模式，分别为：
+
+- 比较模式
+- 减法模式
+
+---
+
+其默认为**比较模式**。当比较器处于**比较模式**时，其总是遵循如下逻辑进行输出：
+
+> 取左侧输入和右侧输入的最大值，若其最大值大于其前端输入，则不进行任何输出，否则输出其前端输入。
+
+---
+
+当比较器处于**减法模式**时，其总是遵循如下逻辑进行输出：
+
+> 取左侧输入和右侧输入的最大值，若其最大值大于其前端输入，则不进行任何输出，否则输出其(前端输入-侧面输入的最大值)。
+
+---
+
+比较器与容器的互动在此处不做讨论。
+
+## 1.3 充能理论
+
+我们建立充能理论以解释一种发生在中继器与比较器等元件的现象，其重要特征为隔着方块充能红石粉或其它中继器/比较器。
+
+我们定义对于任意**可充能**方块，其有两种充能状态：**强充能** 和 **弱充能**。
+
+当可充能方块被强充能时，其标志性特征为可以激活其周围6个方向的红石粉，无论其指向。而弱充能时仅能激活输入端对着可充能方块的中继器，比较器和部分其他红石元件。这也被作为辨别两种充能的重要办法。
+
+以下方法可以使得方块被强充能：
+
+- 中继器，比较器，红石火把，侦测器直接对着可充能方块发出信号。
+
+以下方法可以使得方块被弱充能：
+
+- 可充能方块被信号强度不为0的红石粉指向。
+
+![强充能和弱充能](./img/Tick_StrongOrWeak.png)
+
+在MC中，可充能方块是大多数，因此我们在此以不可充能方块的显著特征——不压线，来区分两种方块。压线指的是一种现象，绝大多数方块在会切断上下连接的红石粉，我们称这种现象为压线。但部分方块，如玻璃，台阶，半砖，箱子等并不具备此现象，这也意味着他们是不可充能方块。我们在这里定义活塞/粘性活塞也为不可充能方块。
+
+## 1.4 刻间时序
+
+> 此部分重点用于讲解基础时序分析。
+
+![基础时序](./img/Tick_Basic_Analysis.png)
+
+在这里我们给出一个例子来使用gt的概念来分析最简单的时序。
+
+如图所示，当拉下拉杆时，右侧中继器会在延迟8gt后被激活，接下来强充能方块，此时处于减法模式的比较器侧面的红石信号强度为14，而正面输入的信号强度为15，15-14=1>0，在延迟2gt后激活红石灯，共延迟10gt。
+
+左侧的比较器处于比较模式，其正面和侧面的信号强度都是14，两侧强度相等，延迟2gt后输出信号强度为14的红石信号，强充能了面前的方块，随后中继器在延迟6gt后激活红石灯，共计延迟8gt。"
+MicroTiming/初窥刻内时序,"<style>
+HeightLightNormal { color : Chartreuse }
+HeightLightWarning { color : Crimson }
+HeightLightAdvanced { color : DarkSeaGreen }
+</style>
+# #02 刻内时序
+![各个阶段](./img/TickPhase.jpg)
+
+## 2.1 刻内时序的观测
+
+> 这天小B做了一个装置：
+>
+> ![装置](./img/MicroTick02_Intro1.png)
+
+请各位猜猜按下按钮会发生什么？
+
+1. 什么都不会发生
+2. 左边活塞伸出了
+3. 右边活塞伸出了
+4. 两个活塞同时推出
+5. 游戏崩溃
+
+> 于是小B按下了按钮
+>
+> ![装置激活](./img/MicroTick02_Intro2.png)
+> 
+> 左……左边的活塞伸出了！！！！！！
+>
+>根据前两天看[01-刻与刻间时序](./01-刻与刻间时序.md)学到的知识：他进行了以下计算：
+>
+> 这个中继器延迟2gt，那个比较器延迟2gt……？哇两个活塞应该同时推出！那为什么只推出了一个活塞呢？明明是同一gt却有个先后顺序，gt不是最小单位了？
+>
+> 面对这样的疑问，聪慧至极的小B给出了惊人的结论：~~游戏出bug了！~~
+
+当然不是这样的！所有的玩家都应该建立一个这样的一个观念：在 Minecraft 中，大多数游戏逻辑是运行在单线程中的，这意味着从逻辑层面上看，事件的执行必定是有顺序的，而非严格意义上的同时！
+
+于是一切都解释的通了，在同1gt内必定存在某种更加精细的时序，我们称在1刻内的精细时序为**刻内时序**。正如前文所提到的，进行如上的~~明明理论上是同一gt发生但偏偏有个先后顺序~~的测试，便完成了一次**刻内时序的观测**。
+
+这里还有个例子：
+当按下按钮，两个装置分别出现了以下症状：
+
+![装置2激活](./img/MicroTick02_Intro4.gif)
+
+明明在同一gt内，加个中继器就大有不同，怎么有这么诡异的事情！为什么呢？本篇就将简要的探讨以上现象！
+
+什么你问这玩意有什么用？
+
+多的是呢！上到极为复杂的红石装置，下至最最基本的精确时序分析，都用得上。刻内时序理论的研究也在很大程度上促进了红石研究！包括但不限于推动上限检测，BED等听起来**高大上**的红石装置和理论。
+
+这里选取一段Void先生写的文字：
+
+> ...
+> 因此，刻内时序的学习之所以必要，不仅仅是为了解决设计中遇到的问题、解释以前无法解释的经验结论。更重要的是，有很多人轻视刻内时序的学习，不愿意学习刻内时序而将其仅仅视为一个问题的来源，在红石设计中常常遇到刻内时序导致的问题，却殊不知刻内时序是红石设计中最强大的工具之一，善用刻内时序的知识可以大大精简红石电路的设计，并提高红石机器的性能。刻内时序知识的缺乏使得许多人从一开始就不知道这件工具是可以利用的，这个情景从社区的良性发展的角度，是需要尽力避免的。
+
+## 2.2 微时序理论
+<style>
+WTUColor { color: Red }
+TTColor { color: #ff7300 }
+CTColor { color: #ffae00 }
+BEColor { color: Green }
+EUColor { color: Blue }
+TEColor { color: BlueViolet }
+ATColor { color: Purple }
+</style>
+
+### 2.2.1 微时序的阶段划分
+
+**1gt**就像现实世界中的**一天**，而在一天之内，我们又会有一定顺序的安排：起床、早饭、午饭、晚饭、睡觉……在Minecraft中，以1gt为最小单位的时序称为宏观时序，而某1gt内的更加细分的时序就称为微时序。
+
+在前文中我们知道，MC执行任何东西总是有优先顺序的，我们通过源码、实验等途径发现——Minecraft在1gt内总是大致按照以下顺序执行固定的事件：
+
+1. **<WTUColor>世界时间更新 World Tick Update</WTUColor>** ，简称<WTUColor>WTU</WTUColor>。游戏内存在一个和世界绑定的<WTUColor>「计时器」</WTUColor>，在世界创建时<WTUColor>「计时器」</WTUColor>被初始化为0。在<WTUColor>**本游戏阶段**</WTUColor>内，该<WTUColor>「计时器」</WTUColor>自增1。我们称第n刻就是：使这个<WTUColor>「计时器」</WTUColor>增加到n的那个<WTUColor>**世界事件更新阶段**</WTUColor>的刻。
+2. **<TTColor>计划刻 Schedule Tick / Tile Tick / Next Tick Entry\*</TTColor>** ，简称<TTColor>TT</TTColor>/<TTColor>NTE*</TTColor>。大部分具有延迟执行行为的元件都是由<TTColor>「计划刻」</TTColor>控制，在<TTColor>**计划刻阶段**</TTColor>执行的的。*（在此处提及NTE和Next Tick Entry的**错误**译名旨在帮助各位读者看懂部分早期的其他文档，不希望各位继续使用这两个名字。）*
+3. **<CTColor>区块刻 Chunk Tick</CTColor>** ，简称<CTColor>CT</CTColor>。区块刻由分为**雷，雪**和**随机刻**（Random Tick）。在此阶段内，游戏先处理**雷、雪**等事件；然后处理**随机刻**：当在存在玩家在一定距离内时，会发<CTColor>「生作物生长」</CTColor>、<CTColor>「草方块蔓延」</CTColor>、<CTColor>「水结冰」</CTColor>等随机刻事件。在每个<CTColor>**区块刻阶段**</CTColor>，游戏遍历玩家附近的所有区块，然后在这些区块里面随机选取方块，执行这些事件。
+4. **<BEColor>方块事件 Block Event</BEColor>** ，简称<BEColor>BE</BEColor>。像是**活塞推拉，音符盒发出声音**都是在这个阶段。拿活塞举例，当活塞发现自己的【**实际状态**】和【**供能的状态**】不符时，就会添加一个<BEColor>「**方块事件**」</BEColor>，在<BEColor>**方块事件阶段**</BEColor>内添加的<BEColor>「**方块事件**」</BEColor>会在本<BEColor>**方块事件阶段**</BEColor>执行，而在<BEColor>**方块事件阶段**</BEColor>之外的阶段添加的<BEColor>「**方块事件**」</BEColor>会被放到未来最近的一个<BEColor>**方块事件阶段**</BEColor>执行。继续上面活塞的例子，活塞会在<BEColor>**此阶段**</BEColor>在要推/拉的方块的预定位置摆上移动中的方块 (b36) 。
+5. **<EUColor>实体运算 Entity Update</EUColor>** ，简称<EUColor>EU</EUColor>。实体需要每刻都会主动**进行运动、实体 AI 等行为**。所有的**实体行为**，比如<EUColor>「生物运动」</EUColor>、<EUColor>「TNT 爆炸」</EUColor>、<EUColor>「怪物攻击」</EUColor>，都发生在<EUColor>**本阶段**</EUColor>。非玩家<EUColor>「激活」</EUColor>压力板、绊线，使得它们产生红石信号，也发生在<EUColor>这个阶段</EUColor>。
+6. **<TEColor>方块实体 Block Entity / Tile Entity</TEColor>** ，简称<TEColor>TE</TEColor>。有部分方块需要每刻**运行自己相关的逻辑**，这些事情发生在<TEColor>**方块实体阶段**</TEColor>。在<TEColor>**方块实体阶段**</TEColor>，漏斗会<TEColor>「吸取」</TEColor>、<TEColor>「传输」</TEColor>物品；被活塞推动的方块，会变成移动中的方块（b36），它们会在自己创建后的前两次<TEColor>**方块实体阶段**</TEColor>进行<TEColor>「推动实体」</TEColor>的逻辑，并且在接下来的第三个<TEColor>**方块实体阶段**</TEColor>变回普通的方块。
+7. **<ATColor>异步事件 Async Task / Network Update</ATColor>** ，简称<ATColor>AT</ATColor>/<ATColor>NU</ATColor>，也可称为Player Action/玩家操作。<ATColor>「玩家操作」</ATColor>实际上是从客户端发往服务端的网络数据包。在<ATColor>**本阶段**</ATColor>，也就是每一刻的结尾，服务端会统一执行所有在这一刻内收到的「玩家操作」数据包。
+
+这些是在平常分析时主要涉及的游戏阶段，后文中我们也会围绕这些事件展开叙述。
+
+### 2.2.2 瞬时
+
+在上文中，我们认识到1gt内又划分成了不同的阶段。就像早饭只能在早上吃、午饭只能在中午吃一样，Minecraft中的许多事件只能遵循一定的顺序，发生在特定的阶段。但还有一些“立刻响应”的事件，就像我们渴了就可以立刻去喝水，而不关心早上、中午、还是晚上。
+
+如果一个方块的行为可以在任意阶段发生的、只由**方块更新**触发，那么这个方块就称为**瞬时元件**。
+
+举例来说，红石粉亮灭是瞬时的。如果玩家关闭了一个拉杆，那么可以导致红石粉在玩家操作阶段熄灭；如果活塞推走了一个红石块，就可以导致红石粉在方块事件阶段熄灭。
+
+### 2.2.3 延时
+
+既然有瞬时事件，就必然有“延时”事件。举例来说，如果玩家放置了一个红石块，红石块激活了一个中继器，这个中继器就会在2gt后亮起。中继器亮起的这一行为具有**延时**，且**由游戏控制**（由计划刻控制），在**特定阶段发生**（计划刻阶段），中继器就不是瞬时事件。
+
+在接下来的几部分中，我们将详细地展开这些**不同的游戏阶段**。
+
+### 2.3 常见元件的运行阶段
+
+| 元件种类 | 运行阶段 |
+| :---: | :---: |
+| 命令方块运行指令 | <TTColor>计划刻TT</TTColor> |
+| 中继器、比较器、红石火把、侦测器的亮灭 | <TTColor>计划刻TT</TTColor> |
+| 红石粉、铁轨改变状态 | 瞬时 |
+| 栅栏门、活板门改变状态 | 瞬时 |
+| 漏斗因红石信号改变状态 | 瞬时 |
+| 漏斗吸收、传递物品 | <TEColor>方块实体TE</TEColor> |
+| 音符盒、钟因红石信号改变状态 | 瞬时 |
+| 音符盒、钟发出声音 | <BEColor>方块事件BE</BEColor> |
+| 发射器、投掷器因红石信号改变状态 | 瞬时 |
+| 发射器发射/投掷器投出物品 | <TTColor>计划刻TT</TTColor> |
+| 红石灯的亮起 | 瞬时 |
+| 红石灯的熄灭 | <TTColor>计划刻TT</TTColor> |
+| 按钮、压力板、绊线的亮起 | 瞬时[^1] |
+| 按钮、压力板、绊线的熄灭 | <TTColor>计划刻TT</TTColor> |
+| 重力方块判定下落、创建实体 | <TTColor>计划刻TT</TTColor> |
+| 重力方块下落、到位 | <EUColor>实体运算EU</EUColor> |
+| 活塞推出或收回 | <BEColor>方块事件BE</BEColor> |
+| b36[^2] 推动实体 | <TEColor>方块实体TE</TEColor> |
+| b36 自然到位 | <TEColor>方块实体TE</TEColor> |
+| b36 被粘性活塞收回到位[^3] | <BEColor>方块事件BE</BEColor> |
+
+[^1]: 但是压力板的亮起只能由实体运动触发，所以实际上只能在实体运算或玩家操作；类似地，按钮只能被玩家或者箭矢按下，所以也限制在这两个阶段。
+
+[^2]: b36 : minecraft:moving_piston,移动中的活塞。
+
+[^3]: 当粘性活塞收回的时候前方是 b36，则会立刻将其到位，也就是所说的粘性活塞短脉冲。
+
+### 2.4 刻内时序基础分析
+
+在这里，我们给出一个基本的例子。
+
+下图中，所有的命令方块内指令都为time query gametime
+
+![基础分析](./img/MicroTickIntro_Basic_Analysis.png)
+
+上升沿 *（拉下拉杆，粘性活塞推出）*：
+
+|刻数|阶段|事件|
+|---|---|---|
+|0|<ATColor>AT</ATColor>|玩家拉下拉杆|
+|0|<ATColor>AT</ATColor>|第一个活塞添加方块事件|
+|1|<BEColor>BE</BEColor>|第一个活塞推出|
+|3|<TEColor>TE</TEColor>|第一个红石块到位|
+|3|<TEColor>TE</TEColor>|命令方块计划在4刻（延迟1刻）运行|
+|3|<TEColor>TE</TEColor>|第二个活塞添加方块事件|
+|4|<TTColor>TT</TTColor>|第一个命令方块读数4|
+|4|<BEColor>BE</BEColor>|第二个活塞推出|
+|6|<TEColor>TE</TEColor>|第二个红石块到位|
+|7|<TTColor>TT</TTColor>|第二个命令方块读数7|
+
+下降沿 *（拉回拉杆，粘性活塞收回）*：
+
+|刻数|阶段|事件|
+|---|---|---|
+|0|<ATColor>AT</ATColor>|玩家关闭拉杆|
+|0|<ATColor>AT</ATColor>|第一个活塞添加方块事件|
+|1|<BEColor>BE</BEColor>|第一个活塞收回|
+|1|<BEColor>BE</BEColor>|第一个红石被撤去|
+|1|<BEColor>BE</BEColor>|第二个活塞添加方块事件|
+|1|<BEColor>BE</BEColor>|第二个活塞收回|
+|3|<TEColor>TE</TEColor>|两个红石块到位|
+|4|<TTColor>TT</TTColor>|两个命令方块都读数4|
+
+（改自void的例子）"
+MicroTiming/计划刻与计划刻元件,"# #03 计划刻
+![一些计划刻原件们](./img/ScheduledTick.jpg)
+本部分将解析计划刻及计划刻元件是如何运行的。
+
+**基础部分**
+
+- 计划刻的概念与内容
+- 常见的计划刻元件
+- 简单实例分析
+
+**进阶部分**
+
+- 计划刻队列的维护
+- 4gt侦测器高频的时序解析
+- 深入解析比较器的计划刻执行逻辑
+- 计划刻抑制
+
+## 3.1 计划刻的概念与内容
+
+### 3.1.1 什么是计划刻？
+
+在Minecraft中，我们常常见到许多红石元件在被触发后并不是立即变化的，例如中继器、比较器。这些元件总是在被触发后延迟一段时间，再发生变化。
+
+让我们以一个生活中的例子来看。上午，你收到了一封邮件，于是你计划下午去处理这封邮件，然后定了一个闹钟。到了下午，闹钟响了，你想到自己要处理邮件了，于是打开邮箱开始处理邮件。
+
+必须要注意的是：**这个“闹钟”并没有任何“文字注释”。它只负责在你的手机中、在正确的时间、提醒你一个人“有事情”。至于具体是什么事情，闹钟并不关心。** 这个闹钟包含且只包含这些内容：
+
+- 什么时候响
+- 这是第几个闹钟
+- 有多重要
+- 在谁的手机上响
+- 提醒谁
+
+计划刻就是这样一个“闹钟”。红石元件在被触发后，为自己添加了一个计划刻。当计划刻执行时，就像是闹钟响了，红石元件就变化了。
+
+由计划刻控制行为的红石元件，也就称为**计划刻元件**
+
+### 3.1.2 计划刻的内容
+
+像上文中的闹钟一样，**计划刻只包含这些内容**，我们称之为一个**计划刻的信息结构**：
+
+- 执行时间`triggerTick`：在何时执行，或称延迟多久后执行[^1]
+- 子顺序`subTickOrder`：计划刻添加顺序
+- 优先级`priority`：计划刻有多优先
+- 位置`pos`：执行的坐标
+- 方块种类`type`：哪一方块种类执行这个计划刻
+<!-- suborder的译名仍有待确定 -->
+[^1]: “延迟多久后执行”并不严谨。实际上，执行时间记录的是世界刻，“延迟`x`gt”就是`执行时间的世界刻=当前世界刻+x`。`当前世界刻>=执行时间的世界刻`时，计划刻执行。但这一区别并不影响大多数情况下的计划刻分析，区块卸载的情况除外。
+
+**位置**和**方块种类**都是易于理解的属性。毕竟，方块自己的计划刻不能由其他方块乱执行 ~~（如果你恰好在方块执行计划刻前把它推走或破坏掉换成其他方块的话）~~ 、也不能在世界里到处乱跑。
+
+**执行时间**，指的是宏观时序上计划刻的执行时间，也就是计划刻应该在哪一gt执行。例如，一个1挡位的中继器被触发后添加2gt后的计划刻，2gt后，该计划刻就会被执行。我们通常说的“计划刻元件的延迟”就是指计划刻在多少gt后执行。
+
+**子顺序**，指的是相同时间内的计划刻添加顺序。例如，在同一gt内，中继器A先被触发，中继器B后被触发。那么，在子序列中，中继器A就在中继器B前面。
+
+**优先级**，指的是计划刻的优先程度。优先级是一个-3~3的整数[^2]，其中数值越小，优先级越高。也就是说，在同一gt内，优先级为-3的计划刻总是比优先级-2、-1、0的计划刻更先执行。
+
+[^2]: 但是目前并没有优先级为1、2、3的计划刻。它们只是在代码中被声明了。
+
+> 通常在讨论优先级时，“优先级更高”和“优先级数值更低”的意思是相同的。为了避免由“优先”这一概念和“优先级数值”造成的歧义，我们更推荐读者在向其他人说明时使用“某一元件的计划刻更优先”来表述。
+
+同样的，就和上文中的闹钟一样：**计划刻只是一个“提醒方块有事要做”的闹钟，它并不关心方块实际要做什么。一切执行计划刻时的行为都由方块自身控制，“执行计划刻的行为”并不在“计划刻的信息结构”中。**
+
+而当我们说“某一元件已存在一个计划刻时”，指的就是在当前位置、存在一个方块类型和当前方块相同的、且还没有被执行的计划刻。[^3]
+
+[^3]: 由于后文说明需要，基础部分仅作简单表述。具体内容涉及计划刻队列的维护，参见进阶部分。
+
+### 3.1.3 计划刻的执行顺序
+
+在前两篇中，我们已经学过了宏观时序的分析，并且认识了微时序。我们知道，**宏观时序总是优于微时序的**，计划刻也是同理。对于执行时间不同的计划刻，执行时间早的计划刻总是更先执行。对于执行时间相同的计划刻，优先级更优先的计划刻总是更先执行。对于优先级相同的计划刻，子序列更小的、也就是更早添加计划刻的总是更先执行。
+
+所以，在比较计划刻执行顺序时，我们可以遵循这样的逻辑：
+
+1. **比较宏观时序**，宏观时序更早即更先执行。
+2. **比较计划刻优先级**，优先级更优先即更先执行。
+3. **比较计划刻添加顺序（子顺序）**，计划刻添加更早即更先执行。
+
+这就像比数字一样，宏观时序就是百位，优先级就是十位，添加顺序就是个位。
+
+### 3.1.4 计划刻顺序的实例
+
+那么，让我们来看看实际的例子。
+
+![例子](./img/03_ttorder.png)
+
+已知在图示情况下，比较器的优先级为0，中继器的优先级为-1。比较器和中继器的延迟都为2gt。
+
+1. 如果在不同gt下，先按下比较器的按钮，再按下中继器的按钮，哪一个音符盒会先响起？
+2. 如果在同一gt内，先按下比较器的按钮，再按下中继器的按钮，哪一个音符盒会先亮起？
+
+答案：
+1. 比较器先亮起。因为宏观时序上，比较器先亮起，而后间隔一定gt中继器才亮起。
+2. 中继器先亮起。因为在计划刻上，虽然比较器比中继器先添加计划刻，但是中继器的优先级为-1，比比较器的优先级0更优先，而计划刻优先级>计划刻添加顺序，所以中继器先亮起。
+
+## 3.2 常见的计划刻元件
+
+### 3.2.1 中继器
+
+中继器和比较器统称为**红石二极管**或**红石门**（Redstone Gate）[^4]
+
+[^4]: 因为在源码中，它们继承自同一个抽象基类`AbstractRedstoneGateBlock`
+
+在[刻与刻间时序](01-刻与刻间时序.md#12-中继器比较器初步)中，我们已经初步认识了中继器和比较器。现在，让我们深入中继器的计划刻行为。
+
+**若中继器被锁定，则不会添加计划刻，也不会在执行计划刻时改变任何状态。** 若中继器未被锁定，则具有以下行为：
+
+**添加计划刻行为**：
+- 当中继器受到NC更新时，它会检查自身状态。若自身不存在计划刻，且应当改变状态 *（即自身没有亮起，但输入端有红石信号；或自身亮起，但输入端没有红石信号）*，那么添加计划刻。
+- 中继器添加的所有计划刻的延迟都为`中继器挡位*2 gt`，除了下面这种情况：
+- 当中继器被放置时，它会检查自身状态，若应当改变状态，则添加1gt后的计划刻。
+
+**执行计划刻行为**：
+- 若中继器亮起，则立即熄灭。
+- 若中继器未亮起，则立刻亮起。这一步不受输入端信号影响。
+  - 若此时没有输入信号，则再添加计划刻（用于熄灭）。
+
+**举个例子**：
+
+从表现上来看，举例来说，如果给一个2挡位中继器一个`时长<=4gt`[^5]的信号，中继器的行为如下：
+- 受到NC更新，添加计划刻
+- 4gt后，执行计划刻
+  - 检测到自身未亮起，于是立即亮起
+  - 检测到输入端无红石信号，添加计划刻（用于熄灭）
+- 再4gt后，执行计划刻
+  - 检测到自身亮起，于是立即熄灭
+
+[^5]: 准确来说，应为“在中继器执行计划刻（进行亮起）前熄灭的信号”
+
+这一例子中包含了中继器的全部计划刻行为。
+
+**特殊的优先级变化**：
+
+- 若中继器指向一个横放的红石二极管或指向一个红石二极管的输入端，则计划刻的优先级为`-3`。
+- 否则，若中继器添加计划刻时处于亮起状态（即这一计划刻是用于熄灭的），则计划刻的优先级为`-2`。
+- 否则，计划刻的优先级默认为`-1`。
+
+
+### 3.2.2 比较器
+
+**添加计划刻行为** :
+- 当比较器受到NC更新时，它会检查自身状态。若自身不存在计划刻，且应当改变状态 *（即自身没有亮起，但输入端有红石信号；或自身亮起，但输入端没有红石信号）*，那么添加计划刻。
+- 比较器添加的所有计划刻的延迟都为`2gt`，除了：
+- 当比较器被放置时，它会检查自身状态，若应当改变状态，则添加1gt后的计划刻。
+
+**执行计划刻行为**：
+
+比较器在执行计划刻时，实际上只做了一件事情：
+- 根据比较器现在的输入状态和比较器模式，更新自己的输出能量等级。
+
+这里的**输出能量等级**指的就是比较器经过计算后得出的输出能量等级 *（具体计算方法见后文）*。而这里的**更新**包括了**更新能量等级**和**发出更新**两件事。并且对于比较器来说，从表观上可能会有输出能量等级不发生变化的情况，但实际上此时比较器依然“更新”了自己的输出能量等级。
+
+比较器还有相对复杂一点的更新行为——
+
+**比较器发出更新的行为**：
+
+1. 在执行计划刻时，若比较器的充能属性改变 *（即自身由熄灭变为亮起，或由亮起变为熄灭）*，则先发出NC更新，再发出PP更新。
+2. 如果比较器为比较模式，或比较器为减法模式且自己的输出能量等级发生变化，则发出NC更新。
+
+举例来说，就是：
+- 首先，这段内容全部建立在比较器**确实执行了计划刻**的前提下——
+- 只要比较器为比较器模式，就算它的输出等级不改变，包括由0变成0，也会有一次NC更新。
+- 如果比较器的输出能量等级由0（熄灭）变为1、2、3、4、5……14、15（亮起），或者由亮起变成熄灭，那么它会先发出一次NC更新，再发出一次PP更新，最后又发出一次NC更新。
+- 如果比较器为减法模式，它的输出能量等级由1、2、3、4、5……变成任意一个其他的能量等级，只会有一次NC更新。
+
+这些行为在一些特殊的布线中可能会有所应用。如果读者对这部分的理解感到困难，可以暂时只记忆比较器最常规的用法——即比较信号大小并判断是否输出、检测容器容量和减法模式，或者直接查表。
+
+| 比较器模式 | 计划刻行为          | 更新行为       |
+|-------|----------------|------------|
+| 比较模式  | 充能属性改变         | NC->PP->NC |
+| 比较模式  | 充能属性未改变        | NC         |
+| 减法模式  | 充能属性改变         | NC->PP->NC |
+| 减法模式  | 能量等级改变，充能属性未改变 | NC         |
+| 减法模式  | 充能等级和能量属性均未改变  | 不更新        |
+
+**比较器输出能量等级计算**
+
+如果信号输入是红石粉或者其他比较器，则继承输入的能量。
+
+如果是容器，请查看此部分内容[比较器信号强度计算](../BlockUpdate/01-更新概念与不同类型的更新?id=_152-比较器信号强度计算)。
+
+特别的，当同时有容器信号和红石信号输入时，比较器会根据情况优先选择不同的信号输入来计算输出,这一现象也被称为容器屏蔽。
+
+| 输入端              | 输出                              |
+|------------------|---------------------------------|
+| 比较器输入端直接与容器相连    | 只计算容器的输入，忽略红石信号                 |
+| 比较器输入端隔着实体方块检测容器 | 当红石信号为15时，输出15信号强度，其他情况优先计算容器输入 |
+
+案例(木桶中均没有物品)：
+![comparator](./img/comparator1.png)
+
+**特殊的优先级变化**：
+- 若比较器指向一个横放的红石二极管或指向一个红石二极管的输入端，则计划刻的优先级为`-1`
+- 否则，计划刻的优先级默认为`0`
+
+至此，我们已经可以分析上一章中的案例
+
+<div style=""display: flex; align-items:flex-start;"">
+    <!-- 图片 -->
+    <img src=""../MicroTiming/img/MicroTick02_Intro5.gif"" alt=""装置2激活"" style=""margin-right: 20px;"">
+    <!-- 表格 -->
+    <table border=""1"">
+        <tr>
+            <th></th>
+            <th>左侧</th>
+            <th>右侧</th>
+        </tr>
+        <tr>
+            <td>gt0</td>
+            <td>按钮按下铁轨激活<br/>侦测器添加2gt计划刻</td>
+            <td>按钮按下铁轨激活<br/>侦测器添加2gt计划刻</td>
+        </tr>
+        <tr>
+            <td>gt2</td>
+            <td>侦测器亮起<br/>侦测器添加2gt计划刻(优先级0)<br/>比较器添加2gt计划刻(优先级-1)</td>
+            <td>侦测器亮起<br/>侦测器添加2gt计划刻(优先级0)<br/>比较器添加2gt计划刻(优先级0)</td>
+        </tr>
+        <tr>
+            <td>gt4</td>
+            <td>比较器计划刻优先级-1,侦测器计划刻0,比较器计划刻先执行，比较器亮起<br/>侦测器熄灭</td>
+            <td>由于侦测器和比较器优先级相同，侦测器计划刻先添加，先执行侦测器计划刻，侦测器熄灭<br/>比较器执行计划刻，由于此时侦测器已经熄灭，所以比较器不亮起</td>
+        </tr>
+    </table>
+<style>
+@media (max-width: 1200px) {
+    div {
+        display: block !important;
+    }
+    img {
+        margin-bottom: 15px;
+    }
+    table {
+        width: 100%;
+    }
+}
+</style>
+</div>
+
+读者可以自行分析一下下面这个类似的案例，在按下按钮后，比较器是否会亮起。
+![案例2](./img/comparator2.png)
+
+### 3.2.3 侦测器
+
+**添加计划刻行为**：
+
+- 侦测器在受到面前的方块发出的PP更新后，如果自身未亮起且当前位置不存在自身的计划刻[^6]，则添加2gt后的计划刻。
+
+[^6]: 由于计划刻的执行逻辑，在当前gt即将执行的计划刻不会视为“存在计划刻”。也就是说，如果在某一gt侦测器将会亮起，而在侦测器亮起前对侦测器发出PP更新，此时侦测器也会添加计划刻。该逻辑是4gt侦测器高频的核心原理。具体行为和实例详见进阶部分。
+
+**执行计划刻行为**：
+- 若自身未亮起，则亮起，发出PP更新，再添加2gt后的计划刻，最后发出NC更新。
+- 若自身亮起，则熄灭。
+
+### 3.2.4 红石火把
+
+**添加计划刻行为**：
+
+- 红石火把在受到NC更新后，如果自身亮起但应当熄灭且当前位置不存在自身的计划刻，则添加2gt后的计划刻。
+
+**执行计划刻行为**
+- 如果自身亮起但应当熄灭，则熄灭。
+  * 如果自身**燃尽**，则**熄灭**[^7]，并添加160gt后的计划刻。
+- 如果自身熄灭但应当亮起，且没有燃尽，则亮起。
+
+[^7]: 此处熄灭通过`WorldEvent`（世界事件）控制，而非直接调用`setblockstate`。
+
+**应当熄灭/亮起**：红石火把所附着的方块是否为实体方块且受到红石信号。
+
+**燃尽**：如果红石火把在60gt内亮起了8次，那么自身燃尽。
+
+红石火把燃尽后，你可以通过破坏再重新放置一个红石火把来让它“亮起”，或者等到160gt后火把执行计划刻自行亮起。
+
+## 3.3 简单的计划刻时序分析
+
+### 3.3.1 侦测器能熄灭红石火把吗？
+
+**通常不能。** 让我们来简单分析一下：
+
+侦测器和红石火把的优先级都是**0**。并且侦测器亮起时**先发出PP更新**，然后**添加计划刻**，最后**发出NC更新**。红石火把**接受NC更新**。这里的**执行计划刻内的行为顺序**和**元件接受什么更新**根本上影响了接下来的分析。所以假设一个侦测器对着一个红石火把附着的实体方块，它的计划刻顺序如下：
+
+- 侦测器亮起：
+  * 发出PP更新，无事发生。
+  * 侦测器**添加计划刻**
+  * 发出NC更新：
+    + 红石火把受到NC更新：
+      * **添加计划刻**
+
+2gt后：
+- 侦测器**执行计划刻**，熄灭。
+- 红石火把**执行计划刻**，此时检查自身是否应当熄灭，发现不应熄灭（因为侦测器熄灭了，附着方块没有受到充能），于是不执行任何行为。
+
+所以概括来说就是：红石火把在要亮起的时候发现没充能了，遂开摆）
+
+**但是**，到这里我们就可以发现一个问题：假如我放置两个侦测器，其中一个侦测器用来 **“触发”红石火把添加计划刻**，另一个用来 **“延续”红石信号来熄灭火把**，那么红石火把是不是就可以亮起了呢？没错。一个简易的结构如下图所示：
+
+![结构](img/03-RedstoneTorch.gif)
+
+### 3.3.2 侦测器能使比较器亮起吗？
+
+### 3.3.3 什么是“末端常亮”中继器？
+
+## 3.4【进阶】计划刻队列的维护
+
+在本部分的说明中，我们会省略一些已被声明但未被调用或极少涉及的变量。
+
+为了提高读者在阅读**计划刻执行过程**中的流畅度，我们会先解释所有涉及的重要概念和方法，最后再解释计划刻的执行逻辑。在阅读时，你可以先初步了解这些概念和方法，再在理解计划执行逻辑遇到困难时回看查阅。
+
+### 3.4.1 基础
+
+整个世界的计划刻在实际执行时都是由一个**世界层计划器**（`WorldTickScheduler`，或称**世界层计划刻调度器**）[^8]控制的；每个位置的计划刻在添加与存储时都由对应区块的一个**区块层计划器**（`ChunkTickScheduler`，或称**区块层计划刻调度器**）控制。
+
+[^8]: 本部分（3.4）所使用的这些译名均为编者自行拟定，目前尚未在其他相关文献中发现对应译法。如果读者有更好的译名或修改意见，请直接提交issue与我们联系。
+
+### 3.4.2 计划刻类
+
+一个包含了计划刻的所有信息的对象可称为**计划刻对象**。计划刻类`OrderedTick`则定义了计划刻对象的属性和方法。它除了具有方块类型`type`、坐标`pos`，执行时间`triggerTick`、优先级`priority`、子顺序`subTickOrder`这五个基本属性外，还实现了以下四个方法：
+
+#### 执行时间比较
+
+先比较`triggerTick`大小；若相同，则比较`priority`大小；若仍然相同，则比较`subTickOrder`大小。
+
+此方法实现了**区块层计划器**中的**优先级队列**中的“优先级”比较（见下文）。
+
+#### 简单比较
+
+不比较`triggerTick`大小。仅先比较`priority`大小；若相同，则比较`subTickOrder`大小。
+
+此方法实现了**世界层计划器**中的**区块层计划器优先级队列**中的“优先级”比较（见下文）
+
+#### 哈希化
+
+对`type`和`pos`的哈希码进行运算后得到该计划刻对象的哈希码：
+
+```java
+31 * pos.hashCode() + type.hashCode()
+```
+
+*在Java中，所有的哈希码都是整数。*
+
+#### 快速实例化
+
+除了常规的实例化方法外，计划刻类还实现了一个`create`方法，用于只基于`type`和`pos`临时创建一个计划刻对象。它的其他三个属性都为`0`。这一临时计划刻对象用于判断某一位置是否存在某一方块的计划刻。
+
+### 3.4.3 区块层计划器
+
+区块层计划器管理计划刻的**添加**、**“检查”**与**存储**。它主要维护了一个**优先级队列**（`PriorityQueue`）和一个**哈希集**（`ObjectOpenCustomHashSet`）
+
+#### 添加计划刻
+
+尝试向**哈希集**中添加**哈希化后的计划刻**，若添加成功（即集合中不存在该计划刻），则同时向**优先级队列**中添加该计划刻的**计划刻对象**。
+
+#### 计划刻存储
+
+所有计划刻的哈希码都存储在对应区块的区块层计划器的哈希表中，所有计划刻的计划刻对象则按顺序存储在对应区块的区块层计划器的优先级队列中。
+
+优先级队列的排序依据[**触发时间比较**](#触发时间比较)，即它将同时考虑`triggerTick`、`priority`和`subTickOrder`。
+
+#### 访问下一计划刻 `peekNextTick`
+
+或称“访问头部计划刻”，此方法会返回当前区块下一个执行的计划刻的计划刻对象，即优先级队列中的第一个计划刻
+
+#### 取出下一计划刻 `pollNextTick`
+
+或称“取出头部计划刻”。此方法会尝试取出当前区块下一个执行的计划刻的计划刻对象，若取出成功，则同时删除哈希表中该计划刻对象的哈希码。
+
+### 3.4.4 世界层计划器
+
+世界层计划器管理计划刻的“检查”和执行。在计划刻的执行阶段，它统筹管理所有区块的区块层计划器，并按一定逻辑按顺序取出计划刻放入可执行计划刻列表中，最后一并执行。
+
+详见[执行计划刻](#346-执行计划刻)。
+
+### 3.4.5 检查计划刻是否存在
+
+此方法即我们常说的“某元件自身不存在计划刻”或“某元件当前位置不存在自身计划刻”，显而易见的，它描述了两个核心参数：“某原件”——方块类型`type`，“自身”“当前位置”——坐标`pos`。
+
+#### 方法1：由区块层计划器控制的检查方法
+    
+即上文中描述的**添加计划刻**方法。向哈希集中添加哈希化后的计划刻实际上就是一种“检查”：如果哈希集中已经存在位于某一坐标的某一方块的计划刻，此时这一方块再尝试添加位于该处的计划刻时就会失败。
+
+#### 方法2：检查计划刻是否“将要执行” `isTicking`
+    
+此方法用于检查元件自身是否会在当前gt执行计划刻。
+
+它接收方块类型和坐标两个参数，先复制一份当前gt将执行的计划刻的队列，然后检查这一队列中是否存在方块类型、坐标都相同的计划刻。
+    
+在执行计划刻时，当前tick的所有可执行的计划刻（如果没有达到计划刻上限的话）都会被从各个区块层计划器的哈希集和优先级队列中取出（详见下文**执行计划刻**），也就是说——如果元件将在这一gt执行计划刻，此时又恰好在执行前尝试添加计划刻，那么这一添加行为就无法被**方法1**“拦截”。
+
+中继器、比较器、红石火把等元件在添加计划刻时就会使用此方法检查计划刻是否“将要执行”。以中继器为例，由于此方法的作用，假如中继器在第2gt时将亮起，那么在第2gt时、中继器亮起前，由于中继器检查到自身将在当前gt执行计划刻，那么无论信号如何变化，它都不会添加计划刻；而在第0gt和第1gt时，如果中继器输入端的充能状态改变且中继器受到更新，那么它就会尝试添加计划刻，但由于方法1的“检查”，这一添加行为不会成功。所以方法1和方法2共同保证了中继器不会在执行计划刻前重复添加计划刻。
+
+#### 方法3：检查计划刻是否在队列中 `isQueued`
+    
+此方法是侦测器所调用的的“检查计划刻是否存在”方法，其实际功能和方法1完全一致。
+
+*我真的不知道它除了可能能减少卡顿外有什么用。 ——tanh_Heng*
+
+它接收方块类型和坐标两个参数，先将坐标对应到区块，再访问该区块对应的区块层计划器，然后快速实例化一个具有对应`type`和`pos`的计划刻，最后检查哈希集中是否存在与这一临时计划刻的哈希码相同的计划刻。
+
+显而易见的，与方法2的根本区别就在于此方法不会检查当前gt将要执行的计划刻。这是4gt侦测器高频的核心原理。
+
+### 3.4.6 执行计划刻
+
+执行计划刻分为**收集**（`collect`）、**执行**（`run`）和**清理**（`cleanup`）三个阶段。其中最重要的是收集阶段。在收集阶段，世界层计划器将按如下步骤将计划刻添加至**可执行计划刻列表**（`tickableTicks`）中：
+
+#### 描述说明
+
+**区块层计划器的头部计划刻**：区块层计划器中，排在最前面的、将要最先执行的那一计划刻。
+
+所有没有明确表述**取出计划刻**的描述都为**访问**方法。
+
+**达到了计划刻上限**：游戏中每gt能够执行的计划刻数量是有限的，**达到了计划刻上限**即指可执行计划刻列表中计划刻的数量大于等于计划刻上限`maxmaxTicks`。
+
+#### 第一步：筛选可执行的区块层计划器 `collectTickableChunkTickSchedulers`
+
+1. 扫描所有区块层计划器（负责管理单个区块内的计划刻）。只选择那些：
+    - 内部有等待执行的计划刻 (存在计划刻)。
+    - 其队列中头部计划刻的执行时间小于等于当前gt。
+    - 该计划刻对应的区块本身满足加载要求。
+
+2. 把这些符合条件的区块层计划器放入一个优先级队列中，称为可执行的区块层计划器的优先级队列（`tickableChunkTickSchedulers`，以下简称计划器队列）。
+
+那么，这个优先级队列如何排序？队列根据每个区块层计划器的头部计划刻进行排序。排序使用[简单比较](#简单比较)（即与区块层计划刻的**执行时间比较**相比，简单比较不会考虑`triggerTick`属性）。这个排序机制是后续[计划刻抑制器](#347-计划刻抑制器)实现的关键。
+
+#### 第二步：从队列中提取可执行计划刻 `collectNextTicks`
+
+1. **取出第一个计划器：** 从计划器队列的最前面取出一个区块层计划器。我们称它为**当前区块层计划器**。
+
+2. **取出它的第一个计划刻：** 从当前区块层计划器的计划刻队列中取出其头部计划刻。
+
+3. **标记为可执行：** 把这个取出的计划刻添加到可执行计划刻列表中，等待实际执行。
+
+4. **尝试连续提取更多计划刻：** 接下来，游戏会尝试从当前区块层计划器中连续地、尽可能多地取出后续的计划刻（只要满足特定条件）：
+
+    1. **上限检查：** 如果已经达到了本次处理允许的计划刻上限，则停止整个连续提取过程。
+
+    2. **访问队列下一个计划器：** 访问当前计划器队列最前面的区块层计划器（因为第一个计划器已经被取走了，所以这是原本的队列中的第二个计划器）。我们称它为**区块层计划器2**。
+
+    3. **检查队列是否非空：** 如果计划器队列不是空的（即成功访问到区块层计划器2），那么访问区块层计划器2的头部计划刻。
+
+    4. **开始连续取出：** 如果还没达到计划刻上限，就循环执行下面的步骤 (5 和 6)。
+
+    5. **查看当前计划器的下一个计划刻：** 再次访问当前区块层计划器的计划刻队列，获取当前它最前面的计划刻（和步骤2同理，因为第一个计划刻已经被取走了，所以这是排在原先的头部计划刻的后面的那一个计划刻）。
+
+    6. **决定是否取出 (核心条件)：**
+
+        - 如果当前区块层计划器中确实还有计划刻（成功访问到其当前头部计划刻），
+
+        - 并且这个计划刻也需要在当前游戏刻（gt）执行，
+
+        - 并且使用**简单比较**规则判断，当前区块层计划器 的这个计划刻的执行时间早于区块层计划器2的头部计划刻的执行时间，
+
+        - 那么就把当前区块层计划器的这个计划刻也取出来，加入到可执行计划刻列表中。
+
+        - 如果以上任何一个条件不满足（没有计划刻了、不是当前gt执行、或者不比队列里下一个计划器的计划刻早），就退出这个连续提取的循环，即**不再尝试连续提取更多计划刻**。
+
+5. **处理未完成计划器：** 当步骤4的连续提取循环结束后，意味着暂时无法再从当前区块层计划器中连续取出更多符合条件的计划刻了。此时检查：
+
+    - 如果当前区块层计划器里还有未被取出的计划刻（队列没空），
+
+    - 并且它现在队列最前面的计划刻（新的头部计划刻）仍然需要在当前游戏刻（gt）执行，
+
+    - 并且整个处理过程还没有达到计划刻上限，
+
+    - 那么就把当前区块层计划器重新加入到计划器队列中（根据其新头部计划刻的执行优先级重新排序），等待后续再次处理。
+
+6. 循环以上步骤（步骤1至步骤5），直到达到计划刻上限或计划器队列被取空。
+
+概括来讲，上述步骤可以这样描述：
+
+游戏首先筛选出所有在当前gt有计划刻要执行、且区块已加载的区块层计划器，并按它们最优先计划刻（头部计划刻）的简单比较顺序排队。然后，它从队头取一个区块层计划器，将它最优先的计划刻加入准备执行的队列中，并尝试从这个计划器里“连续”提取更多同样在当前gt执行的、且比队列里下一个计划器最优先的计划刻还要优先的任务来一起加入准备执行队列中（目的是提高效率）。如果连续提取被打断（比如下一个计划刻不够优先、或者达到执行上限），而这个区块还有当前gt的计划刻未被添加且未超上限，就把当前计划器按照头部计划刻的优先顺序放回计划器队列中，以便稍后继续处理它剩下的任务。
+
+#### 第三步：延迟未被添加的区块层计划器 `delayAllTicks`
+
+将所有计划器队列中还没有被取出的区块层计划器加入一个`区块坐标 -> 下一执行时间`的映射表（`nextTriggerTickByChunkPos`）中，以待后续执行。
+
+### 3.4.7 计划刻抑制器
+
+由执行计划刻的逻辑我们可以注意到：区块层计划器的排序是不考虑`triggerTick`的。也就是说，如果某个或某几个区块层计划器的头部计划刻优先级足够高、且该计划器中的计划刻数量足够多，就可以使世界层计划器不断地只从这几个计划器中取出计划刻直到达到计划刻上限，而不会取出其他计划器中的计划刻。并且这一抑制器只能对抑制器所在区块外的其他区块生效。
+
+例如，如果在某几个区块以一定高频激活足够多的中继器，在其他区块的优先级为0的元件就会在高频期间被“抑制”，如比较器不亮起、侦测器高频不工作，直到高频结束这些计划刻才会重新执行。"
+MicroTiming/方块实体,"# #04 方块实体
+
+![带有方块实体的方块们](./img/BlockEntities.jpg)
+
+## 4.1 方块实体的概念与内容
+
+### 4.1.1 什么是方块实体？
+
+方块本身通过预定义的有限 BlockState 集合保存数据；通过默认的方块渲染行为渲染模型；通过更新系统、计划系统等决定执行逻辑。
+但是，这样的模式具有局限性, 无法直接满足在游戏交互中一些方块的功能。
+
+因此，我们需要一种专门帮助特定方块存储数据，实时处理逻辑，进行额外渲染的组件。我们叫它们***方块实体***。
+方块实体相为普通方块提供了三个重要的额外功能： ***使用NBT存储数据***、***自定义的渲染行为*** 和 ***在每一次tick中进行更新***。
+
+方块实体通过NBT来存储数据，和实体一样。而且，与方块状态不同，
+方块实体的数据不会自动同步到客户端: 方块实体必须自己声明何时同步以及同步哪些数据。
+
+### 4.1.2 方块实体的内容
+
+方块实体是因方块而异的，但一个抽象的，基本的方块实体含有以下基本信息与功能:
+
+#### 携带的信息
+
+- type 类型
+- world 所在的世界
+- pos 位置
+- removed 是否已被移除
+- cachedState 缓存的，对应方块的状态;
+
+#### 提供的重要功能
+
+- readNbt 读入NBT数据
+- writeNbt 写出NBT数据
+- tick 在服务器tick中执行逻辑
+- render 进行自定义的渲染
+
+### 4.1.3 带有方块实体的方块
+
+方块实体与世界绑定，每个方块位置仅有一个方块实体实例。
+
+| 方块                       | 用途                             |
+|--------------------------|--------------------------------|
+| 蜂箱（Beehive）              | 用于储存蜜蜂数量和其中的蜂蜜等级。              |
+| 蜂巢（Bee Nest）             | 用于储存蜜蜂数量和其中的蜂蜜等级。              |
+| 告示牌（Sign）                | 用于储存显示的文字。                     |
+| 悬挂式告示牌（Hanging Sign）     | 用于储存显示的文字。                     |
+| 旗帜（Banner）               | 用于储存显示的图案。                     |
+| 箱子（Chest）                | 用于储存物品，支持战利品表信息。               |
+| 陷阱箱（Trapped Chest）       | 用于储存物品，支持战利品表信息。               |
+| 发射器（Dispenser）           | 用于储存物品，支持战利品表信息。               |
+| 投掷器（Dropper）             | 用于储存物品，支持战利品表信息。               |
+| 合成器（Crafter）             | 用于存储禁用哪些槽位，以及战利品表信息。           |
+| 酿造台（Brewing Stand）       | 用于储存当前的酿造时间。                   |
+| 漏斗（Hopper）               | 用于储存下一次传送物品的间隔时间。              |
+| 熔炉（Furnace）              | 用于储存当前烧炼物的时间和燃料的剩余时间。          |
+| 高炉（Blast Furnace）        | 用于储存当前烧炼物的时间和燃料的剩余时间。          |
+| 烟熏炉（Smoker）              | 用于储存当前烧炼物的时间和燃料的剩余时间。          |
+| 营火（Campfire）             | 用于储存和显示其状态。                    |
+| 潜影盒（Shulker Box）         | 用于储存物品，支持战利品表信息。               |
+| 木桶（Barrel）               | 用于储存物品，支持战利品表信息。               |
+| 讲台（Lectern）              | 用于存储书当前所在的页面。                  |
+| 雕纹书架（Chiseled Bookshelf） | 用于存储最近一次放入或取出的书的槽位号。           |
+| 可疑的沙子（Suspicious Sand）   | 用于储存它容纳的物品。                    |
+| 可疑的沙砾（Suspicious Gravel） | 用于储存它容纳的物品。                    |
+| 信标（Beacon）               | 用于储存金字塔的层数、被激活的效果和容纳的物品。       |
+| 刷怪笼（Spawner）             | 用于储存生成的实体类型、生成时间间隔、数量及附加值。     |
+| 音符盒（Note Block）          | 用于保存它需要播放的音符。                  |
+| 移动中的活塞（Piston Arm）       | 用于保存方块的移动状态和方向，以及被移动方块的ID和数据值。 |
+| 唱片机（Jukebox）             | 用于播放所包含的音乐唱片。                  |
+| 附魔台（Enchantment Table）   | 用于控制悬浮书的状态。                    |
+| 末地传送门（End Portal）        | 用于局域性粒子效果显示。                   |
+| 末影箱（Ender Chest）         | 用于局域性粒子效果显示。                   |
+| 生物头颅（Mob Head）           | 用于储存头颅种类和朝向，以及所属玩家信息（如果存在）。    |
+| 命令方块（Command Block）      | 用于储存命令方块种类、保存的命令、输出的信号强度和输出文字。 |
+| 末地折跃门（End Gateway）       | 用于传送的位置和是否渲染光柱。                |
+| 结构方块（Structure Block）    | 用于储存有关结构的信息。                   |
+| 钟（Bell）                  | 用于渲染摇摆动画。                      |
+| 潮涌核心（Conduit）            | 用于激活范围和状态渲染。                   |
+| 幽匿催发体（Sculk Catalyst）    | 用于储存其蔓延信号。                     |
+| 幽匿感测体（Sculk Sensor）      | 用于监听周围的振动游戏事件。                 |
+| 幽匿尖啸体（Sculk Shrieker）    | 用于监听周围的振动游戏事件。                 |
+| 磁石（Lodestone）            | 用于绑定磁石指针。                      |
+| 黑板（Chalkboard）           | 用于储存显示的文字。                     |
+| 化合物创建器（?????） | 用于储存实验物品和进程。                   |
+| 饰纹陶罐（Decorated Pot）      | 用于存储陶片样式及容纳的物品。                |
+| 宝库（Vault）                | 用于储存其配置数据、渲染数据等信息。             |
+
+## 4.2 重要的带有方块实体的方块
+
+### 4.2.1 漏斗
+
+在 Minecraft 中，漏斗是一种重要的方块实体，主要用于物品的自动化传输。
+
+#### 漏斗方块实体携带的信息
+
+一个可爱的漏斗方块实体携带以下基本信息:
+
+- `inventory` 储存空间（5格）
+- `transferCooldown` 冷却（默认为-1）
+- `lastTickTime` 上一tick的世界时间
+- `facing` 朝向
+
+#### 漏斗方块实体的功能
+
+- **将物品传输到目标容器**
+- **从容器中吸取物品**
+- **尝试吸取物品实体**
+
+#### 漏斗方块实体的工作流程
+
+每个游戏刻（tick），漏斗都会执行以下步骤：
+
+1. **减少冷却时间（cd, Cooldown）**
+
+    - 若 cd 仍大于 0，漏斗不会执行任何拉取或输出操作，而是直接结束运算。
+    - 若 cd 归零，漏斗会开始尝试执行**输出**和**拉取**操作。
+
+2. **执行物品传输逻辑**
+
+    - **首先尝试输出**（将物品放入目标容器）
+    - **随后尝试拉取**（从上方容器吸取物品）
+    - **如果吸取或输出成功**，则漏斗会重置冷却时间，并同步更新自身数据。
+
+![img.png](img/HopperFlowchart-basic1.png)
+
+现在，让我们移步到***尝试拉取和输出的具体的逻辑***。
+
+当漏斗确定自己需要做些什么时，它会先尝试向指向的容器输出。随后，它会尝试从上方吸取物品。最后，如果吸取和输出中有任意一方成功了，它就会设置冷却，并更新同步自己的数据。
+
+![img.png](img/HopperFlowchart-basic2.png)
+
+我们分别来看输出和拉取的逻辑。
+
+先看***输出***...
+***输出***输出操作由 `insert()` 方法完成，它的作用是将物品从漏斗传输到目标容器，并返回一个布尔值来表示是否成功传输。如果传输成功，则漏斗进入冷却状态。
+
+**输出的基本逻辑：**
+
+1. **确认目标容器是否可用**
+
+    - 如果目标容器已满，则输出失败。
+    - 如果目标容器有可用槽位，则尝试传输物品。
+
+2. **尝试输出物品**
+
+    - 遍历漏斗中的物品槽，逐个尝试传输物品到目标容器。
+    - 只要有一次传输成功，就返回“成功”；否则返回“失败”。
+
+![img.png](img/HopperFlowchart-basic3.png)
+
+当调用 `transfer()` 方法尝试传输物品时，`transfer()` 方法会返回一个物品组：
+
+- 若返回值为空，则说明物品已完全传输，输出成功。
+- 若返回值不为空，则说明物品未能全部传输，输出失败。
+
+![img.png](img/HopperFlowchart-basic4.png)
+
+到此，输出的部分已经完成，接下来，我们来看看***拉取***的部分。
+拉取物品的逻辑与输出类似，但方向相反：
+
+- **输出** 时：漏斗 `transfer()` 物品至**目标容器**。
+- **拉取** 时：某个**容器** `transfer()` 物品至**漏斗**。
+
+由于 `transfer()` 方法的逻辑马上会详细解释，因此这里不再赘述。
+
+![img.png](img/HopperFlowchart-basic6.png)
+
+`transfer()` 是漏斗实现物品传输的核心方法。它接收以下参数：
+
+- **from**：物品来源（可以是漏斗或其他容器）
+- **to**：传输目标（可以是容器或另一个漏斗）
+- **itemStack**：希望传输的物品组
+- **slot**：目标容器中的目标槽位
+
+执行流程如下：
+
+1. **检查目标槽位的状态**
+
+    - 如果该槽为空，直接将 `itemStack` 放入，并清空 `itemStack`。
+    - 如果该槽已有相同类型的物品，并且仍有剩余空间，则合并物品并清空 `itemStack`。
+
+2. **判断是否传输成功**
+
+    - 传输后，若 `itemStack` 为空，则表示成功传输，否则表示失败。
+
+3. **特殊处理漏斗间传输的时序**
+    - 如果目标是另一个漏斗，则会给目标漏斗增加 `8gt`的冷却时间。
+    - 若目标漏斗 `to` 已先于源漏斗 `from` 计算，则目标漏斗 `to` 仅会得到 `7gt` 的冷却时间。
+   > 值得注意的是，这只在目标漏斗为空时发生；
+   > 此外，就算`from`后于`to` 计算,并给予`8gt`的冷却时间，由于随后 `to`tick时会将冷却立刻-1，所以结果上还是只有`7gt`冷却。
+
+![img.png](img/HopperFlowchart-basic5.png)
+
+到此，你已经完全了解了漏斗的基本运作机制。相信这将会对之后的篇章理解提供很大的帮助。
+
+#### 4.2.2移动中的活塞
+
+另外一个及其重要的方块叫moving_piston，移动的活塞，俗称b36。
+
+#### 移动的活塞方块实体携带的信息
+
+一个移动活塞方块实体携带一下基本信息:
+
+- `pushedBlock` 存储的方块
+- `facing` 朝向
+- `extending` 是否在伸出（与动画播放的方向有关）
+- `source` 是否是收回中的活塞本体
+- `progress` 当前的移动进度
+- `savedWorldTime` 上次执行逻辑时的世界时间
+
+#### 移动的活塞方块实体的功能
+
+- **处理活塞推送实体**
+- **更新动画进度**
+- **如果`progress>=1`，则将 MOVING_PISTON 替换为`pushedBlock`中存储的方块**
+- **在客户端渲染动画**
+
+#### 移动的活塞方块实体的工作流程
+
+详情见[5.7](./MicroTiming/05-方块事件?id=_57-b36的到位)。
+
+## [进阶]4.3方块实体间的时序
+
+方块实体`tick`过程执行由 `LevelChunk` 中以下两个列表维护：
+
+- `pendingBlockEntityTickers`: 在`tickBlockEntities`过程中动态加入的方块实体。
+- `blockEntityTickers`: 将要`tick`的方块实体
+
+这两个列表都是 ArrayList，因此它们的遍历顺序完全取决于元素的加入顺序。具体流程如下：
+
+- `tickBlockEntities()` 会首先将 `pendingBlockEntityTickers` 中的元素添加到 `blockEntityTickers` 末尾，然后清空 `pendingBlockEntityTickers`。
+- 遍历 `blockEntityTickers` 时，如果某个 `TickingBlockEntity` 已被移除（`isRemoved()` 返回 `true`），则从列表中移除；否则会调用其 `tick()` 方法进行更新。
+
+新增方块实体时，会调用 `addBlockEntityTicker()` 方法，将其加入列表。若当前正处于 `tick` 过程中（`tickingBlockEntities == true`），则加入 `pendingBlockEntityTickers`；否则直接加入 `blockEntityTickers`。
+
+卸载时,同一区块内的方块实体会被保存在 `Map<BlockPos, BlockEntity>` 中，加载时遍历这个 Map，并依次调用 `addBlockEntityTicker()` 加入 `blockEntityTickers`。因此它们的执行顺序取决于 `BlockPos` 的 `hashCode` 计算顺序。
+
+不同区块之间的方块实体加载顺序则取决于区块的加载顺序，即哪个区块先加载，它的方块实体就会先加入 `blockEntityTickers`。
+
+**一句话总结**:
+
+卸载前,方块实体的计算顺序取决于放置的顺序.重新加载后。一个区块内的方块实体计算取决与其pos的hash,不同区块的方块实体则取决于区块加载的顺序。
+
+相关代码如下(删减了部分无关内容)
+```java
+// 用于暂存在tickBlockEntities过程中动态加入的方块实体
+private final List<TickingBlockEntity> pendingBlockEntityTickers = Lists.newArrayList();
+
+//将要tick的方块实体列表
+protected final List<TickingBlockEntity> blockEntityTickers = Lists.newArrayList();
+
+private void tickBlockEntities() {
+
+   this.tickingBlockEntities = true; 
+   
+   if (!this.pendingBlockEntityTickers.isEmpty()) {
+      this.blockEntityTickers.addAll(this.pendingBlockEntityTickers);
+      this.pendingBlockEntityTickers.clear();
+   }
+
+   // 遍历正在 tick 的方块实体列表
+   Iterator<TickingBlockEntity> iterator = this.blockEntityTickers.iterator();
+   while (iterator.hasNext()) {
+      TickingBlockEntity tickingBlockEntity = iterator.next();
+
+      if (tickingBlockEntity.isRemoved()) {
+         // 如果方块实体已经被移除，则从列表中剔除
+         iterator.remove();
+      } else if (this.shouldTickBlocksAt(tickingBlockEntity.getPos())) {
+         // 如果所在位置应被 tick，则调用 tick() 方法进行更新
+         tickingBlockEntity.tick();
+      }
+   }
+   
+   this.tickingBlockEntities = false;
+   
+}
+
+// 添加一个方块实体的ticker
+public void addBlockEntityTicker(TickingBlockEntity tickingBlockEntity) {
+   (this.tickingBlockEntities ? this.pendingBlockEntityTickers : this.blockEntityTickers)
+           .add(tickingBlockEntity);
+}
+
+// 区块内所有方块实体
+protected final Map<BlockPos, BlockEntity> blockEntities = Maps.newHashMap();
+
+// 区块加载完成后，注册所有已有的方块实体（将它们加入 tick 系统）
+public void registerAllBlockEntitiesAfterLevelLoad() {
+   this.blockEntities.values().forEach(blockEntity -> {
+      // 为该方块实体添加 ticker，即加入到 blockEntityTickers中
+      this.updateBlockEntityTicker(blockEntity);
+   });
+}
+
+```"
+MicroTiming/方块事件,"# #05 方块事件
+
+![BEHeroImg](./img/BlockEvent.jpg)
+
+本篇讨论的是方块事件(Block Event, BE)的实现原理。
+
+**基础部分**
+
+- 方块事件的概念与存在意义
+- 方块事件的信息结构与相关元件
+- 方块事件延迟(BED)的通俗认识
+
+**进阶部分**
+
+- 方块事件队列与广度优先搜索机制
+
+## 5.1 什么是方块事件？
+
+在Minecraft游戏交互中，为了减少服务器与客户端之间的网络同步压力，游戏会避免把所有复杂方块的巨量数据都在每一刻同步给客户端。
+
+相反，服务端会选择告诉客户端：“这里发生了一个特定的事件”，然后让客户端的方块自己把服务端发生的事情在本地模拟一遍。
+
+**方块事件(Block Event)** 就是为了这种高效的“通知与模拟”而生的。
+
+### 5.1.1 方块事件的信息结构
+
+当一个方块事件被创建时，它包含且仅包含以下四个核心信息：
+
+- 位置`pos`：事件在哪里发生
+- 方块种类`block`：是哪一种方块在执行这个事件
+- 类型`type`：是哪种具体的事件动作（对活塞而言，代表伸出或收回）
+- 数据`data`：执行该事件时附带的必要参数（对活塞而言，代表推动的朝向）
+
+## 5.2 产生方块事件的元件
+
+> 一部分红石元件会产生方块事件，用途各不相同，包括但不限于以下方块：
+
+| <center>元件种类</center>|<center>事件类型</center> | <center>附带数据</center> |
+|----------------------|-----------------------|-----------------------|
+| 活塞 |（伸出`0`，收回`1`，瞬推收回`2`） | 活塞朝向(0~5) |
+| 音符盒                |`0`                     |`0`                             |
+| 钟                   |`1`                     |       敲击方向（0~5）|
+
+...
+
+---
+
+## 5.2 方块事件延迟(BED)
+
+当多个方块在同一时间被激活并产生方块事件时，它们会同时执行吗？
+
+Minecraft的世界观告诉我们：游戏中不存在绝对的“同时”。即使是在同一游戏刻内，事件的执行也必须有一个先后顺序。这种由执行顺序的时间差造成的现象，就称为**方块事件延迟(Block Event Delay, 简称BED)**
+
+下面展示一下方块事件延迟是怎么在游戏中表现的：
+
+![方块事件延迟的观测](./img/BlockEventDelay_StandardExemplification.png)
+
+开关拉杆，我们发现，当改变红石块的位置的时候，旁边活塞推出的数量发生了变化，当红石块靠近压线方块的时候，数量减少了，而当红石块远离压线方块的时候，数量增多了。
+
+### 5.2.1 深度与队列的通俗理解
+
+你可以把方块事件的执行想象成人们正在排队买票：**先来的先执行，后来的后执行**。
+
+当一个方块事件执行时，它可能会触发后续的新事件。这些新事件会被追加到队列末尾。为了追踪这些事件是由“哪一代”产生的，我们引入**深度**概念：初始事件深度为 0，它直接产生的事件深度为 1，以此类推，用以刻画事件间的衍生因果链
+
+下面是一个树场0t下吸底座的例子，用于展示方块事件深度是如何在实际设计中应用的:
+
+![星河牌下吸](./img/BlockEventDelay_Bottom_Retraction.png)
+
+0gt AT：拉杆被拉下
+
+1gt BE 深度0：粘性活塞开始收回
+
+1gt BE 深度1：粘性活塞将灰化土拉回，转向粉转向
+
+1gt BE 深度2：下吸活塞被更新，自检，发现自己被激活，伸出
+
+1gt BE 深度3：充能方块被移除，更新下吸活塞，自检，发现自己应该收回，添加收回的方块事件，发现自己正在伸出，0t发生。
+
+![星河牌下吸_gt4](./img/BlockEventDelay_Bottom_Retraction_gt4.png)
+
+3gt TE：全部方块均到位。
+
+4gt BE 深度0：上下两个普通活塞伸出，泥土的粘性活塞添加方块事件
+
+4gt BE 深度1：普通活塞伸出，更新粘性活塞，回推粘性活塞伸出，底座激活活塞自检。红石块被移除。
+
+4gt BE 深度2：上下两个普通活塞收回，发出更新，更新泥土的粘性活塞，粘性活塞自检，发现自己不应该推出，添加收回的方块事件，下方粘性活塞同理
+
+4gt BE 深度3：红石块粘性活塞和灰化土粘性活塞的0t发生，灰化土瞬间到位。红石块到位，控制下吸活塞充能方块的粘性活塞伸出。
+
+6gt TE：红石粉被转向，充能方块到位，底座完成重置。
+
+---
+
+## 5.4 [进阶] 方块事件队列与广度优先搜索
+
+在源码层面，方块事件的“排队”本质上是一个广度优先搜索的队列机制。
+
+在游戏的主循环中，方块事件被存放于一个先进先出的队列中。当某一源点（例如被拉杆激活的中心活塞）以NC更新的顺序向周围发出更新是，周围相应的活塞会依次将自己的方块事件压入队列末尾。
+
+执行时，游戏会从队列头部取出一个事件执行：
+
+1. 取出深度为`0`的第一个节点执行
+2. 若该更新引发了新的更新，产生里新的方块事件（深度`1`）会被按更新顺序压入当前队列的最末端。
+3. 游戏继续执行队列中下一个深度为`0`的节点，直到深度`0`的事件全部出队，才会开始执行深度`1`的事件。
+
+这一操作完全等价于广度优先搜索。
+
+这里给出一个例子
+
+![BED_BFS](./img/BlockEventDelay_BFS.png)
+
+其中长边从+x延伸至-x方向
+
+当拉下拉杆时，中心活塞被激活，并以-x、+x、+z的顺序更新周围三个活塞，依次将它们压入队列。游戏随后按顺序执行-x方向和+x方向的活塞，然后更新+x方向的下一个活塞。此时会添加方块事件并将其压入队列，位于+z方向活塞之后。接着执行+z方向活塞，最后执行+x方向的最后一个活塞。
+
+我们可以将每个活塞抽象为一个节点，把深度为0的活塞视作根节点。需要注意的是，在实际情况中，这个图可能存在多个源点。我们对这个抽象出的""活塞图""进行多源BFS模拟，其中子节点加入队列的顺序就是NC的更新顺序，这个顺序由子节点相对于父节点的方向决定。已被访问过的子节点将不会被重复访问。"
+MicroTiming,"# #00 引言
+
+## 概述
+
+本章旨在由表及里地解析Minecraft中对大部分玩家相当棘手的刻内时序。
+
+## 目录
+
+- [#01](./01-刻与刻间时序.md) 刻与刻间时序
+- [#02](./02-初窥刻内时序.md) 初窥刻内时序
+- [#03](./03-计划刻与计划刻元件.md) 计划刻与计划刻元件
+- [#04](./04-方块实体.md) 方块实体
+- [#05](./05-方块事件.md) 方块事件"
+Loader,打包机

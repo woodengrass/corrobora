@@ -1,0 +1,29 @@
+{
+  "id": "1473805823884005457",
+  "terms": [
+    "Grouper"
+  ],
+  "definition": "A grouper is a variable box sorting device, which checks if a box contains a specific item type anywhere in the box. This is similar to a box matcher, but instead of having a fixed filter which is set when you build it, the filter in a grouper can be automatically set and reset based on the boxes you input.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1473805823884005457",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1473805823884005457/1473805824701763748",
+  "status": "APPROVED",
+  "statusMessageID": "1473805824701763748",
+  "updatedAt": 1771453787328,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Box Matcher",
+      "id": "1473809831696797848",
+      "url": "https://discord.com/channels/1375556143186837695/1473809831696797848/1473809834351526049",
+      "matches": [
+        "box matcher"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS004",
+    "VBS003",
+    "VBS005",
+    "VBS006"
+  ]
+}

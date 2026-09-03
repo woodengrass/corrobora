@@ -1,0 +1,42 @@
+{
+  "id": "1454754702133825648",
+  "terms": [
+    "Precision Loader"
+  ],
+  "definition": "A Loader that makes use of a Precision Hopper to achieve Slice Preservation",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754702133825648",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754702133825648/1454754703312158740",
+  "status": "APPROVED",
+  "statusMessageID": "1454754703312158740",
+  "updatedAt": 1766910950085,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Loader",
+      "id": "1454753686558605373",
+      "url": "https://discord.com/channels/1375556143186837695/1454753686558605373/1454753686948675720",
+      "matches": [
+        "Loader"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Precision Hopper",
+      "id": "1454753784810176552",
+      "url": "https://discord.com/channels/1375556143186837695/1454753784810176552/1454753785472749590",
+      "matches": [
+        "Precision Hopper"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Slice Preservation",
+      "id": "1454754741694365787",
+      "url": "https://discord.com/channels/1375556143186837695/1454754741694365787/1454754742784884902",
+      "matches": [
+        "Slice Preservation"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

@@ -1,0 +1,269 @@
+{
+  "version": 1,
+  "ingestionRulesVersion": "t0.5-1",
+  "roots": {
+    "raw": "public/database/raw/",
+    "fixture": "eval/fixtures/triage/samples/"
+  },
+  "raw_root_status": "migrated",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "notes": "normalized_content_hash 為 docs/document-ingestion.md 第 2 節定義的正規化 SHA-256，非原始位元組雜湊。roots.raw（public/database/raw/）已於 T1.2b 完成遷移並生效；raw_root_status='migrated' 時，重播 runner 直接以 roots.raw 解析 source_root='raw' 的案例，不再需要佔位根目錄。本檔雜湊值不受路徑遷移影響。",
+  "cases": [
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/MicroTiming/01-刻与刻间时序.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "143eac6afa9b6a7ba18fb4fafcf10a1291f8c7efba9c5bca7804b2dba8f96f05",
+      "expected_outcome": "pending",
+      "expected_candidate_type": "claim",
+      "required_flags": [],
+      "forbidden_flags": ["empty", "stub", "navigation", "not_found", "broken_link"],
+      "expected_completed_headings": [
+        "#01 刻与刻间时序",
+        "#01 刻与刻间时序 > 1.1 游戏刻，红石刻与延迟",
+        "#01 刻与刻间时序 > 1.2 中继器，比较器初步",
+        "#01 刻与刻间时序 > 1.3 充能理论",
+        "#01 刻与刻间时序 > 1.4 刻间时序"
+      ],
+      "excluded_headings": [],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "完整技術文章。所有站內圖片存在，故不得出現 broken_link。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/LoadingTicket/00-序.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "46f0a193d5c32eb1a6a01946d3dd1a751e909c1d0eee2821234376cbb255a403",
+      "expected_outcome": "excluded",
+      "expected_candidate_type": null,
+      "required_flags": ["navigation"],
+      "forbidden_flags": ["not_found"],
+      "expected_completed_headings": [],
+      "excluded_headings": [
+        "00-序",
+        "00-序 > 概述",
+        "00-序 > 目录",
+        "00-序 > 参考文献"
+      ],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "概述僅 113 字元且行內程式碼不觸發豁免，目录與参考文献為連結清單；無區段可切 Chunk。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/LoadingTicket/02-加载票系统的运作细节.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "ee90b7903ed54449bd56c43cff3ada1b94b135db4545fb5ce5a7d801c432a875",
+      "expected_outcome": "pending",
+      "expected_candidate_type": "community_note",
+      "required_flags": ["stub"],
+      "forbidden_flags": ["navigation", "not_found", "empty"],
+      "expected_completed_headings": ["02加载票系统的运作细节"],
+      "excluded_headings": [
+        "02加载票系统的运作细节 > 2.1ChunkTicketManager的基本架构和其作用",
+        "02加载票系统的运作细节 > 2.2对于玩家的处理"
+      ],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "部分完成文件。根區段短於 120 字元但含圖片故豁免；兩個空區段標 stub 且不進索引。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/LoadingTicket/a-附页-辅助mod.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "e20d7ddf173baeeaa2964d575bceb66fbc9fdf1ab8eb5dd0f09d47080b08b399",
+      "expected_outcome": "pending",
+      "expected_candidate_type": "community_note",
+      "required_flags": ["stub"],
+      "forbidden_flags": ["broken_link", "not_found"],
+      "expected_completed_headings": ["a-附页-辅助mod > Chunkdebug"],
+      "excluded_headings": [
+        "a-附页-辅助mod",
+        "a-附页-辅助mod > Intricarpet",
+        "a-附页-辅助mod > MessMod"
+      ],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "外部 Modrinth 連結不得被檢查或標記失效；Chunkdebug 因含圖片豁免下限，其餘兩節過短。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/LoadingTicket/b-附页-一些译名.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "170432c783e8dd013d509e849165db79d09efa9387bcc9c5dc8c317704e1fabd",
+      "expected_outcome": "pending",
+      "expected_candidate_type": "term",
+      "required_flags": [],
+      "forbidden_flags": ["stub", "navigation", "empty"],
+      "expected_completed_headings": ["b-附页-一些译名"],
+      "excluded_headings": [],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "譯名表格。根區段敘述僅約 30 字元，因含表格而豁免；表格欄列關係必須保留。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/Appendix/00-专有名词解释.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "e791183b16f8a79bc2029c581530209e215fe2936fe01709470b7e8553a0c370",
+      "expected_outcome": "excluded",
+      "expected_candidate_type": null,
+      "required_flags": ["navigation"],
+      "forbidden_flags": ["not_found", "broken_link"],
+      "expected_completed_headings": [],
+      "excluded_headings": [
+        "专有名词解释",
+        "专有名词解释 > 概述",
+        "专有名词解释 > 目录"
+      ],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "純導航頁。目录連結指向的檔案皆存在，不得出現 broken_link。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/BlockUpdate/README.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "655d46684cd48c7f1deca10f3acc9985056214bcd6d06d0363bf9f6e6cd18f52",
+      "expected_outcome": "excluded",
+      "expected_candidate_type": null,
+      "required_flags": ["navigation", "broken_link"],
+      "forbidden_flags": ["not_found"],
+      "expected_completed_headings": [],
+      "excluded_headings": [
+        "#00 引言",
+        "#00 引言 > 概述",
+        "#00 引言 > 目录"
+      ],
+      "broken_links": ["./00-导论.md"],
+      "public_visibility": "public",
+      "notes": "導航頁併失效站內連結。概述有 94 字元仍低於下限，故整份無可切區段。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/EntityAI/404.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "fc270e12e56f1c5dc916cbdd1e57e0234e63545e34c7f529bfd4b20d0f791749",
+      "expected_outcome": "excluded",
+      "expected_candidate_type": null,
+      "required_flags": ["not_found"],
+      "forbidden_flags": ["duplicate_exact", "broken_link"],
+      "expected_completed_headings": [],
+      "excluded_headings": ["PageNotFound"],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "重複對的 canonical（相對路徑字典序較小），故不帶 duplicate_exact；img/404.jpg 存在。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/EntityMove/404.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "fc270e12e56f1c5dc916cbdd1e57e0234e63545e34c7f529bfd4b20d0f791749",
+      "expected_outcome": "provenance_only",
+      "expected_candidate_type": null,
+      "required_flags": ["duplicate_exact"],
+      "forbidden_flags": ["not_found", "empty", "navigation"],
+      "expected_completed_headings": [],
+      "excluded_headings": [],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "去重優先於品質規則，僅記 duplicate_exact，不重複記錄 canonical 已有的 not_found。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/EntityAI/00-序.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "eb667fbc3b527fe1c6a836ad884cb445ab783d6c7599a87f0b274ab39d2c2f0e",
+      "expected_outcome": "excluded",
+      "expected_candidate_type": null,
+      "required_flags": ["empty"],
+      "forbidden_flags": ["navigation", "not_found", "duplicate_exact"],
+      "expected_completed_headings": [],
+      "excluded_headings": ["00-序"],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "僅有一個標題、無任何內容區塊；無連結清單區段故標 empty 而非 navigation。"
+    },
+    {
+      "source_root": "raw",
+      "source_path": "gtmc-database/EntityMove/00-序.md",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "eb667fbc3b527fe1c6a836ad884cb445ab783d6c7599a87f0b274ab39d2c2f0e",
+      "expected_outcome": "provenance_only",
+      "expected_candidate_type": null,
+      "required_flags": ["duplicate_exact"],
+      "forbidden_flags": ["empty", "navigation", "not_found"],
+      "expected_completed_headings": [],
+      "excluded_headings": [],
+      "broken_links": [],
+      "public_visibility": "public",
+      "notes": "空內容同時是重複內容時仍走 provenance_only，不得雙重記錄。"
+    },
+    {
+      "source_root": "fixture",
+      "source_path": "wiki-export-hopper.html",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "2c19d56d7ce1f2368d33741474b0feae591ddce6df8022fad0e95b5e4518dd59",
+      "expected_outcome": "pending",
+      "expected_candidate_type": "claim",
+      "required_flags": [],
+      "forbidden_flags": ["empty", "navigation", "not_found", "parse_error"],
+      "expected_completed_headings": [
+        "漏斗传输冷却",
+        "漏斗传输冷却 > 冷却时长",
+        "漏斗传输冷却 > 相关代码",
+        "漏斗传输冷却 > 示意图"
+      ],
+      "excluded_headings": ["漏斗传输冷却 > 外部链接"],
+      "broken_links": [],
+      "public_visibility": "internal",
+      "notes": "header/nav/footer/script/style/noscript 必須在解析前移除，且不得出現在任何 Chunk。示意图區段僅有圖片，靠圖片豁免保留。"
+    },
+    {
+      "source_root": "fixture",
+      "source_path": "community-note-hopper.txt",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "2dff27d9210db60d08896eb81d7bfd4fe0e39e2ec4ffd72780f94b9ec9118718",
+      "expected_outcome": "candidate",
+      "expected_candidate_type": "needs_review",
+      "required_flags": ["conflicting_fact"],
+      "forbidden_flags": ["empty", "navigation", "not_found"],
+      "expected_completed_headings": ["漏斗限速笔记"],
+      "excluded_headings": [],
+      "broken_links": [],
+      "public_visibility": "internal",
+      "notes": "確定性層可切出根區段，但候選為 needs_review 故不 materialize，因此不建立 Chunk；與 HTML 樣本的 8gt 敘述衝突。"
+    },
+    {
+      "source_root": "fixture",
+      "source_path": "learn-submission-observer.txt",
+      "logical_record_no": null,
+      "normalized_content_hash":
+        "94d1b9ee581edac94d3933fb157d07150495fbfd91dbbb0baa58478d3929ff4f",
+      "expected_outcome": "pending",
+      "expected_candidate_type": "claim",
+      "required_flags": [],
+      "forbidden_flags": ["empty", "stub", "navigation", "not_found", "conflicting_fact"],
+      "expected_completed_headings": ["侦测器朝向与更新"],
+      "excluded_headings": [],
+      "broken_links": [],
+      "public_visibility": "internal",
+      "notes": "/learn 投稿範例。自帶版本與環境故可 materialize 為 pending；社群來源預設 internal，且任何路徑都不得使其成為 approved。"
+    }
+  ]
+}

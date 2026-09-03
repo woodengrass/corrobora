@@ -1,0 +1,29 @@
+{
+  "id": "1473809875653103858",
+  "terms": [
+    "LUF",
+    "LUIF",
+    "LIF",
+    "Lead Unstackable Filter",
+    "Lead Unstackable Item Filter",
+    "and Lead Item Filter"
+  ],
+  "definition": "a Lead Item Filter is a box filtering process which checks the item in the first slot of the box to check if it is stackable or nonstackable. if the lead item is stackable, it returns the item to the box, and continues to the next box. If it is nonstackable, it is removed, and then the next item is checked. this process is repeated until a stackable is found, or the box runs empty. \n\nThis is typically used in conjunction with variable sorting methods which rely on the first item in the box being stackable.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1473809875653103858",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1473809875653103858/1473809876802338858",
+  "status": "APPROVED",
+  "statusMessageID": "1473809876802338858",
+  "updatedAt": 1771454163060,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Variable sort",
+      "id": "1454754850322649100",
+      "url": "https://discord.com/channels/1375556143186837695/1454754850322649100/1454754852465807504",
+      "matches": [
+        "variable sort"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

@@ -1,0 +1,24 @@
+{
+  "id": "1454753449311862900",
+  "terms": [
+    "Batcher"
+  ],
+  "definition": "A Batcher groups item entities together before periodically releasing them into a waterstream or iceline. This is done to improve lag and because some filters ( Especially 2x filters ) would be on cooldown much less often and therefore miss less or no items.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753449311862900",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753449311862900/1454753450339336306",
+  "status": "APPROVED",
+  "statusMessageID": "1454753450339336306",
+  "updatedAt": 1766910651091,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Dropper speed",
+      "id": "1454753562033651876",
+      "url": "https://discord.com/channels/1375556143186837695/1454753562033651876/1454753563258519584",
+      "matches": [
+        "2x"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

@@ -1,0 +1,45 @@
+{
+  "id": "1456914381366493408",
+  "terms": [
+    "Modulo 4"
+  ],
+  "definition": "Refers to the mechanic where an item entity will begin movement only in certain ticks. The modulo 4 operation (remainder after dividing by 4) is used to determine what specific tick it will begin to move, hence the name. This mechanic is typically used for wireless redstone and for quickly separating item entities into 4 categories (eg for modulo 4 masscrafters). See RD003 for more info.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1456914381366493408",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1456914381366493408/1456914383195344947",
+  "status": "APPROVED",
+  "statusMessageID": "1456914383195344947",
+  "updatedAt": 1767425860019,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "item entity",
+      "id": "1456908472384884879",
+      "url": "https://discord.com/channels/1375556143186837695/1456908472384884879/1456908473844502594",
+      "matches": [
+        "item entity"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "ticks",
+        "tick"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1456723394752942214",
+      "code": "RD003",
+      "name": "Item entity order and age mechanics",
+      "url": "https://discord.com/channels/1375556143186837695/1456724032819957984",
+      "path": "Archive/RD_tomes-and-diagrams/RD003_Item_entity_order_and_age_mechanics",
+      "matches": [
+        "RD003"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

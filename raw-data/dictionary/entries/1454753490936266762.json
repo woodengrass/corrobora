@@ -1,0 +1,38 @@
+{
+  "id": "1454753490936266762",
+  "terms": [
+    "Box Detection"
+  ],
+  "definition": "Usually used as a way to tag Loaders(Loader) and Box Displays(Box Display) that restart themselves when boxes come in and they were previously empty.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753490936266762",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753490936266762/1454753491787452438",
+  "status": "APPROVED",
+  "statusMessageID": "1454753491787452438",
+  "updatedAt": 1766910661225,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Loader",
+      "id": "1454753686558605373",
+      "url": "https://discord.com/channels/1375556143186837695/1454753686558605373/1454753686948675720",
+      "matches": [
+        "Loader"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Box Display",
+      "id": "1454753497638506689",
+      "url": "https://discord.com/channels/1375556143186837695/1454753497638506689/1454753498494144522",
+      "matches": [
+        "Box Display"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS005",
+    "BD003",
+    "SP003",
+    "BU012"
+  ]
+}

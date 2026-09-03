@@ -1,0 +1,52 @@
+{
+  "id": "1473804633582338129",
+  "terms": [
+    "LUF Grouper",
+    "Lead Unstackable Filter Grouper"
+  ],
+  "definition": "A lead unstackable filter grouper (LUF grouper) is a device which checks if a box contains a certain item type, with the filter set dynamically like in a grouper. The difference between a normal grouper and an LUF grouper is that on setting the filter, an LUF grouper will continue to pull out items if the item is an unstackable item, only setting the filter if it is stackable. This allows it to be initialized with mixed box input, which is helpful for presorting in variable sorting techniques such as cycvars.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1473804633582338129",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1473804633582338129/1473804635121651743",
+  "status": "APPROVED",
+  "statusMessageID": "1473804635121651743",
+  "updatedAt": 1771453001471,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Grouper",
+      "id": "1473805823884005457",
+      "url": "https://discord.com/channels/1375556143186837695/1473805823884005457/1473805824701763748",
+      "matches": [
+        "grouper"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Mixed Box",
+      "id": "1454753707530129576",
+      "url": "https://discord.com/channels/1375556143186837695/1454753707530129576/1454753708247089184",
+      "matches": [
+        "mixed box"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Variable sort",
+      "id": "1454754850322649100",
+      "url": "https://discord.com/channels/1375556143186837695/1454754850322649100/1454754852465807504",
+      "matches": [
+        "variable sort"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Cyclical variable sorter",
+      "id": "1460469722234749123",
+      "url": "https://discord.com/channels/1375556143186837695/1460469722234749123/1460469724369387550",
+      "matches": [
+        "cycvar"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

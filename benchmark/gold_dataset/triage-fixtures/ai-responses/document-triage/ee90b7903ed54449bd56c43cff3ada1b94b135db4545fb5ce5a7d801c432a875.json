@@ -1,0 +1,28 @@
+{
+  "task_type": "document_triage",
+  "model": "deepseek-v4-flash",
+  "prompt_version": "document_triage@1",
+  "input_hash": "ee90b7903ed54449bd56c43cff3ada1b94b135db4545fb5ce5a7d801c432a875",
+  "source_path": "gtmc-database/LoadingTicket/02-加载票系统的运作细节.md",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "response": {
+    "rawAssetId": 0,
+    "candidates": [{
+    "candidateType": "community_note",
+    "normalizedTitle": "加载票系统的运作细节：ChunkTicketManager 概述",
+    "normalizedContent": "本章围绕 ChunkTicketManager（net.minecraft.server.world.ChunkTicketManager）展开，说明其在加载票系统中的运作位置。文中列出的两个子题「ChunkTicketManager 的基本架构和其作用」与「对于玩家的处理」（玩家视野与模拟距离、玩家加载票的更新）目前仅有标题而无正文。",
+    "termRefs": [
+      "ChunkTicketManager",
+      "加载票",
+      "模拟距离",
+      "玩家视野"
+    ],
+    "qualityFlags": [
+      "stub"
+    ],
+    "confidence": 0.71,
+    "rationale": "仅根区段有实质内容且伴随架构图，其余两节只有标题没有正文，属于未完成文件。已完成部分只是类别定位说明，不含可独立验证的技术结论，因此归为 community_note 而非 claim。"
+    }]
+  }
+}

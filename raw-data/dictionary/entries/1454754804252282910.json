@@ -1,0 +1,39 @@
+{
+  "id": "1454754804252282910",
+  "terms": [
+    "Togglestate",
+    "Toggle state"
+  ],
+  "definition": "Usually used to refer to intentionally having sticky piston's drop its block by sending it a <3gt pulse in order to cycle between two different states (toggling between block in and out).\nImportantly, togglestates have no default position, and there is no way to reset them. This makes them painful to use in survival as they're hard to debug.\nThis is different to latches, which are also systems that hold state. Latches usually have a reset signal that you can trigger when something goes wrong.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754804252282910",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754804252282910/1454754804881428533",
+  "status": "APPROVED",
+  "statusMessageID": "1454754804881428533",
+  "updatedAt": 1766910974365,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "gt"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "FL002",
+    "FL003",
+    "ML010",
+    "AL003",
+    "BU002",
+    "BU005",
+    "OD005",
+    "OD007",
+    "AC002",
+    "NT001",
+    "NT004",
+    "SP001",
+    "SP004"
+  ]
+}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <title>漏斗传输冷却 - 技术wiki</title>
+  <style>body { font-family: sans-serif; }</style>
+  <script>window.analytics = { track: function () {} }</script>
+</head>
+<body>
+<header id="site-header">
+  <a href="/">技术wiki首页</a>
+</header>
+<nav id="sidebar">
+  <ul>
+    <li><a href="/wiki/hopper">漏斗</a></li>
+    <li><a href="/wiki/dropper">投掷器</a></li>
+    <li><a href="/wiki/comparator">比较器</a></li>
+  </ul>
+</nav>
+<main>
+  <article>
+    <h1>漏斗传输冷却</h1>
+    <p>
+      漏斗在成功传输一个物品后会进入传输冷却，冷却期间不再尝试把物品推入下一个容器，
+      也不会从上方容器抽取物品。冷却是按游戏刻计数的，与红石信号无关，
+      因此在做限速设计时必须把冷却时长与元件的宏观延迟分开计算。
+      本页描述 Java 版 1.21 原版的行为；Bedrock 版的数值与本页无关，不可直接套用。
+    </p>
+    <h2>冷却时长</h2>
+    <p>成功传输后，漏斗把传输冷却设置为 8gt；下一次尝试传输发生在冷却归零之后。</p>
+    <table>
+      <thead>
+      <tr><th>元件</th><th>成功传输后冷却</th><th>版本</th></tr>
+      </thead>
+      <tbody>
+      <tr><td>漏斗</td><td>8gt</td><td>Java 1.21</td></tr>
+      <tr><td>漏斗矿车</td><td>4gt</td><td>Java 1.21</td></tr>
+      </tbody>
+      </table>
+    <h2>相关代码</h2>
+    <pre><code class="language-java">this.setCooldown(8);</code></pre>
+    <h2>示意图</h2>
+    <p><img src="./img/hopper-cooldown.png" alt="漏斗冷却示意"></p>
+    <h2>外部链接</h2>
+    <p><a href="https://example.invalid/wiki/hopper">原始条目</a></p>
+  </article>
+</main>
+<footer>
+  <p>本页内容采用示例授权发布。</p>
+</footer>
+<noscript>请启用 JavaScript。</noscript>
+</body>
+</html>

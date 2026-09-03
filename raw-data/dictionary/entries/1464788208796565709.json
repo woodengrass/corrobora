@@ -1,0 +1,31 @@
+{
+  "id": "1464788208796565709",
+  "terms": [
+    "Bucket"
+  ],
+  "definition": "A bucket is a container, typically holding a specific subset of items. Buckets are used to fragment large bodies of information into callable and searchable subsets to speed up a search process by reducing the number of calls that need to be made to confirm no match exists.\n\nOne place the term appears regularly is with regard to temp storages, where a box being input needs to check for a match somewhere in the systems. buckets are used to reduce search operations, by only checking a small group of boxes that are stored, as compared to checking every box.\n\nIt also exists as an item, and not a storage tech concept, that can pick up and interact with items such as water, lava, powdered snow, and milk. It can also pick up various mobs using a water bucket such as tadpoles, axolotls, various fish and others.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1464788208796565709",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1464788208796565709/1464788210138878080",
+  "status": "APPROVED",
+  "statusMessageID": "1464788210138878080",
+  "updatedAt": 1771739643469,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Temp Storage",
+      "id": "1454754780273574001",
+      "url": "https://discord.com/channels/1375556143186837695/1454754780273574001/1454754781196451978",
+      "matches": [
+        "temp storage"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "LS005",
+    "MF003",
+    "US004",
+    "US008",
+    "US001",
+    "VBS003"
+  ]
+}

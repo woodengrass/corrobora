@@ -1,0 +1,35 @@
+{
+  "id": "1469657186740469760",
+  "terms": [
+    "Furnace Array",
+    "Super Smelter"
+  ],
+  "definition": "A Furnace Array is a device which distributes items across multiple furnaces to efficiently smelt lots of items at a time. Furnace arrays can vary widely in sizes from 32 to 1728 and beyond.\n\nFurnace array peripherals built into storage systems are typically smaller (around 50 furnaces), and are designed to reduce both active and passive lag as much as possible.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1469657186740469760",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1469657186740469760/1469657189575692492",
+  "status": "APPROVED",
+  "statusMessageID": "1469657189575692492",
+  "updatedAt": 1771739510646,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Peripheral",
+      "id": "1454753771035824158",
+      "url": "https://discord.com/channels/1375556143186837695/1454753771035824158/1454753771555913873",
+      "matches": [
+        "peripheral"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS011",
+    "LS002",
+    "LS003",
+    "LS004",
+    "LS005",
+    "SP004",
+    "SP005",
+    "SP006",
+    "SP009"
+  ]
+}

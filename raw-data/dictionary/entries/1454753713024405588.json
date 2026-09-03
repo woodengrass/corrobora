@@ -1,0 +1,28 @@
+{
+  "id": "1454753713024405588",
+  "terms": [
+    "Mixed loader"
+  ],
+  "definition": "A Loader  that can handle multiple itemtypes going to the same box. Fullness detection is usually done by reading that items are backing up in the container ( hopper / dropper ) feeding the box.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753713024405588",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753713024405588/1454753714144411649",
+  "status": "APPROVED",
+  "statusMessageID": "1454753714144411649",
+  "updatedAt": 1766910714284,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Loader",
+      "id": "1454753686558605373",
+      "url": "https://discord.com/channels/1375556143186837695/1454753686558605373/1454753686948675720",
+      "matches": [
+        "Loader"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "PI002",
+    "ML010",
+    "ML012"
+  ]
+}

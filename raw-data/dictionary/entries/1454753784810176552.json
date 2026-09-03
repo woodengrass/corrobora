@@ -1,0 +1,33 @@
+{
+  "id": "1454753784810176552",
+  "terms": [
+    "Precision Hopper"
+  ],
+  "definition": "A hopper that is unlocked in the same tick as it's supposed to suck up an item. If the item entity is created in that tick, as it would be with for example timing a shulker box breaking correctly, there will be 0 physics enacted on that item. This makes it not only extremely reliable as there are no physics issues, but also might be lazy chunk compatible [Needs proof] .",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753784810176552",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753784810176552/1454753785472749590",
+  "status": "APPROVED",
+  "statusMessageID": "1454753785472749590",
+  "updatedAt": 1766910730956,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "tick"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "item entity",
+      "id": "1456908472384884879",
+      "url": "https://discord.com/channels/1375556143186837695/1456908472384884879/1456908473844502594",
+      "matches": [
+        "item entity"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

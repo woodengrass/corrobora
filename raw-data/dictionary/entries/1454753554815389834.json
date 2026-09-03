@@ -1,0 +1,30 @@
+{
+  "id": "1454753554815389834",
+  "terms": [
+    "Directional"
+  ],
+  "definition": "A contraption is said to be directional if it exhibits a different behavior when rotated or mirrored.  This is usually caused by some internal component being directional itself, which in turn is most often caused by update order: each components notifies its neighbors of the update in a set order (for example, negative to positive z first, then negative to positive y, then x). There are also other causes of directionality.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753554815389834",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753554815389834/1454753555566166029",
+  "status": "APPROVED",
+  "statusMessageID": "1454753555566166029",
+  "updatedAt": 1766910676508,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Update order",
+      "id": "1456912184172085260",
+      "url": "https://discord.com/channels/1375556143186837695/1456912184172085260/1456912184922607793",
+      "matches": [
+        "update order"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "DT002",
+    "FS003",
+    "VIP008",
+    "FS002",
+    "MIS012"
+  ]
+}

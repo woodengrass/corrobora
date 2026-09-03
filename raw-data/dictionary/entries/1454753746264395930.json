@@ -1,0 +1,16 @@
+{
+  "id": "1454753746264395930",
+  "terms": [
+    "Pair Searcher",
+    "Pair Finder",
+    "Pair Assembler"
+  ],
+  "definition": "A pair searcher is a contraption that takes in multiple boxes (usually single item-type boxes) and outputs pairs of boxes so that the boxes of each pair have the same item type. They differ in speed, how they handle single boxes (ones that don't have a matching pair) and implementation in general.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753746264395930",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753746264395930/1454753746709123285",
+  "status": "APPROVED",
+  "statusMessageID": "1454753746709123285",
+  "updatedAt": 1766910721823,
+  "references": [],
+  "referencedBy": []
+}

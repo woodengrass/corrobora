@@ -1,0 +1,33 @@
+{
+  "id": "1454753751335436422",
+  "terms": [
+    "Parallel codes"
+  ],
+  "definition": "A code is said to be parallel if the all the bits of the signal are sent through individual wires or lines This usually allows for faster and easier to use codes than Serial codes, but it tends to be more expensive and bigger.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753751335436422",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753751335436422/1454753752350457887",
+  "status": "APPROVED",
+  "statusMessageID": "1454753752350457887",
+  "updatedAt": 1766910723070,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Bit",
+      "id": "1454753462171734026",
+      "url": "https://discord.com/channels/1375556143186837695/1454753462171734026/1454753462905737238",
+      "matches": [
+        "bit"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Serial codes",
+      "id": "1454754716138475581",
+      "url": "https://discord.com/channels/1375556143186837695/1454754716138475581/1454754716981661882",
+      "matches": [
+        "Serial codes"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

@@ -1,0 +1,81 @@
+{
+  "id": "1454754768088989789",
+  "terms": [
+    "Box splitter",
+    "splitter"
+  ],
+  "definition": "A box splitter is a contraption that takes in a mixed box as input and unloads the box into single item-type boxes. These devices work by unloading a box using a variable filter. The variable filter is set with an item, and unloads all the items of the same type from the box. The filtered items are then sent to a box loader which loads them into a box. Once all items of a type have been unloaded, the filter is reset to allow a different item type to unload, and the box-breaking mechanism in the loader is forcibly activated to replace the box. This ensures that each box output only has a single item type.\n\nConventional splitters use a hopper to do the variable filtering and are limited to hopperspeed per input box, but the contents of the box have limited impact on the unloading speed (unlike that of a cycvar). However, they can produce a lot of non-full partial boxes, which may need to be merged with other partial boxes of the same type if one desires full boxes. VIP003 uses hoppercarts and item entities to solve this issue and produce minimal partial boxes at 32-64x hopperspeed.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754768088989789",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754768088989789/1454754769674567868",
+  "status": "APPROVED",
+  "statusMessageID": "1454754769674567868",
+  "updatedAt": 1768274208762,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Mixed Box",
+      "id": "1454753707530129576",
+      "url": "https://discord.com/channels/1375556143186837695/1454753707530129576/1454753708247089184",
+      "matches": [
+        "mixed box"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Loader",
+      "id": "1454753686558605373",
+      "url": "https://discord.com/channels/1375556143186837695/1454753686558605373/1454753686948675720",
+      "matches": [
+        "loader"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Hopper speed",
+      "id": "1454937395693879409",
+      "url": "https://discord.com/channels/1375556143186837695/1454937395693879409/1454937397304365294",
+      "matches": [
+        "hopperspeed"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Cyclical variable sorter",
+      "id": "1460469722234749123",
+      "url": "https://discord.com/channels/1375556143186837695/1460469722234749123/1460469724369387550",
+      "matches": [
+        "cycvar"
+      ]
+    },
+    {
+      "type": "archivedPost",
+      "id": "1387083566676181035",
+      "code": "VIP003",
+      "name": "32X and 64X Compact Ideal Splitter",
+      "url": "https://discord.com/channels/1375556143186837695/1388318356377043076",
+      "path": "Archive/VIP_variable-item-processing/VIP003_32X_and_64X_Compact_Ideal_Splitter",
+      "matches": [
+        "VIP003"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Ideal box output",
+      "id": "1460470569966374956",
+      "url": "https://discord.com/channels/1375556143186837695/1460470569966374956/1460470570809557257",
+      "matches": [
+        "minimal partial boxes"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS004",
+    "PI004",
+    "VIP003",
+    "VIP004",
+    "VBS004",
+    "MIS009",
+    "MIS011",
+    "PI005"
+  ]
+}

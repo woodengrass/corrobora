@@ -1,0 +1,39 @@
+{
+  "id": "1454753719664119890",
+  "terms": [
+    "mspt",
+    "Milliseconds Per Tick"
+  ],
+  "definition": "A measurement of how many milliseconds it takes to process each gametick. If a server exceeds 50MSPT in total, then the game will slow down, as there is no longer enough time to process all 20 ticks per second(tps). MSPT is also used as a measure of how performance-intensive a contraption is by seeing how much the MSPT increases by running/loading it.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753719664119890",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753719664119890/1454753720259575821",
+  "status": "APPROVED",
+  "statusMessageID": "1454753720259575821",
+  "updatedAt": 1766927388375,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "gametick"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "tps",
+      "id": "1454754810854244488",
+      "url": "https://discord.com/channels/1375556143186837695/1454754810854244488/1454754812834091051",
+      "matches": [
+        "ticks per second",
+        "tps"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS007",
+    "LS005",
+    "MIS009"
+  ]
+}

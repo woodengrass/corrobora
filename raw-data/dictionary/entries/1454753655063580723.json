@@ -1,0 +1,27 @@
+{
+  "id": "1454753655063580723",
+  "terms": [
+    "Hexadecimal",
+    "Hex"
+  ],
+  "definition": "A code where each digit of the code has 16 possible states (usually represented as 0 to 9 and then A to F). It's most commonly implemented with signal strength values, where ss(Signal Strength) 0 represents 0, ss10 represents A, ss15 represents F and so on. Multiple hex signals can be combined to form a code with multiple digits. For example, valid three digit hex codes are 032, AFF, 0F4.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753655063580723",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753655063580723/1454753656326062249",
+  "status": "APPROVED",
+  "statusMessageID": "1454753656326062249",
+  "updatedAt": 1766910700304,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "ss",
+      "id": "1454754774833696893",
+      "url": "https://discord.com/channels/1375556143186837695/1454754774833696893/1454754775542267957",
+      "matches": [
+        "ss"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "FS003"
+  ]
+}

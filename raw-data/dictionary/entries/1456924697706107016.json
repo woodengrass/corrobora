@@ -1,0 +1,34 @@
+{
+  "id": "1456924697706107016",
+  "terms": [
+    "Hopper hashing"
+  ],
+  "definition": "Hopper hashing occurs when a device depends on a specific ticking order of hoppers for operation. This is a problem because hoppers are block entities, which are ticked in a location dependent but unpredictable order after the chunk it is in is reloaded. A device that relies on this order can fail unexpectedly after server restart or when placed in different locations. \n\n## More Details\nThis occurs because the block entity list [`ChunkAccess.blockEntities`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/ticks/LevelTicks#L34) is a [Object2ObjectOpenHashMap](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/world/level/chunk/ChunkAccess#L83) which doesn't guarantee order. The actual block entity ticking list is order preserving but it is filled from the ChunkAccess.blockEntities list when the chunk is loaded so the order gets scrambled. You can't really reliably predict the order because it also depends on other block entities in the list.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1456924697706107016",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1456924697706107016/1456924698469470393",
+  "status": "APPROVED",
+  "statusMessageID": "1456924698469470393",
+  "updatedAt": 1771902140208,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "tick",
+        "ticks"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Tile Entity",
+      "id": "1454754788473307200",
+      "url": "https://discord.com/channels/1375556143186837695/1454754788473307200/1454754789320560680",
+      "matches": [
+        "block entity"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

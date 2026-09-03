@@ -1,0 +1,38 @@
+{
+  "id": "1457055322647695542",
+  "terms": [
+    "Chunk loader",
+    "chunk load"
+  ],
+  "definition": "A chunk loader is a simple device which keeps certain chunks loaded in the game. This allows for devices in the chunk to continue operating even when the player is far away. All redstone machines require chunk loading to operate reliably, unloading a chunk of your storage system while it is running will often break it.\n\n## Mechanics\n- When an item or entity goes through a nether portal, it will load a 3x3 chunk area on the other side as entity processing (meaning entities in the chunk will tick and move), and a 5x5 ring as redstone processing (meaning observer, repeater, pistons, etc... will work).\n- Thrown ender pearls will load a 1 chunk area as entity processing, and a 3x3 chunk area as redstone processing.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1457055322647695542",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1457055322647695542/1457055324426080287",
+  "status": "APPROVED",
+  "statusMessageID": "1457055324426080287",
+  "updatedAt": 1767459563307,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "tick"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "FS003",
+    "MIS001",
+    "MIS003",
+    "MIS004",
+    "MIS005",
+    "MIS010",
+    "LS002",
+    "LS004",
+    "CKL001",
+    "SP004",
+    "MIS011",
+    "MIS013"
+  ]
+}

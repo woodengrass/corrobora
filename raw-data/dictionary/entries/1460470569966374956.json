@@ -1,0 +1,21 @@
+{
+  "id": "1460470569966374956",
+  "terms": [
+    "Ideal box output",
+    "ideal output",
+    "minimum partial boxes",
+    "minimal partial boxes"
+  ],
+  "definition": "Ideal box output refers to a device which outputs minimal partial boxes after the contents of mixed boxes are sorted into single item-type boxes. What this means is that for each type, every box except at most one will be a full box (the one remaining is a partial box).",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1460470569966374956",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1460470569966374956/1460470570809557257",
+  "status": "APPROVED",
+  "statusMessageID": "1460470570809557257",
+  "updatedAt": 1768274978713,
+  "references": [],
+  "referencedBy": [
+    "VIP003",
+    "VIP005",
+    "VIP007"
+  ]
+}

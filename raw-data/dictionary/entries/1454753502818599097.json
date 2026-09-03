@@ -1,0 +1,14 @@
+{
+  "id": "1454753502818599097",
+  "terms": [
+    "Box Separator"
+  ],
+  "definition": "A Box Separator is a contraption that takes boxes as input and separates them into different outputs based on their contents. This could for example be a contraption that takes single item-type boxes and has different outputs for boxes with 16-stackables and 64-stackables",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753502818599097",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753502818599097/1454753503775031296",
+  "status": "APPROVED",
+  "statusMessageID": "1454753503775031296",
+  "updatedAt": 1766910663871,
+  "references": [],
+  "referencedBy": []
+}

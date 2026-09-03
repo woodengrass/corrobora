@@ -1,0 +1,33 @@
+{
+  "id": "1454753582606979103",
+  "terms": [
+    "Dust updateless"
+  ],
+  "definition": "Some contraptions are not Dustless, but the dust they use does not get updated (does not change ss(Signal Strength)). This can be because it is either used to steadily power a component, or because it's used by redirecting it, but not changing ss. Redirecting dust is really lag friendly, as lag usage goes. These terms are therefore often used interchangeably.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753582606979103",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753582606979103/1454753583739437189",
+  "status": "APPROVED",
+  "statusMessageID": "1454753583739437189",
+  "updatedAt": 1766910682907,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Dustless",
+      "id": "1454753587979620354",
+      "url": "https://discord.com/channels/1375556143186837695/1454753587979620354/1454753589133049889",
+      "matches": [
+        "Dustless"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "ss",
+      "id": "1454754774833696893",
+      "url": "https://discord.com/channels/1375556143186837695/1454754774833696893/1454754775542267957",
+      "matches": [
+        "ss"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

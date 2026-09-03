@@ -1,0 +1,25 @@
+{
+  "id": "1454753468966506558",
+  "terms": [
+    "Block event delay",
+    "BED"
+  ],
+  "definition": "Block event delay usually refers to piston updating other pistons in a chain reaction within a single game tick. Since pistons activate during the block event phase of the tick (kind of) and things execute in the order they are scheduled, having something be activated by a piston that was updated by a chain of three other pistons before it (BED 3) will always happen before something that was activated by a BED 5 event.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753468966506558",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753468966506558/1454753470643961980",
+  "status": "APPROVED",
+  "statusMessageID": "1454753470643961980",
+  "updatedAt": 1766910656234,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Gametick",
+      "id": "1454753634435858666",
+      "url": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+      "matches": [
+        "tick"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

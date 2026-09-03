@@ -1,0 +1,40 @@
+{
+  "id": "1454753764606083180",
+  "terms": [
+    "Perfect aligner",
+    "4D align"
+  ],
+  "definition": "Perfect item aligner refers to a contraption that aligns items in all three axes before sending them down a stream, where they usually get picked up by hoppers. Since these contraptions are usually ran at Hopper speed,  the items need to have a perfect timing between them, so that they don't reach a hopper during its cooldown stage, hence why these are also called 4D aligners (3D+time).",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753764606083180",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753764606083180/1454753765365256286",
+  "status": "APPROVED",
+  "statusMessageID": "1454753765365256286",
+  "updatedAt": 1767742582454,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Aligner",
+      "id": "1454753442471084134",
+      "url": "https://discord.com/channels/1375556143186837695/1454753442471084134/1454753443678916638",
+      "matches": [
+        "aligner"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Hopper speed",
+      "id": "1454937395693879409",
+      "url": "https://discord.com/channels/1375556143186837695/1454937395693879409/1454937397304365294",
+      "matches": [
+        "Hopper speed"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "LS002",
+    "NT005",
+    "CT001",
+    "PU003",
+    "PU004"
+  ]
+}

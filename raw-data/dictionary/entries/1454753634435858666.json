@@ -1,0 +1,117 @@
+{
+  "id": "1454753634435858666",
+  "terms": [
+    "Gametick",
+    "Gameticks",
+    "gt",
+    "tick",
+    "ticks"
+  ],
+  "definition": "Minecraft iteratively runs its processing code in a loop. One cycle of this loop is called a Tick or Gametick (gt). \nGameticks are also used as the default measurement of time while working with redstone. The game attempts to run 20 gameticks a second (20tps), but will fail to do so and slow down the game if the server is lagging (>50mspt). \nOften confused with the less technical term \"redstone tick\". A redstone tick is in practice 2gt, as its origin comes from the default setting of a repeater. \nA default repeater when freshly placed is a 2gt- or one redstone-tick-repeater.\n\n## Details\nIn each [`ServerLevel.tick()`](https://mcsrc.dev/1/1.21.11_unobfuscated/net/minecraft/server/level/ServerLevel#L347-461), the game will process the following actions in this order:\n1. Enforce world border\n2. Weather\n3. Advance game time\n4. Scheduled block ticks\n5. Scheduled fluid ticks\n6. Process raids\n7. Purge unloaded chunks\n8. For each chunk:\n    1. Increment inhabited time\n    2. Spawn mobs\n    3. Custom spawners\n    4. Lightning\n    5. Ice and snow\n    6. Random tick (eg, for crop growth)\n9. Broadcast chunks\n10. Unload chunks\n11. Block events (See BED)\n12. Dragon fight, entity despawn, and entity tick.\n13. Tick block entities (used to be called tile entities).\n14. Entity management",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454753634435858666",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454753634435858666/1454753635690090539",
+  "status": "APPROVED",
+  "statusMessageID": "1454753635690090539",
+  "updatedAt": 1771901975484,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "tps",
+      "id": "1454754810854244488",
+      "url": "https://discord.com/channels/1375556143186837695/1454754810854244488/1454754812834091051",
+      "matches": [
+        "tps"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "mspt",
+      "id": "1454753719664119890",
+      "url": "https://discord.com/channels/1375556143186837695/1454753719664119890/1454753720259575821",
+      "matches": [
+        "mspt"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Redstone Tick",
+      "id": "1454805316029120542",
+      "url": "https://discord.com/channels/1375556143186837695/1454805316029120542/1454805317320835073",
+      "matches": [
+        "redstone tick"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "Block event delay",
+      "id": "1454753468966506558",
+      "url": "https://discord.com/channels/1375556143186837695/1454753468966506558/1454753470643961980",
+      "matches": [
+        "BED"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "MIS003",
+    "MIS010",
+    "MIS012",
+    "CH001",
+    "CH002",
+    "CH003",
+    "CH004",
+    "CH005",
+    "CH007",
+    "CH008",
+    "MH003",
+    "PI001",
+    "ML003",
+    "AL003",
+    "BU002",
+    "IBS002",
+    "FBS003",
+    "BW003",
+    "OBP001",
+    "OBP005",
+    "TD006",
+    "BD004",
+    "MF003",
+    "MF004",
+    "MF005",
+    "HS002",
+    "HS003",
+    "US002",
+    "US006",
+    "US008",
+    "OIP002",
+    "AC001",
+    "AB001",
+    "AB002",
+    "WT005",
+    "DT002",
+    "NT001",
+    "NT002",
+    "NT003",
+    "NT005",
+    "CT001",
+    "CT005",
+    "CKL001",
+    "SP001",
+    "SP002",
+    "SP003",
+    "SP005",
+    "SP009",
+    "CC005",
+    "CC007",
+    "VIP006",
+    "VBS001",
+    "VBS002",
+    "VBS003",
+    "VBS004",
+    "VBS006",
+    "PU004",
+    "TT003",
+    "TT005",
+    "RD001",
+    "RD003"
+  ]
+}

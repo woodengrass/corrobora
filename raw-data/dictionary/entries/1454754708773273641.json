@@ -1,0 +1,26 @@
+{
+  "id": "1454754708773273641",
+  "terms": [
+    "Quasi connectivity",
+    "QC"
+  ],
+  "definition": "The effect of quasi-powering a piston, dropper or dispenser. A good way to visualize when a block is being quasi-powering is to imagine a redstone lamp above the component. If that lamp was to be on in that location, the block is quasi-powered. Quasi-powering usually doesn't update the component being QCed, which results in the component not \"realizing\" it should activate or deactivate until it receives an update. For this reason, QC is often  used for Block Update Detector, and people even sometimes say \"BUD powered\" rather than \"quasi powered\".",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1454754708773273641",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1454754708773273641/1454754710643933326",
+  "status": "APPROVED",
+  "statusMessageID": "1454754710643933326",
+  "updatedAt": 1766910951716,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Block Update Detector",
+      "id": "1454753476813787279",
+      "url": "https://discord.com/channels/1375556143186837695/1454753476813787279/1454753477443063869",
+      "matches": [
+        "Block Update Detector",
+        "BUD"
+      ]
+    }
+  ],
+  "referencedBy": []
+}

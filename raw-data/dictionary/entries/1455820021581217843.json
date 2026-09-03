@@ -1,0 +1,46 @@
+{
+  "id": "1455820021581217843",
+  "terms": [
+    "Signal Strength Isolated",
+    "Signal Strength Independent",
+    "SSI"
+  ],
+  "definition": "Signal strength isolated, signal strength independent, or SSI all refer to item filter designs which cannot crosstalk with each other regardless of signal strength output. This is done by A/B tiling filters such that their wires never cross. The benefit of using SSI filters is that you can then set them up such that it can accept 63 items at once (with only one filter item in first slot of filter hopper). Because you can send more items for the same amount of item entities, the lag produced by the storage is slightly reduced.",
+  "threadURL": "https://discord.com/channels/1375556143186837695/1455820021581217843",
+  "statusURL": "https://discord.com/channels/1375556143186837695/1455820021581217843/1455820022256500874",
+  "status": "APPROVED",
+  "statusMessageID": "1455820022256500874",
+  "updatedAt": 1767164945766,
+  "references": [
+    {
+      "type": "dictionaryTerm",
+      "term": "Crosstalk",
+      "id": "1454753542177816576",
+      "url": "https://discord.com/channels/1375556143186837695/1454753542177816576/1454753542878269451",
+      "matches": [
+        "crosstalk"
+      ]
+    },
+    {
+      "type": "dictionaryTerm",
+      "term": "A/B Tiling",
+      "id": "1454753732293033984",
+      "url": "https://discord.com/channels/1375556143186837695/1454753732293033984/1454753733035687988",
+      "matches": [
+        "A/B tiling"
+      ]
+    }
+  ],
+  "referencedBy": [
+    "CH005",
+    "CH007",
+    "CH008",
+    "MH002",
+    "FL001",
+    "FL004",
+    "AC005",
+    "FL005",
+    "FL006",
+    "CH010"
+  ]
+}

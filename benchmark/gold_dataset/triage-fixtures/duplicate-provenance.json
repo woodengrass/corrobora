@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "ingestionRulesVersion": "t0.5-1",
+  "approved_by": "woodengrass",
+  "approved_at": "2026-07-28T00:00:00.000Z",
+  "notes": "canonical 選擇規則見 docs/document-ingestion.md 第 6 節：先比 source_key 再比相對路徑字典序。本檔兩組皆同一來源（gtmc），故 source_key 相同，實際比較鍵仍是相對路徑。relation 本期只允許 exact_duplicate。",
+  "pairs": [
+    {
+      "source_path": "gtmc-database/EntityMove/404.md",
+      "logical_record_no": null,
+      "canonical_source_path": "gtmc-database/EntityAI/404.md",
+      "duplicate_hash":
+        "fc270e12e56f1c5dc916cbdd1e57e0234e63545e34c7f529bfd4b20d0f791749",
+      "relation": "exact_duplicate"
+    },
+    {
+      "source_path": "gtmc-database/EntityMove/00-序.md",
+      "logical_record_no": null,
+      "canonical_source_path": "gtmc-database/EntityAI/00-序.md",
+      "duplicate_hash":
+        "eb667fbc3b527fe1c6a836ad884cb445ab783d6c7599a87f0b274ab39d2c2f0e",
+      "relation": "exact_duplicate"
+    }
+  ]
+}
