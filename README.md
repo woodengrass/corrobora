@@ -24,5 +24,3 @@ corrobora/
    已經在 OpenST-QQBot 的其他分支上想清楚，不要重新設計一次。
 3. `raw-data/` 是實際會被匯入的內容，`benchmark/gold_dataset/` 是驗證匯入與檢索是否正確的
    題庫與 fixture。
-
-本 repo 目前只是本地整理，尚未推送到遠端。
