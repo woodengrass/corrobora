@@ -1,17 +1,14 @@
-# openst-expert
+# corrobora
 
 特定領域 AI 專家化系統——利用線上大型 LLM 的通用推理能力，結合自建專業知識庫、
 Agentic 多輪檢索、Knowledge Graph 與程式分析工具，讓通用 LLM 在特定領域（第一個
-驗證領域：Minecraft Technical / 生電）逼近專家級分析能力。
-
-與 `OpenST-QQBot` 是不同 repository、不同技術棧（Python/FastAPI + PostgreSQL + Qdrant，
-OpenST-QQBot 是 Node/TypeScript + CSV/JSON），未來 OpenST-QQBot 只作為呼叫本系統
-API 的 client 之一。詳見 [`docs/plan/00-overview-and-architecture.md`](docs/plan/00-overview-and-architecture.md)。
+驗證領域：Minecraft Technical / 生電）逼近專家級分析能力。技術棧為 Python/FastAPI +
+PostgreSQL + Qdrant。詳見 [`docs/plan/00-overview-and-architecture.md`](docs/plan/00-overview-and-architecture.md)。
 
 ## 目錄結構
 
 ```text
-openst-expert/
+corrobora/
 ├── docs/
 │   ├── plan/               開發計畫（原 EXPERT_SYSTEM_PLAN.md 拆分版，見 docs/plan/README.md）
 │   └── legacy-reference/   從 OpenST-QQBot 各 worktree 挖出的既有規格、程式碼與資料

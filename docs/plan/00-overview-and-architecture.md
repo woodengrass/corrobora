@@ -6,9 +6,9 @@
 
 ## 0. 定位與範圍
 
-本文件規劃一個**獨立系統**（暫名 `openst-expert`），與 OpenST-QQBot 是不同 repository、不同技術棧、不同開發節奏：
+本文件規劃一個**獨立系統**（暫名 `corrobora`），與 OpenST-QQBot 是不同 repository、不同技術棧、不同開發節奏：
 
-| 項目 | OpenST-QQBot（現有） | openst-expert（本計畫） |
+| 項目 | OpenST-QQBot（現有） | corrobora（本計畫） |
 | --- | --- | --- |
 | 技術棧 | Node.js / TypeScript | Python / FastAPI |
 | 資料 | CSV / JSON | PostgreSQL + Qdrant |
@@ -73,7 +73,7 @@ flowchart TD
 單一 monorepo，Python 為主，poetry/uv 管理，每個 service 可獨立部署：
 
 ```text
-openst-expert/
+corrobora/
 ├── pyproject.toml
 ├── docker-compose.yml                 # postgres, qdrant, api 一鍵起本地環境
 ├── services/
