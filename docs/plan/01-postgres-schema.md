@@ -319,18 +319,33 @@ CREATE TABLE experiment_results (
 
 ### 3.8 程式碼符號（第 12-13 節詳述 pipeline）
 
+**補丁原則：`code_symbols` 只存機器事實，定義放外部**：`code_symbols` 只記錄抽取器能決定的事實（版本、mapping、檔案位置、hash），人類可讀的定義、解釋、領域對應一律進 `code_annotations`。`IMPLEMENTED_BY → Domain Concept` 這條邊本身也是外部 metadata，走 `relations`，不寫進 `code_symbols`。
+
+> **白話說**：`code_symbols` 是戶籍謄本，只寫「這個版本、這個 mapping、這個檔案第幾行長什麼樣」。你覺得它是什麼意思、對應哪個遊戲概念，寫到 `code_annotations` 和 `relations`，版本一變不用把解釋複製一份。
+
 ```sql
 CREATE TABLE code_versions (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   edition TEXT NOT NULL,
   game_version_id BIGINT NOT NULL REFERENCES game_versions(id),  -- v2 修正：不再用 TEXT
-  mapping_name TEXT NOT NULL        -- 'mojmap'|'yarn'|'searge'
+  mapping_name TEXT NOT NULL,        -- 'mojmap'|'yarn'|'searge'
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- 穩定身份表：之前 canonical_symbol_id 只是裸 BIGINT，沒有 PK
+-- 現在扶正，跨版本同一個邏輯符號共用同一個 canonical id
+CREATE TABLE code_canonical_symbols (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  stable_key TEXT NOT NULL UNIQUE,   -- 例如 'net.minecraft.HopperBlockEntity#transferCooldown'
+  first_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  notes TEXT
 );
 
 CREATE TABLE code_symbols (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   code_version_id BIGINT NOT NULL REFERENCES code_versions(id),
-  canonical_symbol_id BIGINT,        -- 跨版本同一邏輯符號，見第15節
+  canonical_symbol_id BIGINT NOT NULL REFERENCES code_canonical_symbols(id),
   fqcn TEXT NOT NULL,                -- fully qualified name
   symbol_kind TEXT NOT NULL,         -- 'class'|'method'|'field'
   signature TEXT,
@@ -338,19 +353,50 @@ CREATE TABLE code_symbols (
   body_hash CHAR(64),
   file_path TEXT NOT NULL,
   start_line INT,
-  end_line INT
+  end_line INT,
+  knowledge_object_id BIGINT UNIQUE, -- 由 trigger 回填，見 3.9 節
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX idx_symbol_fqcn ON code_symbols(fqcn);
 CREATE INDEX idx_symbol_canonical ON code_symbols(canonical_symbol_id);
 
+-- 外部定義表：人話、領域對應、審核，全在這裡，不進 code_symbols
+CREATE TABLE code_annotations (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  canonical_symbol_id BIGINT NOT NULL REFERENCES code_canonical_symbols(id),
+  -- NULL = 通用定義，適用所有版本；非 NULL = 只適用某個版本範圍
+  version_scope_id BIGINT REFERENCES version_scopes(id),
+  display_name TEXT NOT NULL,
+  description TEXT NOT NULL,
+  interpretation TEXT,               -- 這段 code 被用來證明什麼 Claim
+  confidence TEXT NOT NULL DEFAULT 'unverified'
+    CHECK (confidence IN ('documented','expert_reviewed','measured','inferred','unverified')),
+  review_status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (review_status IN ('pending','approved','rejected','deprecated','disputed')),
+  created_by TEXT NOT NULL,          -- reviewer_id / 'ai:claim_extract@v1' / 'system:indexer'
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_anno_canonical ON code_annotations(canonical_symbol_id);
+CREATE INDEX idx_anno_review ON code_annotations(review_status);
+CREATE UNIQUE INDEX uq_anno_canonical_scope
+  ON code_annotations(canonical_symbol_id, version_scope_id);
+-- PG 視 NULL 為相異，上面擋不住兩個通用定義，需另加 partial index
+CREATE UNIQUE INDEX uq_anno_canonical_generic
+  ON code_annotations(canonical_symbol_id)
+  WHERE version_scope_id IS NULL;
+
 CREATE TABLE code_symbol_diffs (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  canonical_symbol_id BIGINT NOT NULL,
+  canonical_symbol_id BIGINT NOT NULL REFERENCES code_canonical_symbols(id),
   from_code_version_id BIGINT NOT NULL REFERENCES code_versions(id),
   to_code_version_id BIGINT NOT NULL REFERENCES code_versions(id),
   diff_type TEXT NOT NULL   -- UNCHANGED|RENAMED|MOVED|SIGNATURE_CHANGED|LOGIC_CHANGED|ADDED|REMOVED
 );
 ```
+
+分工：`code_annotations` 存「怎麼描述它」，`relations(IMPLEMENTED_BY)` 存「它跟哪個 Domain Concept 有圖邊」。`code_annotations` 本身不註冊進 `knowledge_objects`，只有 `code_symbols` 才註冊。
 
 ### 3.9 關係（知識圖譜本體，PostgreSQL 版）
 
@@ -415,7 +461,7 @@ CREATE TABLE audit_logs (
 1. Raw content 只透過新 `source_revisions` row 追加，絕不 UPDATE；文件內容變更會產生新 `document_revisions`，`chunks` 永遠精確屬於某一個 revision（3.2節）。
 2. 有審核意義的實體（`claims`, `relations`, `mechanism_details`...）用 `review_status` + `human_reviews` 記錄歷程，不用「軟刪除覆蓋」。
 3. 需要「取代」的情境（新版本推翻舊 Claim）建立新 Claim，並用 `relations(SUPERSEDES)` 連接，不刪舊資料。
-4. 程式碼符號跨版本追蹤靠 `canonical_symbol_id`，由 indexing pipeline 用 body_hash/signature 相似度自動配對，人工可修正配對錯誤（第15節）。
+4. 程式碼符號跨版本追蹤靠 `code_canonical_symbols` + `code_symbols.canonical_symbol_id`，由 indexing pipeline 用 body_hash/signature 相似度自動配對，人工可修正配對錯誤（第15節）。人類定義不跟著版本複製，只在 `code_annotations` 按 `version_scope_id` 覆寫。
 5. 版本序列一律靠 `game_versions.release_order` 整數比較，任何地方看到需要「這版本是不是比那版本新」都查這張表，不重新發明字串比較邏輯。
 6. 任何新的跨型別參照（graph 邊、evidence 連結）一律先查/建 `knowledge_objects`，不再新增裸的 `(type, id)` 欄位組合。
 
