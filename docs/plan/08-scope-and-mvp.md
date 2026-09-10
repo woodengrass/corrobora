@@ -15,7 +15,7 @@
 | Neo4j / Memgraph | 只在 PG relations 遞迴查詢證實為瓶頸時才評估 | 見第7節 |
 | ColBERT late interaction | Phase 2 | Cross-Encoder rerank 先驗證夠不夠用 |
 | CPT（Continued Pretraining） | Advanced，且需先有 SFT 資料證明小模型不夠用 | CPT 成本高、風險高（catastrophic forgetting），優先做 LoRA/SFT |
-| 完全自由的 autonomous agent（ReAct 自由生成 next action） | 不做 | 使用者明確要求 deterministic state machine，可控性優先 |
+| 完全自由的 autonomous agent（ReAct 自由生成 next action，含自由 code agent） | 不做 | 使用者明確要求 deterministic state machine，可控性優先；code 調查一律是受控子迴圈（見 5.1.7 節） |
 | 多語系（英文以外的其他領域語言）泛化驗證 | Advanced | 先在單一語言（繁中/簡中+英文技術詞）把 pipeline 打穩 |
 
 MVP 的判斷準則：**任何功能若沒有辦法在 2 週內看到「Recall@10 是否提升」或「Unsupported Claim Rate 是否下降」這類量化訊號，就先不做**。
@@ -45,15 +45,16 @@ MVP 的判斷準則：**任何功能若沒有辦法在 2 週內看到「Recall@1
 
 **測試優先序**：
 1. Claim atomic 檢查的 deterministic rule 單元測試
-2. Version filter 正確性測試（確保跨版本資料不互相污染，這是整個系統可信度的底線）
+2. Version filter 正確性測試（確保跨版本資料不互相污染，這是整個系統可信度的底線；含 version isolation：版本不相容與未審核資料確實被擋掉）
 3. Evidence Package schema 的 golden snapshot 測試
 4. Retrieval Recall@K 對固定 10 題（先用小規模題庫起步，第16節）
+5. Ingestion fixture replay 通過率（triage-fixtures，見 benchmark 說明）
 
 ---
 
 ## 23. MVP 定義
 
-**MVP 目標**：驗證「Concept/Claim 資料模型 + 簡化版 Agent Loop + Evidence Package + Strong LLM」比「現有 CSV 語意搜尋直接丟給 LLM（即現有 QQBot 的 `/ask`）」在**至少一種指標**（Unsupported Claim Rate 或 Recall@10）上有可測量的提升。
+**MVP 目標**：驗證「Concept/Claim 資料模型 + 簡化版 Agent Loop + Evidence Package + Strong LLM」比「現有 CSV 語意搜尋直接丟給 LLM（即現有 QQBot 的 `POST /v1/ask` 對應舊 `/ask`）」在**至少一種指標**（Unsupported Claim Rate 或 Recall@10）上有可測量的提升。
 
 **MVP 範圍**：
 
@@ -65,7 +66,7 @@ MVP 的判斷準則：**任何功能若沒有辦法在 2 週內看到「Recall@1
 - Code Intelligence / Litematic / Dynamic Verification / 小模型訓練：**完全不做**
 - Evidence Package → Strong LLM → 簡化版 Final Verification（只做 deterministic 的 `claim_has_evidence`/`version_matches`，不做 AI verifier）
 
-**完成條件**：對 15-20 題手工 gold 題庫（第16節子集），MVP pipeline 的 Unsupported Claim Rate 低於現有 `/ask` 直接 RAG 方式，且每題平均 latency 在可接受範圍（建議先設 <15s，不含人工審核時間）。
+**完成條件**：對 15-20 題手工 gold 題庫（第16節子集），MVP pipeline 的 Unsupported Claim Rate 低於現有 `/v1/ask` 直接 RAG 方式；latency 拆成 `retrieval / LLM / verification` 分開量測，總和先設 <15s，不含人工審核時間，定案前先量實際分佈。
 
 ---
 

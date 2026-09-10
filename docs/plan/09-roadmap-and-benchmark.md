@@ -24,7 +24,7 @@
 
 ### Phase 2（+8-12 週）：Code Intelligence 起步 + Claim 反證機制成熟
 
-- Tree-sitter 索引 + 有限範圍 JDT 語意解析（只針對高頻引用符號）
+- Tree-sitter 索引 + 有限範圍 JDT 語意解析（只針對已核准 concept 相關 + 高頻引用符號，見 06 節）
 - SCIP symbol index，`get_callers`/`get_callees`/`compare_versions` tool 落地
 - Minecraft Semantic Layer 的 deterministic 部分（RegistryEntry/Tag/LootTable 解析）
 - Final Claim Verification 完整版（含 AI verifier 分流）
@@ -48,7 +48,7 @@
 
 ## 附：Benchmark 與 Ablation（延續原規劃內容，不重複展開）
 
-沿用使用者原始需求第25-26節定義的指標與 Ablation 分組（A. General LLM only 到 I. Agentic+Dynamic Verification），每次 pipeline 變更都要重跑同一份題庫比較（沿用 KNOWLEDGE_SYSTEM_PLAN.md 既有「評測與維護」章節的紀律：命中證據正確性、版本正確性、引用正確性、回答完整性、幻覺情況）。
+沿用使用者原始需求第25-26節定義的指標與 Ablation 分組（A. General LLM only 到 I. Agentic+Dynamic Verification），每次 pipeline 變更都要重跑同一份題庫比較（沿用 KNOWLEDGE_SYSTEM_PLAN.md 既有「評測與維護」章節的紀律：命中證據正確性、版本正確性、引用正確性、回答完整性、幻覺情況）。每次評測記錄 `git_sha + data_hash + model_version`，否則不可視為可重現比較。
 
 **v2 修正（題庫規模）**：15-20 題只適合當 MVP smoke test，用來確認 pipeline 沒退步；**不能拿來下「架構優於 baseline」這種強度的研究結論**——樣本數不足以支撐統計意義。正式評測要分層擴充到至少 ~120 題：
 
@@ -73,11 +73,11 @@
 2. 建第一批資料表（第22節列出的第一批，含 `concepts.external_ref`/`external_ref_pending`、`knowledge_objects` 的 `AFTER INSERT` trigger），並匯入 `game_versions` 種子資料（Java 版本序列，`release_order` 手動整理一份 1.0~最新版 + 常用 snapshot 的清單）
 3. `ingestion/pipelines/dictionary.py`：實作 5.1.2 節匯入偽代碼，跑通 `public/database/dictionary/entries/*.json`（979 筆）+ `zh-translations.json` 全量匯入，驗收標準：`concepts`/`concept_aliases`/`relations` 筆數與原始 JSON 條目數、`references` 邊數一致
 4. Markdown parser：實作 5.1.3 節規則，跑通 `public/database/gtmc-database/` 全量匯入（215 篇，含 `404.md` 占位偵測與 license 登記），`source_revisions` 去重 + `documents`/`document_sections`/`chunks` 寫入
-5. Dense embedding（BGE-M3，可沿用 [`embeddings.ts`](../src/services/embeddings.ts) 已驗證的 hf-mirror 鏡像/代理下載策略，見 5.1.6 節）+ Qdrant `concepts`/`documents` collection 建立與寫入
+5. Dense embedding（BGE-M3，model 名、版本、維度、distance 視為同一份 contract，升級重建，見 4.2 節；可沿用 [`embeddings.ts`](../src/services/embeddings.ts) 已驗證的 hf-mirror 鏡像/代理下載策略，見 5.1.6 節）+ Qdrant `concepts`/`documents` collection 建立與寫入（Point ID 統一 UUID + PG 反查）
 6. `semantic_search` tool + 最小 Gateway `/v1/ask`（先不經過 Agent，直接 retrieve→prompt→LLM，用步驟 3-4 的真實資料驗證管線通）
 7. `ingestion/pipelines/machine.py`：`database.json` -> `farms`（metadata 直接 approved，`tags`->`relations` 候選標 pending），`sub_id` 保留為 `external_ref` 維持與現行分享連結相容
 8. Claim extraction：先實作 5.1.4 節的規則初篩（沿用 [`learn.ts`](../src/services/learn.ts) 的 `KNOWLEDGE_SHARING_PATTERNS` 關鍵詞列表）+ 單一 prompt template，對 `database.csv` 跑一批小樣本（建議先 200 行）+ CLI 審核工具
 9. Orchestrator 4 狀態骨架 + ResearchState 落地（先不做 REFORMULATE），Graph 展開直接查詢步驟 3 產出的 `relations` 資料，不需另外建種子
 10. Evidence Package builder + Final Verification 的 deterministic 子集
 11. 15-20 題 gold 題庫（優先取材自 `dictionary/entries` 涵蓋到的術語，因為這批資料有審核依據，答案可驗證）+ `eval_retriever.py`/`eval_answer.py`
-12. 與現有 QQBot `/ask` 的 baseline 比較報告 → 決定是否進 Phase 1（含 5.1.5 節 `referencedBy` 懸空引用是否已從資料維護者取得對應表的追蹤事項）
+12. 與現有 QQBot `POST /v1/ask`（對應舊 `/ask`）的 baseline 比較報告 → 決定是否進 Phase 1（含 5.1.5 節 `referencedBy` 懸空引用是否已從資料維護者取得對應表的追蹤事項）

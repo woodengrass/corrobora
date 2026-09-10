@@ -47,7 +47,7 @@ class ResearchState(BaseModel):
 3. `unknowns` 每輪重新計算：依第12節 Evidence Requirement 尚未覆蓋的項目。
 4. `remaining_budget` 每輪扣減，歸零觸發強制停止並進入「不完整證據」分支（見第19節 unknowns 欄位）。
 
-State 整份持久化在 PG（`research_sessions` 表，JSONB 欄位存 state snapshot 供除錯與 SFT 訓練資料萃取，第24節），不放記憶體易失。
+State 整份持久化在 PG（預定 `research_sessions` 表，JSONB 欄位存 state snapshot 供除錯與 SFT 訓練資料萃取，第24節），不放記憶體易失。完整 DDL 由 `01` 統一定義，本篇不重複定義。
 
 ---
 
@@ -65,19 +65,19 @@ class ToolResult(BaseModel):
     took_ms: int
     truncated: bool           # 是否因 budget 被截斷
 
-# 範例
-def search_effects(query: str, version: str | None = None,
+# 範例（版本一律用 ID，不用字串比對；graph 先走 knowledge_objects 解析）
+def search_effects(query: str, game_version_id: int | None = None,
                     edition: str = "java", top_k: int = 10) -> ToolResult: ...
 
 def get_mechanism_constraints(mechanism_id: int) -> ToolResult: ...
 
 def find_counterevidence(claim_id: int) -> ToolResult: ...
 
-def expand_graph(node_type: str, node_id: int,
+def expand_graph(knowledge_object_id: int,
                   relation_types: list[str] | None = None,
                   max_hops: int = 1) -> ToolResult: ...
 
-def get_callers(symbol_id: int, code_version: str) -> ToolResult: ...
+def get_callers(symbol_id: int, code_version_id: int) -> ToolResult: ...
 ```
 
 工具分組與後端對應：
@@ -87,10 +87,10 @@ def get_callers(symbol_id: int, code_version: str) -> ToolResult: ...
 | Concept | `search_concepts`, `resolve_alias`, `get_related_concepts` | PG (concepts, aliases, relations) |
 | Mechanism | `search_mechanisms`, `search_by_effect`, `search_by_application`, `get_mechanism_requirements`, `get_mechanism_constraints` | Qdrant named vector + PG join |
 | Claim | `search_claims`, `get_claim`, `find_counterevidence`, `verify_claim_scope` | PG claims + claim_evidence |
-| 通用檢索 | `semantic_search`, `sparse_search`, `hybrid_search`, `read_document_section` | Qdrant + PG chunks |
-| Graph | `expand_graph`, `find_path`, `find_producers_of_effect` | PG relations 遞迴查詢 |
-| Code | `search_symbols`, `read_symbol`, `get_callers`, `get_callees`, `get_overrides`, `get_field_readers/writers`, `trace_control_flow`, `trace_data_flow`, `compare_versions`, `get_symbol_diff` | code_symbols + CodeQL/SCIP 查詢層 |
-| Experiment | `search_experiments`, `run_test`, `get_test_result` | experiments 表；`run_test` MVP 不實作（第17,21節） |
+| 通用檢索 | `semantic_search` [MVP]、`sparse_search` / `hybrid_search` [Phase 1]、`read_document_section` [MVP] | Qdrant + PG chunks |
+| Graph | `expand_graph`, `find_path`, `find_producers_of_effect` [MVP 簡版，1 跳優先] | PG relations 遞迴查詢，先走 `knowledge_objects` 解析 |
+| Code | `search_symbols`, `read_symbol`, `get_callers`, `get_callees`, `get_overrides`, `get_field_readers/writers`, `trace_control_flow`, `trace_data_flow`, `compare_versions`, `get_symbol_diff` [Phase 2，受控子迴圈，非自由 agent] | `code_symbols` + `code_annotations` + CodeQL/SCIP 查詢層；版本一律用 `code_version_id` / `game_version_id` |
+| Experiment | `search_experiments`, `get_test_result` [MVP 只查已登錄]、`run_test` [Future] | experiments 表；`run_test` MVP 不實作（第17,21節） |
 | Reasoning | `propose_hypotheses(research_state) -> list[CandidateHypothesis]` | **不是後端查詢 tool**，是 LLM 產出候選假設的呼叫點，回傳值不直接寫 state，必須經 Orchestrator 驗證（第9節），這是唯一允許 LLM「發散」的 tool，其餘 tool 一律是結構化查詢 |
 
 **共通機制**：
@@ -178,6 +178,7 @@ class SufficiencyChecklist(BaseModel):
 全部 `per_subquestion` 為 true 且其餘三個欄位為 true 才進入 BUILD_PACKAGE；否則檢查硬限制：
 
 ```python
+# 以下為初始猜測值，MVP 先量測 retrieval / LLM / verification latency、token、cost 後再定案
 class Budget(BaseModel):
     max_rounds: int = 8
     max_tool_calls: int = 40

@@ -142,6 +142,27 @@ def migrate_dictionary_entries():
 | [`src/services/source.ts`](../src/services/source.ts) | 遞迴收集檔案 + 二進位副檔名判斷的通用邏輯 | Phase 2 `code_intel/indexer` 掃描原始碼樹時可參考同樣的跳過規則（`img/`、`.class`、`.jar` 等） | 目標目錄本身無內容，此為架構參考而非資料遷移 |
 | [`src/services/search.ts`](../src/services/search.ts) | DuckDuckGo Lite 免費方案的請求/解析邏輯 | Phase 2+ 若要做「已審核來源政策下的網頁檢索」可參考 | 現行邏輯直接把搜尋摘要塞進 answer，違反新系統「未審核網頁爬取」延後的原則（第21節），只搬技術實作，不搬使用方式 |
 
+#### 5.1.7 Code Source：Minecraft 原始碼與 Mappings（ingestion 邊界，詳見第 13-15 節）
+
+Code Source 不走文件 triage 流程，不進 `document_triage`。
+
+```text
+Minecraft Source + Mappings + game_version
+→ 基本解析 / Index
+→ Code Graph
+→ Code Investigation Loop（受 Orchestrator 控制，非自由 agent）
+→ CodeEvidenceRef
+→ Evidence Workspace
+```
+
+Code Graph 節點與邊：`Symbol`、`Definition / Reference`、`CALLS`、`READS / WRITES`、`EXTENDS / IMPLEMENTS / OVERRIDES`、`REGISTERS / LOOKS_UP / SCHEDULES_TICK`、`IMPLEMENTED_BY → Domain Concept`。
+
+規則：
+
+1. 能規則解析的先規則解析，不用 AI 猜；`IMPLEMENTED_BY` 初版一律 candidate，需人工審核。
+2. 每次 ingestion 必須綁定 `code_version_id + mapping + game_version_id`，定義放 `code_annotations`（見 3.8 節），不寫進 `code_symbols`。
+3. Code Evidence 仍要進 `Evidence Workspace`，但壓縮策略不同：不做語意摘要替換原文，保留 `fqcn + signature + file/line + hash`，不同 overload 不得合併去重；`debugging` / `code_analysis` 優先保留 code evidence。
+
 ---
 
 ## 6. Claim Extraction / Review Pipeline

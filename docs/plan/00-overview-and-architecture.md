@@ -13,7 +13,7 @@
 | 技術棧 | Node.js / TypeScript | Python / FastAPI |
 | 資料 | CSV / JSON | PostgreSQL + Qdrant |
 | 角色 | QQ 平台 adapter、使用者互動 | 領域知識檢索與推理後端 |
-| 關係 | 未來作為 **client**，呼叫本系統 `/answer` API | 提供 Evidence Package 或最終答案 |
+| 關係 | 未來作為 **client**，呼叫本系統 `POST /v1/ask`（正式 API，舊 `/answer` 僅視為 legacy adapter） | 提供 Evidence Package 或最終答案 |
 
 驗證領域：Minecraft Technical / 生電（Redstone Tech）。所有 schema 與模組命名刻意保持領域中立（`concepts`、`mechanisms` 而非 `blocks`、`redstone_devices`），使日後可替換領域語料而不改架構。
 
@@ -70,58 +70,60 @@ flowchart TD
 
 ## 2. Repository / 模組切分
 
-單一 monorepo，Python 為主，poetry/uv 管理，每個 service 可獨立部署：
+單一 monorepo，Python 為主，poetry/uv 管理，每個 service 可獨立部署。狀態標記：`[MVP]` 首批實作、`[Phase 1]` 檢索強化、`[Phase 2]` 程式碼智能、`[Future]` 進階／訓練：
 
 ```text
 corrobora/
 ├── pyproject.toml
 ├── docker-compose.yml                 # postgres, qdrant, api 一鍵起本地環境
 ├── services/
-│   ├── gateway/                       # FastAPI 入口，路由到各 service
+│   ├── gateway/                       # [MVP] FastAPI 入口，路由到各 service
 │   │   ├── main.py
 │   │   └── routers/{ask,review,ingest}.py
-│   ├── query_understanding/
+│   ├── query_understanding/           # [MVP]
 │   │   ├── classifier.py              # query_type 分類（小模型或規則+LLM）
 │   │   └── entity_linker.py           # alias -> concept_id
-│   ├── orchestrator/
+│   ├── orchestrator/                  # [MVP 簡版，Phase 1 完整]
 │   │   ├── state_machine.py           # 第11節
 │   │   ├── research_state.py          # 第9節 Pydantic model
 │   │   └── stop_conditions.py         # 第12節
-│   ├── retrieval/
+│   ├── retrieval/                     # [MVP dense-only，Phase 1 hybrid]
 │   │   ├── dense.py / sparse.py / fusion.py / reranker.py
 │   │   └── qdrant_client.py
-│   ├── graph/
+│   ├── graph/                         # [MVP 簡版，Phase 1 完整]
 │   │   ├── relations.py               # PG relations CRUD
 │   │   └── traversal.py               # find_path, expand
-│   ├── code_intel/
+│   ├── code_intel/                    # [Phase 2]
 │   │   ├── indexer/{treesitter,jdt,scip}.py
 │   │   ├── mc_semantic_layer.py       # 第14節
 │   │   └── query.py                   # get_callers 等
-│   ├── claims/
+│   ├── claims/                        # [MVP]
 │   │   ├── extraction.py              # AI 抽取 candidate claim
 │   │   ├── review.py                  # workflow
 │   │   └── verification.py            # deterministic check
-│   ├── evidence/
+│   ├── evidence/                      # [MVP]
 │   │   ├── workspace.py               # 第18節
 │   │   └── package.py                 # 第19節
-│   ├── tools/                         # Agent 高階 tool，第10節
+│   ├── tools/                         # [MVP] Agent 高階 tool，第10節
 │   │   └── registry.py
-│   └── domain_model/
+│   └── domain_model/                  # [Future] Advanced 訓練／推論
 │       ├── inference.py               # 本地小模型 serving（vLLM/SGLang client）
 │       └── training/{cpt,sft,lora}.py
-├── db/
+├── db/                                # [MVP]
 │   ├── migrations/                    # alembic
 │   └── schema.sql
-├── ingestion/
+├── ingestion/                         # [MVP]
 │   ├── parsers/{markdown,csv,json,litematic}.py
 │   └── pipelines/{document,machine,dictionary}.py
-├── benchmark/
+├── benchmark/                         # [MVP smoke]
 │   ├── gold_dataset/
 │   ├── eval_retriever.py
 │   ├── eval_agent.py
 │   └── eval_answer.py
-└── tests/
+└── tests/                             # [MVP]
 ```
+
+> **註（與第 9 節 / 01-schema 銜接）**：`ResearchState` 需持久化到 PostgreSQL（預定 `research_sessions`、`research_events`、`tool_calls`），完整 DDL 留待 `01-postgres-schema.md` 補上，本篇不另行定義，避免兩邊各寫一套。
 
 ---
 

@@ -25,8 +25,10 @@ class EvidenceItem(BaseModel):
 
 def compress(items: list[EvidenceItem], token_budget: int) -> list[EvidenceItem]:
     # 1. dedup: 同 source_id 或近似 summary（embedding sim > 0.95）只留最高 priority 一筆
+    #    例外：code_symbol 不同 overload / 不同 signature 不得合併，去重鍵必須含 fqcn + signature + code_version_id
     # 2. sort by priority desc
     # 3. greedy 填入直到 token_budget 用盡，優先保留 supports + contradicts 各至少一筆／critical claim
+    # 4. code evidence 不做語意摘要替換原文，保留 fqcn + signature + file/line + hash + full_ref
 ```
 
 **v2 修正（Evidence Quality 公式）**：原公式用 `relevance × confidence × recency`，但 `recency`（新舊）對 Minecraft 技術知識是錯誤的通用指標——2020 年寫的 1.16.1 原始碼分析，不會因為「舊」就比一篇 2025 年但寫錯版本的文章差。拿掉 `recency`，換成真正決定證據可信度的因素：
@@ -48,7 +50,7 @@ EvidenceQuality = retrieval_relevance × version_match × source_authority × di
   | AI 推論（未經人工審核的 candidate） | 0.3 |
 
 - **`directness`**：證據是否直接回答 subquestion，還是要經過額外推論鏈才連得上（人工標註或由 Claim Extraction 階段的 AI 抽取信心分數帶出）。
-- **`verification_weight`**：`review_status='approved'` 為 1.0，`pending` 打七折，`disputed` 打三折，`rejected` 直接排除不進 workspace。
+- **`verification_weight`**：`review_status='approved'` 為 1.0，`pending` 打七折，`disputed` 打三折，`rejected` 直接排除不進 workspace。code 證據的 `review_status` 以 `code_annotations` + `relations(IMPLEMENTED_BY)` 為準，不以 `code_symbols` 本身判斷（`code_symbols` 只存事實，無審核狀態）。
 
 **這個公式本身不是寫死的全域常數**：不同 `query_type`/Claim 類型可以覆蓋 `source_authority` 表（例如 `debugging` 類問題應該把 code evidence 的權重拉得比一般問題更高），實作上把上表當作 per-query_type 可覆蓋的 policy，不是硬編碼進 `compress()` 函式本體。
 
@@ -67,7 +69,7 @@ class EvidencePackage(BaseModel):
     candidate_claims: list[ClaimRef]      # 明確標記未審核
     mechanisms: list[MechanismRef]
     constraints: list[ConstraintRef]
-    execution_paths: list[CodePathRef]    # call graph 摘要，非原始碼全文
+    execution_paths: list[CodePathRef]    # call graph 摘要，非原始碼全文；每段保留 code_version_id + mapping + fqcn + signature + file/line + hash
     counterevidence: list[EvidenceRef]
     experiments: list[ExperimentRef]
     unknowns: list[str]                   # 明確列出未覆蓋項目，來自第12節 checklist
@@ -90,7 +92,7 @@ flowchart TD
     Draft["LLM Draft Answer"] --> Split["Claim Splitter（規則+輕量LLM）<br/>拆成 atomic 陳述句，各自綁定引用的 claim_id/symbol_id"]
     Split --> Route{"這句話宣稱了什麼？"}
     Route -->|"引用具體 claim_id"| C1["claim_has_evidence(claim_id)<br/>直接查 PG"]
-    Route -->|"宣稱 A calls B"| C2["call_edge_exists(A,B)<br/>查 code_symbols/call graph"]
+    Route -->|"宣稱 A calls B"| C2["call_edge_exists(A,B)<br/>查 code 邊（版本內，需帶 code_version_id，不跨 mapping 混查）"]
     Route -->|"宣稱 X requires Y"| C3["relation_exists(X, REQUIRES, Y)"]
     Route -->|"宣稱版本限定"| C4["version_matches(claim_id, environment)"]
     Route -->|"宣稱有實驗佐證"| C5["experiment_exists(claim_id)"]
