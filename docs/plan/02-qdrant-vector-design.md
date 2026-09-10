@@ -12,7 +12,7 @@
 | 缺點 | 跨型別查詢要 fan-out 多次 query 再合併 | 所有型別被迫用同一 embedding 維度；payload index 變複雜 |
 | 適合本案原因 | **實體型別的 embedding 語意本來就不同**（mechanism 的 effect_vector 和 code_summary 的向量不該共用模型/維度），且 Agent tool 本來就是分別呼叫 `search_mechanisms()`/`search_symbols()`，天然對應多 collection | — |
 
-**建議：多 collection，按「檢索用途」切，不按 SQL 表切**：
+**建議：多 collection，按「檢索用途」切，不按 SQL 表切**（MVP 只先建 `documents` + `concepts`，dense-only；其餘 collection 按 Phase 1/2 順序加）：
 
 | Collection | 對應資料 | 說明 |
 | --- | --- | --- |
@@ -57,9 +57,11 @@
 
 **v2 修正（版本 payload）**：不再存 `version_min`/`version_max` 字串。改存 `version_ids`：寫入時從 PG 的 `version_scope_versions`（3.1節）展開出該筆資料涵蓋的所有 `game_versions.id`，整份陣列寫進 payload。查詢時 Query Understanding 把使用者的目標版本解析成單一 `game_version_id`，用 Qdrant 的 `MatchAny`/`array-contains` 做精確整數比對，不再有字串 range 比較的正確性風險。
 
-**Payload index**：`status`, `edition`, `version_ids`, `concept_slugs` 都建 keyword/integer index，用於檢索前置 filter（見第7節：filter 先行，再 ANN）。
+**Payload index**：`status`（keyword）、`edition`（keyword）、`version_ids`（integer array）、`concept_slugs`（keyword array）都建 payload index，用於檢索前置 filter（見第7節：filter 先行，再 ANN）。`code` 相關 collection 另加 `code_version_id`、`mapping_name` filter，`mapping` 不同不得混排。
 
-**Point ID = PG 主鍵映射**：每個 collection 的 point id 直接用 `{table}_{id}` 或 UUID + PG 反查欄位（`chunks.qdrant_point_id`），確保 Qdrant 只是 candidate index，PostgreSQL 永遠是 truth source，可隨時從 PG 全量重建 Qdrant。
+**Point ID = UUID + PG 反查（統一，不用 `{table}_{id}` 字串）**：每個 point 用 UUID，PG 側用 `chunks.qdrant_point_id` 等欄位反查。確保 Qdrant 只是 candidate index，PostgreSQL 永遠是 truth source，可隨時從 PG 全量重建 Qdrant。重建時先清 collection 再按 `updated_at` 分批寫入，避免新舊混存。
+
+**Embedding contract（MVP 先凍結，升級必須重建）**：model 名、版本、維度、distance、切段規則（chunk size / overlap / 語言處理）視為同一份 contract。`mechanisms` 的 4 向量現階段只是佔位，MVP 只用 `description` dense；sparse / reranker / ColBERT 留到 Phase 1/2，model 升級一律重建對應 collection，不混用新舊向量。
 
 ### 4.3 Version Filter 流程
 
@@ -74,7 +76,7 @@
 | Concept/別名精確查找 | `concept_aliases` 上的 `lower(alias)` 唯一索引（已在3.3節），O(1) 查找 |
 | 模糊拼寫/縮寫容錯 | PostgreSQL `pg_trgm` extension 對 `concepts.canonical_name`/`concept_aliases.alias` 建 GIN trigram index |
 | 長文技術詞彙全文比對 | PostgreSQL 內建 FTS（`tsvector`/`tsquery`）對 `chunks.content` 建索引，當 fallback，不當主要檢索 |
-| 程式符號精確查找 | `code_symbols.fqcn` 唯一索引（已在3.8節） |
+| 程式符號精確查找 | `code_symbols(fqcn)` 一般索引 + `(code_version_id, fqcn, signature)` 定位唯一（`fqcn` 跨版本/overload 會重複，不可建全域唯一，見 3.8 節） |
 
 這條通道的結果與 Dense+Sparse 的結果一起送進 RRF 融合，而不是獨立回傳——這樣「使用者打對了精確術語」時排序自然靠前，不需要額外規則判斷何時該用哪條通道。
 
