@@ -3,5 +3,7 @@ __pycache__/
 *.pyc
 .env
 .DS_Store
+.idea/
 node_modules/
 dist/
+raw-data/minecraft source code/
