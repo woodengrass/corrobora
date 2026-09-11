@@ -1,72 +1,92 @@
-[索引](README.md) ｜ [← Evidence Workspace / Package / 最終驗證](07-evidence-and-verification.md) ｜ [分階段路線圖與 Benchmark →](09-roadmap-and-benchmark.md)
+[索引](README.md) · [← 驗證](07-evidence-and-verification.md) · [Roadmap →](09-roadmap-and-benchmark.md)
 
----
+# 範圍與 MVP：先完成一個可累積、可重查的研究閉環
 
-## 21. 現在不該做的功能（避免 Overengineering）
+## 1. MVP 的問題
 
-明確排除於 MVP / Phase 1 / Phase 2：
+**在相同強 Agent 與資料條件下，保存可追溯 Findings、先找記憶再補缺口，
+是否能減少重複研究，而不因漏答或過期記憶降低品質？**
 
-| 功能 | 排除到 | 理由 |
-| --- | --- | --- |
-| CodeQL 全量 Call Graph / DFG | Phase 2 後期，按需查詢起步 | 建置成本高，MVP 沒有足夠 Claim 需要程式驗證 |
-| Eclipse JDT 語意解析 | Phase 2 後期 | 同上，先用 Tree-sitter 打樁 |
-| Litematic / Blueprint 解析 | Phase 3+ | 需要先有穩定 Component 分類本體，MVP 沒有 |
-| Dynamic Verification / Test Runner | Advanced | 需要獨立 MC 測試環境與 mod 開發，投入產出比在早期最低 |
-| Neo4j / Memgraph | 只在 PG relations 遞迴查詢證實為瓶頸時才評估 | 見第7節 |
-| ColBERT late interaction | Phase 2 | Cross-Encoder rerank 先驗證夠不夠用 |
-| CPT（Continued Pretraining） | Advanced，且需先有 SFT 資料證明小模型不夠用 | CPT 成本高、風險高（catastrophic forgetting），優先做 LoRA/SFT |
-| 完全自由的 autonomous agent（ReAct 自由生成 next action，含自由 code agent） | 不做 | 使用者明確要求 deterministic state machine，可控性優先；code 調查一律是受控子迴圈（見 5.1.7 節） |
-| 多語系（英文以外的其他領域語言）泛化驗證 | Advanced | 先在單一語言（繁中/簡中+英文技術詞）把 pipeline 打穩 |
+MVP 是測量方法與架構閉環，不是論文結論。小樣本用來找問題與估計成本／變異，
+不能因 15 題通過就宣稱 continual learning 已成立。
 
-MVP 的判斷準則：**任何功能若沒有辦法在 2 週內看到「Recall@10 是否提升」或「Unsupported Claim Rate 是否下降」這類量化訊號，就先不做**。
+## 2. 最小範圍
 
----
+| 能力 | MVP 做到哪裡 |
+| --- | --- |
+| Corpus | 112 筆詞典、23 篇 GTMC；擇可標註的漏斗／物品處理或更新主題，不要求全量 legacy 語意清理 |
+| Raw | bytes snapshots、dual hash、document revisions、sections/passages、links、來源政策 |
+| Retrieval | dense＋lexical baseline、alias lookup、section/article expansion；ports 可換模型 |
+| Memory | Finding revisions、scoped validation、sources/dependencies/relations；兩層 Qdrant index |
+| Agent | 一個 strong provider adapter、自主多輪研究、memory-first＋gap record、budget |
+| Consolidation | exact idempotency＋相似 Finding 比較提案＋最小 review CLI |
+| Invalidation | 文檔 revision／上游 Finding 的反向依賴傳播與按需重查，先單一精確版本 validation |
+| Code | 使用現有本機 1.21.11 source 的 search/read＋snapshot/file/range/hash；小範圍 symbol index spike |
+| Sessions | 查詢、讀取／重用、工具、tokens/cost/latency、結果與維護成本 |
+| Catalog | 資產與 81 筆機器 baseline 保留；catalog 移植可平行，不阻塞 memory 核心 |
+| Benchmark | 既有題目重新標註成 pilot stream，raw agent vs memory vs gap-only；可控制的更新事件 |
 
-## 22. 建議先寫哪些服務 / 資料表 / API / 測試
+MVP 前半先建立 Documents＋stateless Agent baseline；後半才加入 Findings 與 lifecycle。
+Tree-sitter 全 repo edges、graph associative expansion、自動 semantic merge 都不是閉環前置。
+code file 級 dependency 已可驗證變動管線，symbol-body 粒度在後續測細化收益。
 
-實作優先序（對應 MVP，見第17節）：
+## 3. 可交付的使用流程
 
-**資料表（第一批遷移，已依 v2 修正更新）**：`game_versions`, `version_scopes`, `version_scope_versions`, `sources`, `source_revisions`, `documents`, `document_revisions`, `document_sections`, `chunks`, `concepts`, `concept_aliases`, `claims`, `claim_conditions`, `claim_exceptions`, `knowledge_objects`, `claim_evidence`, `human_reviews`, `relations`（先只用於 concept/claim/chunk 三種 `knowledge_objects.object_type`）。`mechanism_details`, `effect_details`, `constraint_details`, `application_details` 第二批。`farms`/`code_*`/`experiments` 第三批（對應 Phase 1/2）。`game_versions` 種子資料（Java 版本序列）必須在第一批就準備好，否則 `version_scopes` 無從建立。
+1. 使用者問一個需跨文章／code 的問題，Agent 找不到足夠記憶，完成一次 fresh research。
+2. 保存一個高價值 provisional Finding，綁實際來源；review 可在 session 後完成。
+3. 新問題 wording／條件不同，但部分需要同一機制，系統找回它，只補缺失部分。
+4. 更新一份相關文件／上游 Finding，受影響 validation 進 needs_revalidation。
+5. 下一題只重查受影響部分；不相關 Finding 与歷史版本引用保持可用。
+6. 全流程能比較答案、來源正確性、閱讀量與總成本，而不只是顯示「命中 memory」。
 
-**服務**：
-1. Ingestion（先支援 dictionary-entry JSON + markdown + csv 三種 parser，對應現有 `dictionary/entries`、`gtmc-database`、`database.csv`，優先序見 5.1 節分級）
-2. Claim Extraction + 最小審核 CLI/網頁
-3. Retrieval（dense only 先上，sparse/RRF/rerank 第二輪）
-4. Query Understanding（先用規則+既有 alias 表 + LLM few-shot 分類，不訓練小模型；別名比對可先移植 `dictionary.ts::matchDictionaryTerms` 的邏輯當降級 fallback，見 5.1.6）
-5. Orchestrator（先實作 UNDERSTAND→PLAN→RETRIEVE→ASSESS 四狀態，REFORMULATE/RESOLVE_CONTRADICTION 第二輪）
-6. Evidence Workspace/Package
-7. Gateway `/v1/ask`
+## 4. 第一批資料與 API
 
-**API（MVP 必要）**：
-- `POST /v1/ask` — 主入口
-- `POST /ingest/document` — 匯入
-- `GET/POST /review/claims` — 審核
-- `GET /health`
+按依賴建 migration batches，而不是一次建立所有未來 extension：
 
-**測試優先序**：
-1. Claim atomic 檢查的 deterministic rule 單元測試
-2. Version filter 正確性測試（確保跨版本資料不互相污染，這是整個系統可信度的底線；含 version isolation：版本不相容與未審核資料確實被擋掉）
-3. Evidence Package schema 的 golden snapshot 測試
-4. Retrieval Recall@K 對固定 10 題（先用小規模題庫起步，第16節）
-5. Ingestion fixture replay 通過率（triage-fixtures，見 benchmark 說明）
+- **Corpus batch**：sources/revisions/observations/import_runs、documents/revisions、sections/passages、
+  links/assets、versions/scopes、concepts/aliases/translations/sources、unresolved references。
+- **Research batch**：sessions/events、jobs、index_builds/outbox；先讓 raw baseline 有可比觀測。
+- **Memory batch**：findings/revisions/validations、sources/dependencies/relations/concepts、reviews、
+  invalidation_events。無 source 或 upstream dependency 的 verified 寫入要被拒絕。
+- **Code batch**：repositories/versions/files；symbol/index 擴展可獨立加入。
+- **Extension batch**：machines/revisions/tags、blueprints、experiments，依案例開啟。
 
----
+最小入口（皆為待實作契約）：
 
-## 23. MVP 定義
+- `POST /v1/ask`、`GET /v1/research/sessions/{id}`。
+- `POST /v1/ingest/documents`、`GET /v1/documents/{id}/revisions/{revision_id}`。
+- `POST /v1/findings/search`、`POST /v1/findings/candidates`、`POST /v1/findings/reviews`。
+- `GET /health`；對外 Agent tools 使用同一 application services，避免兩套寫入政策。
 
-**MVP 目標**：驗證「Concept/Claim 資料模型 + 簡化版 Agent Loop + Evidence Package + Strong LLM」比「現有 CSV 語意搜尋直接丟給 LLM（即現有 QQBot 的 `POST /v1/ask` 對應舊 `/ask`）」在**至少一種指標**（Unsupported Claim Rate 或 Recall@10）上有可測量的提升。
+## 5. 完成條件
 
-**MVP 範圍**：
+### 工程底線
 
-- 資料：`dictionary/entries`（979 筆，approved）+ `gtmc-database`（215 篇，approved）優先遷移；`database.json`（機器 metadata）次之；`database.csv`（4287 行，pending，先跑規則初篩+AI抽取）與 `Dictionary.txt`/`TechMC Glossary.csv`（pending）殿後——詳細對照與偽代碼見 5.1 節，不再沿用 KNOWLEDGE_SYSTEM_PLAN.md 舊規則重新設計
-- 檢索：Dense-only（BGE-M3 dense 向量），無 sparse/rerank
-- Graph：只用 `relations` 表存 concept↔mechanism↔claim 三種型別關係，種子資料直接來自 5.1.2 節 `dictionary/entries` 遷移產出的 979 筆 approved concept 與既有 `references` 關係，不需人工從零建立
-- Agent：4 狀態 state machine（UNDERSTAND→PLAN→RETRIEVE→ASSESS），無 REFORMULATE 迴圈（先跑一輪，不夠就直接標 unknown）
-- Claim：完整 Candidate→Review→Approved workflow，但審核介面可以是 CLI
-- Code Intelligence / Litematic / Dynamic Verification / 小模型訓練：**完全不做**
-- Evidence Package → Strong LLM → 簡化版 Final Verification（只做 deterministic 的 `claim_has_evidence`/`version_matches`，不做 AI verifier）
+- Raw revision 可還原，重匯入與 job retry 不重複產生資料。
+- 非授權 Agent 不能標 verified／覆寫來源；version、permission、dependency 在 PG 強制檢查。
+- 同條件重送、相似但不同條件、矛盾、跨版本、間接依賴、失效途中查詢都有 fixture。
+- Qdrant 停機／索引延遲時能降級且不錯用 stale status。
+- 完成上述六步 demo，可從 session 重建「實際讀了哪些資料與用了哪些 Findings」。
 
-**完成條件**：對 15-20 題手工 gold 題庫（第16節子集），MVP pipeline 的 Unsupported Claim Rate 低於現有 `/v1/ask` 直接 RAG 方式；latency 拆成 `retrieval / LLM / verification` 分開量測，總和先設 <15s，不含人工審核時間，定案前先量實際分佈。
+### 研究起步
 
----
+- 15–20 題 pilot（包含相關不同題、部分重用、新主題及至少一個更新事件）；
+  逐題標 expert rubric、必要 evidence／scope，記錄未通過與不能回答的題。
+- raw agent、memory、gap-only 使用同一 Agent、corpus、budget，輸出相同評分欄位。
+- 同時报告 accuracy／完整度、來源正確、false-covered、stale errors、成本与维护工作量。
+- 若節省成本但 accuracy 或完整度下降，MVP 工程可能完成，研究假說仍未成立，先分析原因。
 
+## 6. 功能取捨
+
+| 處置 | 項目 |
+| --- | --- |
+| 保留／提高優先級 | PG、Qdrant、immutable raw、document hybrid retrieval、aliases、Findings、provenance、sessions、benchmark |
+| 簡化 | orchestrator、Evidence Workspace、graph schema、code pipeline、review 的操作介面 |
+| 從核心建置清單移除 | deterministic query planner、巨大 query-specific state machine、全量 Claim／KG extraction、專家生成小模型 |
+| 後續研究增量 | 更細 dependency、associative expansion、自動 consolidation、擴大 longitudinal stream |
+| Optional，需實驗支持 | JDT、SCIP、CodeQL、CFG/DFG、Neo4j、ColBERT、multi-vector、SGLang／多 serving backend |
+| 獨立平行支線 | Blueprint structural understanding、機器資料庫深化、dynamic test runner |
+| 最後才評估 | 特定任務 SFT/LoRA、retrieval fine-tuning、CPT；均非架構 requirement |
+
+小模型不是依固定階段「時間到了就要做」。只有頻率、品質與費用證明有需求，才投入訓練。
+排期應在 pilot 後依開發與 review 人力決定，不延續舊稿尚未實測的固定週數。

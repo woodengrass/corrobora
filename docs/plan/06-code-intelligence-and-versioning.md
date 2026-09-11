@@ -1,70 +1,107 @@
-[索引](README.md) ｜ [← Agent 設計](05-agent-design.md) ｜ [Evidence Workspace / Package / 最終驗證 →](07-evidence-and-verification.md)
+[索引](README.md) · [← Agent](05-agent-design.md) · [Provenance →](07-evidence-and-verification.md)
 
----
+# Lightweight Code Navigation、版本與 Blueprint
 
-## 13. Code Intelligence Pipeline
+## 1. 實際起點
 
-MVP/Phase 1 **不做**（見第21節），但先定義 Phase 2 目標流程避免日後結構衝突：
+本工作區有 `raw-data/minecraft source code/`，被 `.gitignore` 排除；不是 Git tracked corpus。
+其 README 標示 Minecraft **1.21.11**、mapping **parchment 2025.12.20**、
+Vineflower **1.13.0-a712f4c930**。Gradle 設定 Java 21；實測 6,624 個 `.java`，
+約 31.8 MB Java bytes。這是原始資料資產，不是 corrobora 已有 code intelligence service。
+
+目前只確認這一版本的 source snapshot。未執行 Gradle build，也未確認其與原始 JAR 的
+完整對應；來源 README 的版本聲明、mapping manifest、decompiler、實際 file/tree hashes
+要在匯入時各自記錄。其 `DO NOT REDISTRIBUTE` 標記延續為本機研究來源的 export policy。
+
+## 2. Code Graph 告訴 Agent 去哪裡找
 
 ```text
-Minecraft Source + Mappings + game_version
-  -> Tree-sitter: 語法樹、基本 symbol 位置（快、多語言通用）
-  -> Eclipse JDT: 語意解析、型別推斷、overload resolution
-  -> SCIP: 產生標準 symbol/definition/reference index（跨工具交換格式）
-  -> CodeQL: Call Graph、CFG、DFG、複雜資料流查詢
-  -> 寫入 code_canonical_symbols / code_symbols / code_symbol_diffs（第3.8節）
-  -> 人類定義寫 code_annotations，不寫 code_symbols
+Minecraft Repository / Snapshot
+  → 檔案清單、repo lexical search、基本 symbol index
+  → 可可靠取得的 Lightweight Edges
+  → Strong Agent 直接讀 source / 比較 code paths
+  → 高價值時保存 Finding + precise code refs
 ```
 
-分工原則：Tree-sitter 做「快速、可增量」的第一遍；JDT 做「正確但貴」的語意層，只在 Tree-sitter 標記為 public API / 高引用符號時才觸發，避免對整個 codebase 做全量語意分析（Minecraft 反編譯碼庫可能數十萬行，先限定只索引已核准 concept 相關的類別）。CodeQL 查詢按需（on-demand）執行，不是每次 ingestion 都重跑全部 CodeQL query。線上調查是 Orchestrator 下的受控子迴圈（見 5.1.7 節），不是自由 agent。
+先提供 repo search、read_file、固定 snapshot 的 line/hash reference；Tree-sitter 可作
+class/method/field/file、definition 与 syntactic references 的輕量 index。
+不必等 JDT／SCIP 完成才能開放原始碼研究，也不把整份 repo 逐 symbol 先寫 AI 摘要。
 
-> **白話說（這四個工具分別在做什麼）**：可以把分析一份原始碼想成蓋房子檢查——Tree-sitter 是「先拍照記錄哪裡有牆、哪裡有門」（語法結構，快但只看表面長相）；Eclipse JDT 是「確認這道牆真的承重、這扇門真的通到哪一間房」（語意/型別，準確但慢，所以只對重要的部分做）；SCIP 是「把檢查結果寫成一份大家都看得懂的標準格式報告」（跨工具交換格式，不是分析本身）；CodeQL 是「順著水管、電線走一遍，看某個開關按下去最終會影響哪些房間」（Call Graph/資料流，能回答「這段程式碼被誰呼叫、又呼叫了誰」這類問題，但成本最高，所以只在真的需要時才問）。
-
----
-
-## 14. Minecraft-specific Code Semantic Layer
-
-Phase 2 後期。分層原則：
-
-| 產生方式 | 內容 |
+| 能力 | baseline 邊界 |
 | --- | --- |
-| **Deterministic**（從 resource/data pack JSON 直接解析） | `RegistryEntry`, `ResourceLocation`, `Tag`, `LootTable`, `Recipe`——這些是結構化資料，可 100% 規則解析，不該用 AI |
-| **Deterministic + Code 分析** | `REGISTERS`, `LOOKS_UP`, `BELONGS_TO_TAG`, `SCHEDULES_TICK`——從 call graph 找特定 registry API 呼叫點，規則式判斷 |
-| **AI 輔助** | `Event`→`EMITS_EVENT`/`HANDLES_EVENT` 的語意標註（哪個 handler 對應哪個遊戲概念）、`Concept -> IMPLEMENTED_BY -> CodeSymbol` 的初始候選配對，因為「這段程式碼實作了哪個玩家理解的機制」需要語意判斷，之後必須人工審核才能變成 approved relation；人類描述寫 `code_annotations`，圖邊走 `relations` |
+| class/method/field/file、位置與 signature | deterministic parser，可從小範圍驗證後擴至全 repo |
+| definition/reference | 保留解析方式、來源位置與 unresolved targets |
+| CALLS、READS、WRITES | 能可靠解析才標 resolved；Tree-sitter 不能保證 overload／virtual dispatch 全解析 |
+| EXTENDS、IMPLEMENTS、OVERRIDES | 語法可見與型別解析確認分開；OVERRIDES 不凭同名猜 |
+| canonical symbol identity | 限 repository／mapping lineage，rename 候選需可信 mapping 或 review |
+| concept ↔ symbol bridge | 少量高價值、按需建立，附 Finding 支持 |
 
-原則：**能規則解析的絕不用 AI**，AI 只負責「規則做不到的語意橋接」，且產出一律是 candidate（`code_annotations` pending + candidate relation），走 Claim 系統同一套審核流程（不另開一套審核機制）。
+Graph missing edge 不是「不存在呼叫」的證明。Agent 應能繼續讀實際實作；
+symbol 與 edge 索引的 completeness／resolution 記為工具回傳 metadata。
 
----
+## 3. 技術選項與加入條件
 
-## 15. Multi-version Support / Version Alignment
+| 技術 | 建議處置 | 重新評估條件 |
+| --- | --- | --- |
+| repo search＋read_file | 立即作 baseline | 大 repo 測 tool/token 成本 |
+| Tree-sitter | 保留輕量導航 | 對比 pure repo search 的定位時間／引用正確率 |
+| Eclipse JDT | optional、局部按需 | overload/type resolution 錯誤實際造成 benchmark 失敗 |
+| SCIP | optional | 真正需要與其他工具交換／重用 symbol index |
+| CodeQL | optional、benchmark-gated | 強 Agent＋repo search＋輕圖在 data/control-flow 題型仍不穩定 |
+| 全量 CFG／DFG | 延後 | 按需分析已有明顯效益，且建置成本可攤銷 |
+| MC semantic extraction | 簡化 | 少量 registry/tag/resource 導航可規則解析；不做全世界語意圖 |
 
-- 每個可檢索實體帶 `version_scope_id`，檢索一律先 filter 再 ANN（已在第4.3節說明）。
-- Code symbol 版本比對流程：
-  1. 新版本 ingestion 時，對每個新 symbol 計算 `ast_hash`/`body_hash`/`signature`，並綁定 `code_version_id + mapping + game_version_id`。
-  2. 用 `code_canonical_symbols` 候選比對：先比對 mapping name 相同 + fqcn 相同 → `UNCHANGED`/`LOGIC_CHANGED`（依 body_hash 是否變）；fqcn 不同但 signature 相似度高 → 候選 `RENAMED`/`MOVED`，標記人工確認；找不到對應 → `ADDED`；舊版本存在但新版本找不到 → `REMOVED`。
-  3. 自動配對信心不足（相似度低於閾值）一律進 pending，由審核者在 Review Service 手動指認 `code_canonical_symbols.id`；通用定義保留在 `code_annotations(version_scope_id IS NULL)`，版本特化才另加一筆。
+任何進階工具都與相同 Agent、相同 corpus、相同 budget 的 baseline 比較，計入建索引時間／
+儲存與維護成本。不要把 Tree-sitter→JDT→SCIP→CodeQL 寫成必走流水線。
 
----
+## 4. Code provenance 與失效
 
-## 16. Blueprint / Litematic
+Code Finding 至少可沿來源鏈解出：repository、snapshot／commit、game version、mapping name＋
+version、file path、symbol signature、line range、file/body hash、hash algorithm version。
+本機未有 repo commit 時使用 snapshot tree hash，不能填假 commit。
 
-**明確延後，不進 MVP/Phase 1/Phase 2**（詳見第21節理由）。Phase 3+ 再規劃：deterministic parse litematic → Block Graph → pattern-match 出 Component（Spawn Platform/Kill Chamber 等，用規則式子圖比對，不是 AI 猜）→ Farm CONTAINS Component、Component USES_MECHANISM Mechanism 兩類 relation，直接複用第3.9節既有 `relations` 表，不需新 schema。
+同名方法跨 version／mapping／overload 不共用 locator。body hash 變更表示需要重查，
+不代表行為必然變；body hash 未變也不代表所有前提不變，caller、callee、field initializer、
+tag/resource／設定可能改變。Agent 保存研究結果時應列關鍵依賴；不確定的范围用 file 或
+repo snapshot 粒度，承認較高 false invalidation 成本，透過 benchmark 再縮細。
 
----
+新 Minecraft 版本入庫後，先建立未知／待驗證的 target scope，不把舊版已成立的 validation
+直接改 stale。對同版本 authoritative source 的修正，才依被改內容及 dependency policy
+影響原 validation。詳細傳播見[記憶生命週期](11-research-memory-lifecycle.md)。
 
-## 17. Dynamic Verification（Test Runner）
+### 可先做的研究案例
 
-**Advanced 階段**（第21節），先佔位 schema（第3.7節 experiments 已足夠），流程草案：
+現有 GTMC `MicroTiming/04-方块实体.md`、legacy 漏斗筆記與本機
+`HopperBlockEntity` 已可構成跨來源研究樣本。實際 source 的 `pushItemsTick`、`tryMoveItems`、
+`tryMoveInItem` 展示不同方法與條件；只保存一個 `8` literal 不能回答
+「哪個漏斗、哪條 code path、何時出現 7／8gt」。
+這類整理值得成為具条件的 Finding；類名或一行常數則直接 repo search 即可。
+文件 code snippet 若未有明確 snapshot，仍屬 document evidence，不冒充 version-pinned source。
 
-```text
-定義 Experiment（version_scope, seed, gamerules, sim distance, entity setup）
-  -> Fabric mod + Mixin 注入量測點（spawn attempts, tick time...）
-  -> 執行固定 tick 數 -> Spark/async-profiler/JFR 收集效能與呼叫頻率
-  -> 寫入 experiment_runs + experiment_results
-  -> 建立 relations(EXPERIMENT VALIDATES CLAIM)
-```
+## 5. Blueprint：人類做過什麼
 
-MVP 完全不做；`search_experiments`/`get_test_result` tool 先實作為「查已有人工登錄的實驗資料」，`run_test` 留空實作（回傳 not_implemented），Agent 遇到需要動態驗證的 unknown 直接誠實列在 Evidence Package 的 `unknowns`。
+Blueprint database 與 mechanism research 平行演進，不阻擋 Documents／Memory。
 
----
+1. **Catalog**：先遷移 81 筆 machines，保存 name、author、description、tags、sub_id、
+   filename、preview、原始排序與來源 revision。目錄存在不代表檔案已取得。
+2. **Asset**：取得 `.litematic`／schematic／world archive 時保存 bytes/hash／format／availability；
+   同 machine 可有多種版本與 module。不可假定現在已有 4,000 個藍圖。
+3. **Association**：找到某 mechanism 的人類使用案例、可替代機器與可重用 module；
+   tags→concept 關係是待確認的 interpretation，不把名字中「全速」當量測保證。
+4. **Structural research**：另立實驗，deterministic parse blocks/NBT/regions → 結構特徵 →
+   類似機器／component retrieval。靜態結構不能直接证明實際效率或可靠性。
 
+現有機器 metadata 中 name、tags、description 可能給出不同適用版號，必須保留矛盾，
+不能採第一個字串就標整機 verified。source_removed_at 延續「來源消失不等於審核否定」的設計。
+
+## 6. 實驗與小模型
+
+初版可人工登記 experiment/run、環境、raw log、量測與樣本數，讓 Finding 引用具體實驗。
+Fabric/Mixin 自動 Test Runner 是獨立 extension；無實測時，Agent 可提出設計與測試方法，
+不能宣稱已測得產量或 MSPT。
+
+主線為 Strong Online Agent＋infrastructure。只有高頻、規律且費用高的任務才考慮
+distillation：reranker、terminology linker、finding extractor、consolidation／coverage classifier、
+next retrieval action。先做 Strong LLM few-shot，取得可靠標註與成本資料，再評估 SFT/LoRA；
+retrieval/reranker fine-tuning 按對應瓶頸選擇，CPT 最後才考慮。
+不用 Minecraft expert generation model 當架構前提；SGLang／多 serving backends 同樣 optional。

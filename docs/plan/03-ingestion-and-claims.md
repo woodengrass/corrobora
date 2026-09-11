@@ -1,191 +1,117 @@
-[索引](README.md) ｜ [← Qdrant 向量與 Payload 設計](02-qdrant-vector-design.md) ｜ [知識圖譜與檢索管線 →](04-knowledge-graph-and-retrieval.md)
+[索引](README.md) · [← 向量索引](02-qdrant-vector-design.md) · [檢索流程 →](04-knowledge-graph-and-retrieval.md)
 
----
+# 文件攝取：保存可研究的原文，不預先抽取整個知識世界
 
-## 5. Ingestion Pipeline
-
-**白話說**：不管資料從哪裡來（爬蟲、人工上傳、既有 CSV），一律要走完下面七步才會出現在使用者看得到的答案裡；第 6 步「落地為 pending」是刻意的關卡——資料在還沒過人審之前，寧可讓系統知道「這筆資料存在但還不能用」，也不要讓它悄悄混進正式答案來源。
-
-```mermaid
-flowchart LR
-    A["原始檔案 / 爬蟲 / 人工輸入"] --> B["1. Source 註冊 +\ncontent_hash 去重\n(source_revisions)"]
-    B --> C["2. 格式解析\n(parsers/markdown,csv,litematic,java)"]
-    C --> D["3. 結構化\ndocument_sections + chunks"]
-    D --> E["4. Candidate 抽取\nconcept 候選(NER+alias)\nclaim 候選(LLM抽取，第6節)"]
-    E --> F["5. embedding 產生\n(dense+sparse) 寫入 Qdrant\npayload.status='pending'"]
-    F --> G["6. 落地為 status='pending'\n等待人工審核"]
-    G -->|"審核通過"| H["7. status='approved'\n更新 PG 與 Qdrant payload\n（不用重新 embedding）"]
-    G -->|"審核駁回"| I["status='rejected'\n保留紀錄，不進 Answer Index"]
-```
-
-CSV/JSON 舊資料（`database.csv`, `database.json`, `Dictionary.txt`）遷移策略沿用 `KNOWLEDGE_SYSTEM_PLAN.md` 第 158-168 行既有分類，細節見下方 5.1。
-
-### 5.1 現有 OpenST-QQBot 資產盤點與遷移對照
-
-盤點對象是 `OpenST-QQBot` repo 裡 `public/database/` 的既有資料，以及 `src/services/` 裡可沿用的實作邏輯。原則：**能不經 Candidate 流程直接標記 approved 的資料要先遷，模糊品質的資料一律走 Candidate 流程，不因為「反正已經在生產環境用了」就跳過審核**。這份盤點對應 Phase 0（資料政策與盤點）與 MVP 第一個月 Implementation Order 第 1-4 步。
-
-#### 5.1.1 分級總覽
-
-| 分級 | 資產 | 可直接標記狀態 | 理由 |
-| --- | --- | --- | --- |
-| A. 直接遷移（skip Candidate） | `public/database/dictionary/entries/*.json` | `approved` | 已有 `status:"APPROVED"`、`threadURL` 來源、`references`/`referencedBy` 關係，等同人工審核過的 Verified Concept |
-| A. 直接遷移 | `public/database/dictionary/zh-translations.json` | `approved` | 與上者 id 對應的正式中文翻譯 |
-| A. 直接遷移 | `public/database/gtmc-database/**/*.md` | `approved`（文件本身）／chunk 內容仍需切段 | 結構化技術文件，非社群閒聊，品質等同已審核文件 |
-| B. 結構遷移，內容待審 | `public/database/database.json` | `approved`（機器中繼資料）｜`pending`（tags→relations 的語意連結） | 機器名稱/作者/檔名等 metadata 無爭議，但 tags 對應到哪個 concept/mechanism 需要人工確認 |
-| C. 走完整 Candidate 流程 | `public/database/database.csv` | `pending` | topic/content 品質落差大，無來源無版本，見 5.1.4 |
-| C. 走完整 Candidate 流程 | `public/database/Dictionary.txt` | `pending` | 純人工中英對照，可能與 A 級詞典衝突，需 dedup |
-| C. 走完整 Candidate 流程 | `public/database/TechMC Glossary.csv` | `pending` | 欄位需重新映射，且可能與 A 級詞典重複 |
-| D. 邏輯可搬，資料為空 | `public/database/source/`（`src/services/source.ts` 讀取的目錄） | 不適用 | 目錄實際無內容，Code Intelligence 階段需重新取得 Minecraft 反編譯碼庫，`source.ts` 的檔案遍歷邏輯留待第13節 indexing pipeline 參考 |
-
-#### 5.1.2 A級：`dictionary/entries/*.json` -> `concepts` + `concept_aliases` + `concept_translations` + `relations`
-
-原始欄位對照：
-
-| 原始欄位（`entries/{id}.json`） | 目標欄位 | 備註 |
-| --- | --- | --- |
-| `id`（Discord thread ID，如 `1454753442471084134`） | `sources.type='discord'` 下建一筆 `source_revisions`，`concepts` 另建自有 `id`，原 Discord id 存入 `concepts.external_ref` | 保留原 id 供 `referencedBy` 反查，見下方已知落差 |
-| `terms[0]` | `concepts.canonical_name` | 第一個詞作正式名 |
-| `terms[1:]` | `concept_aliases`（`alias_type='abbr'` 或 `'slang'`，依長度/大小寫啟發式判斷，人工可事後修正） | 例："Block Update Detector" + "BUD" |
-| `definition` | 建一筆 `documents`(source=dictionary) + 一筆 `chunks`，並在 `claim_evidence`/`term_evidence` 建立 concept↔chunk 的證據關聯 | 定義全文本身當一手證據來源，不直接塞進 `concepts` 表（維持 3.9 節「文件與知識條目不可混為一談」原則） |
-| `status:"APPROVED"` | `concepts.status='approved'` | 直接信任既有審核結果 |
-| `threadURL` / `statusURL` | `sources.url` | 可追溯回 Discord 原討論串 |
-| `references[]`（單向：本詞條引用了誰） | `relations(from=concept, RELATES_TO, to=concept)`，`review_status='approved'` | `matches` 欄位可存入 `relations.conditions` 供除錯 |
-| `referencedBy[]`（如 `"AB003"`） | **暫不建立 relations**，先寫入 `concepts.external_ref_pending`（JSONB 陣列）保留原始值 | 見 5.1.5 已知落差：這批 ID 目前找不到對應資料表 |
-
-匯入偽代碼（`ingestion/pipelines/dictionary.py`，已依 3.2/3.9 節 v2 修正更新為 document_revision + knowledge_objects 版本）：
-
-```python
-def migrate_dictionary_entries():
-    zh_map = {e["id"]: e for e in load_json("zh-translations.json")["entries"]}
-    for entry in iter_entry_files("dictionary/entries/*.json"):
-        source_rev = register_source_revision(          # 寫入 source_revisions，raw_content_uri 指向本地 filesystem
-            source_type="discord", url=entry["threadURL"], raw=entry)
-        concept = upsert_concept(
-            slug=slugify(entry["terms"][0]),
-            canonical_name=entry["terms"][0],
-            category="concept",           # 是 mechanism/effect/entity 由人工後續分類，第一版全塞 concept
-            status="approved",
-            external_ref=entry["id"])     # AFTER INSERT trigger 自動在 knowledge_objects 註冊
-        for alias in entry["terms"][1:]:
-            upsert_concept_alias(concept.id, alias, language="en",
-                                  alias_type=guess_alias_type(alias))
-        if entry["id"] in zh_map:
-            zh = zh_map[entry["id"]]
-            upsert_concept_alias(concept.id, zh["termsZh"], language="zh",
-                                  alias_type="translation")
-            insert_concept_translation(concept.id, "zh", zh["termsZh"], zh["definitionZh"])
-        doc = insert_document(source_rev.source_id, title=entry["terms"][0], language="en")
-        doc_rev = insert_document_revision(doc.id, source_rev.id, parser_version="dict-v1",
-                                            status="approved")
-        chunk = insert_chunk(doc_rev.section_root, content=entry["definition"])
-        chunk_obj_id = get_knowledge_object_id("chunk", chunk.id)   # trigger 已建好，這裡查回 id
-        insert_relation(from_object_id=get_knowledge_object_id("concept", concept.id),
-                         relation_type="SUPPORTED_BY",
-                         to_object_id=chunk_obj_id,
-                         review_status="approved")
-        for ref in entry.get("references", []):
-            target = find_concept_by_term(ref["term"])
-            if target:
-                insert_relation(from_object_id=get_knowledge_object_id("concept", concept.id),
-                                 relation_type="RELATES_TO",
-                                 to_object_id=get_knowledge_object_id("concept", target.id),
-                                 review_status="approved",
-                                 conditions={"matched_text": ref["matches"]})
-        # referencedBy 指向的外部編號目前無對應表，先保留原始值待 5.1.5 釐清
-        update_concept_external_pending(concept.id, entry.get("referencedBy", []))
-```
-
-**這一步可作為 Implementation Order 的最快勝利**：979 筆詞條全部帶審核狀態與來源，預期 1-2 天可寫完 parser 並跑完全量匯入，直接產出 MVP 需要的 `concepts`/`concept_aliases` 種子資料，取代原計畫「人工建立 20-30 筆核心生電概念」（原第22節第8步）——用既有 979 筆取代人工建立，範圍更大且已有審核依據。
-
-#### 5.1.3 A級：`gtmc-database/**/*.md` -> `documents` + `document_sections` + `chunks`
-
-現有分類目錄（`BlockUpdate/`、`LoadingTicket/`、`EntityAI/`、`EntityMove/`、`Components&Features/`、`Appendix/`）本身就是主題分類，遷移規則：
-
-| 規則 | 說明 |
-| --- | --- |
-| 目錄名 -> `documents.topic_tag`（新增欄位，非 3.2 節必要欄位，但利於後續按主題篩選） | 例：`BlockUpdate/02-连续的方块更新及其分析方法.md` -> topic_tag=`BlockUpdate` |
-| 檔名數字前綴 -> `document_sections.order_index` | 維持原作者編排順序 |
-| Markdown `#`~`######` -> `heading_path`（沿用 KNOWLEDGE_SYSTEM_PLAN.md 第172行既有切段規則，不重新設計） | |
-| `img/` 子目錄 | 圖片先不遷移（MVP 不處理多模態），`chunks.content` 保留 `![]()` 語法原文，Phase 2 再決定是否要建 `document_assets` |
-| `404.md`（如 `EntityAI/404.md`）| 內容为空/占位文件，匯入時偵測並標記 `documents.status='rejected'`，不進 Answer Index | 避免空文件污染檢索結果 |
-| license（`gtmc-database/LICENSE`） | 對應建一筆 `licenses` row，`sources.license` 指向它 | 3.10 節 licenses 表首次有實際資料可填 |
-
-215 個檔案，`status` 建議統一設 `approved`（沿用 KNOWLEDGE_SYSTEM_PLAN.md 既有判斷：GTMC 文件為高可信度技術文件），唯獨偵測到的占位/空檔要擋下來。
-
-#### 5.1.4 B/C級：`database.json`（機器）與 `database.csv`（社群知識）
-
-**`database.json` -> `farms`**：欄位對照直觀（`name`/`author`/`description`/`filename` 直接映射，`tags` 拆成 `relations(farm, USES_MECHANISM/APPLIES_TO, concept)` 候選，因為單靠 tag 字串猜不出精準是哪個 concept，這部分建議 `pending`，由審核者在既有 979 筆 concept 種子中手動勾選對應）。`sub_id` 保留為 `farms.external_ref`，維持與現有 QQBot `/api/share?sub-xxxxx` 連結相容，未來若 QQBot 改接新系統的 API，分享連結不用變。
-
-**`database.csv` -> Candidate Claim**：4287 行內品質差異很大，直接全量丟給 LLM 抽取成本高。分兩批處理：
-
-1. **規則初篩**：沿用 `src/services/learn.ts` 的 `KNOWLEDGE_SHARING_PATTERNS`（「就是」「指的是」「定義為」等 15 個中文知識陳述關鍵詞）作為第一層 heuristic，命中的行優先送 AI Extraction，未命中的行（多半是純術語對照，如範例第13-15行 `Accessible,可访问的`）改走「詞典候選」而非「Claim 候選」，併入 5.1.2 的 alias 比對流程，不浪費 LLM 抽取成本在單純詞彙對照上。
-2. **AI Extraction**：其餘進第6節標準 Candidate Claim workflow，`created_from_source_id` 指向 `database.csv` 對應行的 `source_revisions`（整份 CSV 當一個 source，每行存原始行號以便追溯）。
-
-範例（`database.csv` 第7行「漏斗機制」）足夠 atomic 且資訊完整，人工審核成本低，是很好的 Phase 0 試跑樣本；第6行「大宗」這種純縮寫解釋則該落回 concept_aliases 而非 claim。
-
-#### 5.1.5 已知落差：`referencedBy` 懸空引用
-
-`dictionary/entries` 的 `referencedBy` 欄位（如 `1454753442471084134.json` 裡的 `"referencedBy": ["AB003","VBS002","TT001"]`）指向一個目前 repo 內找不到對應資料的外部編號系統，推測是原 Discord 審核系統裡機器/案例的正式編號庫，尚未同步進本 repo。**Phase 0 資料政策盤點必須先向資料原始維護者（Discord 審核團隊）確認這批 ID 對應到什麼**，否則：
-
-- 若貿然建立 `relations` 指向不存在的實體，會違反第3.9節「應用層負責校驗 from_id/to_id 存在」的原則；
-- 若略過不處理，會遺失「這個 concept 被哪些機器/案例引用」的重要反向索引，而這正是 Agent `find_producers_of_effect`/`expand_graph` 這類 tool 未來很依賴的資訊。
-
-處理方式：先在 `concepts.external_ref_pending`（JSONB）原樣保留，Phase 1 若拿到對應資料表再回填為正式 `relations`；MVP 期間不阻塞，也不假裝這些引用已解析。
-
-#### 5.1.6 可沿用的既有服務邏輯（非資料，是實作參考）
-
-| 既有程式 | 可搬的部分 | 落地位置 | 不能照搬的原因 |
-| --- | --- | --- | --- |
-| [`src/services/embeddings.ts`](../src/services/embeddings.ts) | hf-mirror 鏡像源 + 本地代理偵測 + DNS fallback 的下載策略（國內網路環境已驗證可行） | `services/domain_model/inference.py` 或 ingestion 的 embedding 模組下載邏輯 | Node.js + `@xenova/transformers`，新系統用 Python + BGE-M3，模型物件與 pipeline API 不同，但「如何應對國內下載超時」這段運維經驗直接套用 |
-| [`src/services/dictionary.ts`](../src/services/dictionary.ts) 的 `matchDictionaryTerms` | 中英雙向字串比對思路，可當 `resolve_alias()` tool 的 fallback（embedding 服務不可用時的降級路徑） | `services/tools/registry.py::resolve_alias` | 純 substring 比對無法處理語意相近但字面不同的別名，僅適合當 Phase 2 前的 MVP 簡化實作或降級 fallback |
-| [`src/services/learn.ts`](../src/services/learn.ts) 的 `KNOWLEDGE_SHARING_PATTERNS` | 15 個中文知識陳述關鍵詞列表，作為 Candidate Claim 抽取前的粗篩規則 | `services/claims/extraction.py` 前置 filter | 原邏輯抽取後直接寫 CSV、無來源追溯、無審核，這部分整個不沿用，只取關鍵詞列表本身 |
-| [`src/services/source.ts`](../src/services/source.ts) | 遞迴收集檔案 + 二進位副檔名判斷的通用邏輯 | Phase 2 `code_intel/indexer` 掃描原始碼樹時可參考同樣的跳過規則（`img/`、`.class`、`.jar` 等） | 目標目錄本身無內容，此為架構參考而非資料遷移 |
-| [`src/services/search.ts`](../src/services/search.ts) | DuckDuckGo Lite 免費方案的請求/解析邏輯 | Phase 2+ 若要做「已審核來源政策下的網頁檢索」可參考 | 現行邏輯直接把搜尋摘要塞進 answer，違反新系統「未審核網頁爬取」延後的原則（第21節），只搬技術實作，不搬使用方式 |
-
-#### 5.1.7 Code Source：Minecraft 原始碼與 Mappings（ingestion 邊界，詳見第 13-15 節）
-
-Code Source 不走文件 triage 流程，不進 `document_triage`。
+## 1. 建議流程
 
 ```text
-Minecraft Source + Mappings + game_version
-→ 基本解析 / Index
-→ Code Graph
-→ Code Investigation Loop（受 Orchestrator 控制，非自由 agent）
-→ CodeEvidenceRef
-→ Evidence Workspace
+來源登記／權限
+  → 保存 immutable raw bytes + metadata snapshot
+  → Source Revision + Import Run
+  → 確定性解析、去重與品質標記
+  → Document Revision → Sections → Passages + links/assets
+  → terminology／version hints（可選補充，不改原文）
+  → PG commit + index outbox
+  → Raw Passage hybrid retrieval
+  → Agent 按需讀完整 section／article
+  → 有研究與重用價值時才提出 Candidate Finding
 ```
 
-Code Graph 節點與邊：`Symbol`、`Definition / Reference`、`CALLS`、`READS / WRITES`、`EXTENDS / IMPLEMENTS / OVERRIDES`、`REGISTERS / LOOKS_UP / SCHEDULES_TICK`、`IMPLEMENTED_BY → Domain Concept`。
+Documents 的資料工程仍是主線：metadata、語言、章節與位置越完整，Agent 越容易縮小閱讀範圍。
+**移除「所有原文必須先經 AI triage→Claim→人審，才能被研究」的前置依賴。**
+資料可供研究、來源可公開、內容是否可信、Finding 是否 verified 是四個不同維度。
+有矛盾的社群文章是研究材料，不應因為不適合直接作答案而在 raw search 中消失。
 
-規則：
+## 2. 原始層與索引層的保留策略
 
-1. 能規則解析的先規則解析，不用 AI 猜；`IMPLEMENTED_BY` 初版一律 candidate，需人工審核。
-2. 每次 ingestion 必須綁定 `code_version_id + mapping + game_version_id`，定義放 `code_annotations`（見 3.8 節），不寫進 `code_symbols`。
-3. Code Evidence 仍要進 `Evidence Workspace`，但壓縮策略不同：不做語意摘要替換原文，保留 `fqcn + signature + file/line + hash`，不同 overload 不得合併去重；`debugging` / `code_analysis` 優先保留 code evidence。
+| 情況 | 保存 | 搜尋／閱讀 |
+| --- | --- | --- |
+| 正常 Markdown／HTML／text | bytes、原始／解析正文、版本、links | passages 索引，Agent 可展開上下文 |
+| 空白、404 | raw＋確定性 flags | 不進語意正文索引，仍可回查存在與匯入原因 |
+| 純導航頁 | raw＋section＋links | 不當 factual evidence，但可沿目錄找文章 |
+| 部分未完成 | 完整 raw、完整 section tree、flags | 有內容區段正常搜尋，未完成區段標記後可閱讀 |
+| 短段／TODO 字樣 | 原文與 flag | 預設降為低優先級，不一刀刪除所有含 TODO 的段落 |
+| 圖片、表格、code block | 原樣保存、位置與資產引用 | 沒有 vision/OCR 時回報限制，不捏造圖中內容 |
+| exact duplicate | 每份來源與 snapshot 都保留 | 相同內容可共用 embedding，召回後聚合，保留每份 provenance |
+| conflicting_fact／possible_typo | 原文及問題標記 | 授權 research 模式可查；結論需進行 fresh verification |
+| parser failure | raw＋error＋parser version | 不偷偷讓 AI summary 取代失敗的 parsing；可用 raw read 作有標記的調查 |
 
----
+沿用 legacy R1（RFC 4180）、R2/R3（empty／404）、R6（broken link）、R7（exact duplicate）、
+R8（比對鍵不改原文）的核心經驗。R4/S2 的導航判斷用於「是否值得索引」；
+S3 `<120 字元` 與 S4「出現 TODO 就排除整節」改為 flags／降權 baseline，
+因為研究閱讀與舊 Answer Index 的風險不同，短術語、否定句與反證可能很有價值。
+修改的規則必須建立新版 expected fixtures，不能改舊 gold 假裝無行為變更。
 
-## 6. Claim Extraction / Review Pipeline
+HTML 仍不執行 script 或外部資源，優先 article/main，保留表格欄列與 pre/code。
+Markdown 的 GFM 表格、列表、code、圖片與 docsify link（省略 `.md`、`?id=`、中文編碼）
+都應保留。chunk 長度是模型輸入限制，不能反過來決定來源是否存在。
 
-**白話說**：這一節在回答「一句話從『AI 覺得這是個知識點』變成『系統敢拿去回答使用者』，中間要經過什麼關卡」。核心規則只有一條：AI 只能把候選送到審核者面前，**任何一個 Claim 要變成 approved，都要有一個真人按下 approve**，沒有例外，也沒有「信心分數夠高就自動通過」這種後門。
+## 3. 各類現有資料的實際遷移
 
-```mermaid
-stateDiagram-v2
-    [*] --> RawChunk: Raw Source Chunk
-    RawChunk --> AIExtraction: AI Extraction<br/>(structured: statement, conditions[], exceptions[], version hint)
-    AIExtraction --> DeterministicCheck
-    DeterministicCheck --> Rejected_atomic: 不是 atomic 陳述
-    DeterministicCheck --> Deduplicated: 已有近似 Claim（embedding dedup）
-    DeterministicCheck --> Pending: 通過檢查 → candidate claim (pending)
-    Pending --> Approved: 人工 approve<br/>寫入 claim_evidence 正式生效
-    Pending --> Rejected: 人工 reject（保留紀錄）
-    Pending --> AIExtraction: request_changes（打回重抽或人工編輯）
-    Approved --> Disputed: 事後出現矛盾證據<br/>(建 claim_evidence(stance=contradicts)，<br/>不自動改狀態，交審核者決定)
-    Disputed --> Deprecated: 審核者確認過時
-    Disputed --> [*]: 審核者確認仍成立，保留 approved
-```
+| 本 repository 路徑 | 實測內容 | 建議落點／注意事項 |
+| --- | --- | --- |
+| `raw-data/dictionary/entries/*.json` | 112 筆，全有 upstream `APPROVED` | 原文 document/passage + concept sources；保留 upstream review，不自動產生 verified Findings |
+| `raw-data/dictionary/zh-translations.json` | 112 筆，`termsZh` 為字串 | 翻譯原文與來源獨立保存；不把中文定義誤視為原文已驗證的逐字等價 |
+| `raw-data/dictionary/config.json` | 詞條目錄與截斷 summary | 可用於目錄，不以 summary 取代 entries 的 definition |
+| `raw-data/gtmc-database/` | 23 篇 Markdown，含導航／空白／404／未完成 | 結構化 raw corpus；不因 GTMC 名稱就把所有段落標 verified |
+| `raw-data/machines/database.json` | 81 筆、228 tags | machines + revisions/tags，保留 sub_id、原始順序與描述；版本冲突保留為 hints |
+| `raw-data/legacy/database.csv` | 151 邏輯記錄、19 筆多行正文 | 先 raw snapshot + RFC parser；其中 GTMC 重複內容用來源關聯，短詞作候選 aliases |
+| `raw-data/legacy/database.md` | 215 行，歷史社群學習紀錄 | 受保護 raw；檢索表示依既有政策去除使用者識別，附 transform 與原始 locator |
+| `raw-data/legacy/Dictionary.txt` | 117 行 | 待審 alias／translation 建議，不覆蓋正式詞典 |
+| `raw-data/TechMC Glossary.csv` | 415 列、26 欄、UTF-8 BOM | 以實際 `Full Form (English)`／`Short Form`／`Chinese` 等欄映射；目前 internal |
 
-審核介面（Review Service）最小需求：一個 list+diff 頁面，顯示 candidate claim + 來源 chunk 原文 + 相似既有 claim，三個按鈕（approve/reject/request changes）。**MVP 可以就是一個內部網頁或甚至 CLI**，不需要做得漂亮。
+沒有 979 筆詞條、215 篇 GTMC 或 4287 筆 CSV 記錄；那些是舊稿的錯誤計數。
+19 篇 GTMC 與 CSV 內容的重複是 legacy audit 的「換行正規化＋trim」比較，
+不等於新 canonical hash 的完全相同；保留 comparison_kind，不把不同 hash 偷改成一樣。
 
----
+### 詞典連結的兩個陷阱
 
+1. `references[]` 有 type／id／URL，應優先按 namespace＋ID 精確解析，不只按 term 字串。
+   實際 189 個 reference 中存在不屬於這 112 個 dictionary IDs 的目標，未解析者保存
+   `unresolved_references`；不能假設全部都是 dictionaryTerm。
+2. `referencedBy[]` 有 197 個不同外部編號，例如 AB003／VBS002。現在未有完整對照表，
+   保留原值；不以猜測建立 machine relation。`terms[]` 也可能列對比概念，須處理一詞多義。
+
+## 4. Durable capture 與增量更新
+
+先把讀到的 bytes 寫入 content-addressed blob，完成 checksum 驗證後才 commit revision。
+中途失敗不發布來源指標；孤立 blob 可在核對後清理，但已被 revision 引用的 raw 不刪。
+重抓同內容追加 observation 而不重做 embedding；A→B→A 也能追溯。
+
+舊 rawAssets.ts 只保存 path＋hash，舊檔案未 commit 即被覆寫時，歷史內容會消失。
+這個限制不能移植到新架構。manifest 仍可作掃描快取，但要向 PG 確認 revision 已存在；
+不能用 manifest 取代 authoritative capture。
+
+每個 parser／index job 具 importer、rules、representation version，支援 idempotent replay。
+source 消失先記 observation／availability，不刪 source revision。worker 抓取 job 用短交易與 lease；
+LLM 呼叫不持有 DB transaction，不在每次啟動時把所有 worker 的 running job 無條件重置。
+
+## 5. AI 整理放在哪裡才值得？
+
+可選工作包括版本 hint、術語 linking、長文閱讀導引、針對已發現問題的 contradiction review。
+使用 Strong LLM few-shot baseline，記錄模型與成本；有價值再做小模型。
+這些結果都是衍生 metadata 或 candidate，不會覆蓋 raw，不是所有文件入庫的必要關卡。
+
+Finding 在研究完成後提出，使用[admission 與 consolidation](11-research-memory-lifecycle.md)。
+全量 `claim_extract`、Flash→Pro 強制分流與 corpus-wide graph extraction 從主線移除。
+過去人工整理的高價值 Claim 未來可經 provenance／scope 稽核轉為 Finding，
+並非把歷史所有 atomic statements 自動搬成 memory。
+
+## 6. 沿用 fixture 的方式
+
+舊 [triage fixtures](../../benchmark/gold_dataset/README.md) 的 14 個來源 hash 與 9 份人工 JSON
+仍有價值，但它們測的是舊 candidate/materialize 規則，不是本系統完整 ingestion。
+重播 adapter 做三件事：根路徑映射、legacy camelCase→snake_case、rawAssetId 佔位 remap。
+其中 conflict_review 的 IDs 是多來源陣列索引，不能把所有 `0/1` 換成同一 raw ID。
+
+新 expected layer 要明確列：raw 已保存、section 可讀、index eligibility、flags、provenance、
+source policy，以及「没有自動 verified」。例如衝突文字由舊 `candidate/no chunk`
+改為新「有 passage、research 可讀、conflict flag」，應作明示的行為變更測試。
+
+## 7. 驗收
+
+- 原文未改寫，重匯入不重複，舊 revision 可以還原。
+- heading、段落、表格、code、引用與圖片位置可追溯。
+- raw search 可定位完整上下文，而非只輸出數段 AI 改寫摘要。
+- 跨來源 duplicate 不遺失原 URL／權限，也不被算成獨立佐證。
+- 停用 LLM extraction 仍能完成 Documents ingestion 與搜尋。

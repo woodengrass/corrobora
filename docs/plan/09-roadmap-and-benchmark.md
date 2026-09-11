@@ -1,83 +1,120 @@
-[索引](README.md) ｜ [← 範圍界定與 MVP 定義](08-scope-and-mvp.md) ｜ （本篇是最後一篇）
+[索引](README.md) · [← MVP](08-scope-and-mvp.md) · [現況與遷移](10-current-state-and-migrations.md) · [長期實驗](12-longitudinal-experiment.md)
 
----
+# Roadmap 與可驗證的研究問題
 
-## 17-18 Phase Roadmap
+## 1. 主研究問題
 
-### MVP（4-6 週）
+在強通用 Agent 已能優秀理解專業資料的前提下，具有 provenance、consolidation 與
+dependency-aware invalidation 的 Research Memory，能否讓 Agent 在大型未整理 corpus 上
+形成有效的 **non-parametric continual domain learning**？
 
-見第23節。
+這不是已證實結論。研究需要把「多了可用資料」「重複問相同答案」「少回答」與
+「真正重用研究知識處理新問題」分開。
 
-**風險**：Claim 抽取品質不穩定導致審核工作量過大而拖慢 pipeline 驗證節奏；緩解：先用 5.1 節 A 級資產（`dictionary/entries` + `gtmc-database`，已有審核依據）而非全量 `database.csv`。
+| RQ | 可檢驗假說 | 主要對照／指標 |
+| --- | --- | --- |
+| RQ1 | Findings 減少重複研究且 accuracy 不劣化 | C vs D；accuracy、evidence correctness、總研究成本 |
+| RQ2 | Memory-first＋gap-only 比整題 fresh search 更省，仍覆蓋必要条件 | D vs E；tokens、tool calls、完整度、false-covered |
+| RQ3 | Consolidation 減少重複而不傷 retrieval quality | E vs F；duplicate rate、false merge/split、recall、維護成本 |
+| RQ4 | Dependency invalidation 降低更新後 stale knowledge errors | 同配置 invalidation on/off；stale error、detection precision/recall、revalidation cost |
+| RQ5 | Associative expansion 幫助跨文章／多跳／設計題 | F vs G；multi-hop evidence recall、答案品質、extra reads |
+| RQ6 | 研究次數增加時，新題可重用比例上升，品質維持 | stateless vs sequential memory learning curves、固定 probe、跨模型接棒 |
 
-### Phase 1（+6-8 週）：檢索強化 + Graph 展開
+## 2. 建議開發路線
 
-- 加入 Sparse（BGE-M3 sparse）+ RRF + Cross-Encoder rerank
-- Multi-vector（mechanism 的 4 種 named vector）
-- Agent 加入 REFORMULATE 迴圈與 Stop Condition 完整 checklist
-- `farms`/`farm_components` 遷移取代 `database.json`
-- Benchmark 擴充到 30-50 題，開始追蹤 Recall@5/10/20/50、MRR、nDCG
+以下 M0–M5 是本版的**未來里程碑**，不對應舊專案 Phase／Track 的完成度。
+目前已存在的是資料與參考資產，見[實際盤點](10-current-state-and-migrations.md)。
 
-**預期成果**：Recall@10 相較 MVP dense-only 有量化提升；Agent 能處理需要多跳檢索的問題（如生電機制的第11節範例）。
+| 里程碑 | 工作與依賴 | 可驗收產出／下一步條件 |
+| --- | --- | --- |
+| M0：研究設定 | 確認主題、來源 manifest、研究者可用权限、模型與预算；整理既有題目／fixtures | 固定 corpus＋baseline spec＋人工 evidence rubric，盤點數字可重現 |
+| M1：可研究 corpus | Python modular monolith／PG／blob／Qdrant；Documents ingestion、alias、hybrid、section read；source search＋file refs；sessions | 原文還原、檢索有效、stateless raw Agent 可跑；記錄品質／成本分布 |
+| M2：Memory 閉環 | 依 M1 加 Finding revisions／validations／sources／dependencies、memory search、gap record、review、基本 consolidation＋invalidation | [MVP](08-scope-and-mvp.md) 全流程與 pilot；不先做進階 graph／小模型 |
+| M3：記憶可靠性 | 擴充間接依賴、併發／重播、文檔真實修訂；取得第二 code version；局部 symbol index、細粒度 diff | false-covered、false invalidation／stale errors 可量測，更新／rollback 測試通過 |
+| M4：長期研究 | 擴充 topic families／數百步 stream、盲評、多順序／多 seed；做 C/D/E/F/H 主實驗 | accuracy 非劣性、成本曲線、維護攤銷、失敗案例、信賴區間 |
+| M5：有證據的擴展 | graph association ablation、code analysis 工具比較、跨模型接棒；可獨立做 blueprint | 指定題型的效益足以支付新增工程／運行成本才採用 |
 
-**風險**：Sparse 模型（BGE-M3）中文技術詞 tokenize 效果未知，需要小規模驗證再全面採用；緩解：先在題庫子集上 A/B 比較 dense-only vs hybrid。
+Catalog 遷移可與 M1/M2 平行；Blueprint 結構研究與自動遊戲測試不用等核心論文全部完成，
+但它們也不能阻擋 Documents／Memory。Neo4j／CodeQL／CPT 不放進「必定要完成」里程碑。
 
-### Phase 2（+8-12 週）：Code Intelligence 起步 + Claim 反證機制成熟
+每個 milestone 有 smoke correctness 與研究分析兩種結果；假說未成立仍需誠實產出負結果。
+時程在 M0 pilot 與人力確認後估計，不承諾未量測的固定 4–6 週／15 秒 SLO。
 
-- Tree-sitter 索引 + 有限範圍 JDT 語意解析（只針對已核准 concept 相關 + 高頻引用符號，見 06 節）
-- SCIP symbol index，`get_callers`/`get_callees`/`compare_versions` tool 落地
-- Minecraft Semantic Layer 的 deterministic 部分（RegistryEntry/Tag/LootTable 解析）
-- Final Claim Verification 完整版（含 AI verifier 分流）
-- RESOLVE_CONTRADICTION 狀態落地，counterevidence 搜尋成為標準流程
+## 3. A–H 比較組的操作定義
 
-**預期成果**：涉及程式邏輯的問題（如「這個裝置的冷卻時間為什麼是 8gt」）能給出程式碼佐證，而非只靠文件描述。
+所有主比較使用相同 base Agent 模型、版本、工具權限、corpus 快照與 budget 上限。
 
-**風險**：Java 反編譯碼庫規模可能導致索引時間/儲存成本超預期；緩解：先限定索引範圍（只索引與已核准 concept 相關的類別），不做全庫索引。
+| 組 | 定義 | 用來回答什麼 |
+| --- | --- | --- |
+| A. Strong Agent + Raw Corpus | 通用 repo/filesystem lexical search/read，可自主多輪；無本系統 document semantic index／memory | 強 Agent 原生能力基準，不能刻意限制為看不懂 source |
+| B. Standard RAG | 同 corpus 分段索引，固定 single-shot retrieve→context→answer；top-k 在 dev 選定 | 傳統單次檢索基準，不刻意固定低品質 top 5 |
+| C. Agentic Raw Corpus Search | A 的自主能力＋本系統 document hybrid/context tools；每题 stateless，無跨 session Findings | **memory 主對照**；與 D–H 只改記憶能力 |
+| D. Agent + Findings | C＋Findings 存取／保存；可重用但新研究仍針對完整問題，無顯式 gap-only policy | isolate Findings 的增益 |
+| E. + Gap-only | D＋structured coverage／針對 missing parts 研究 | gap-only policy 是否有益 |
+| F. + Consolidation | E＋語意 equivalent/extends/contradicts/supersedes 管理 | duplication、錯誤 merge 與成本 |
+| G. + Association | F＋bounded Finding graph expansion | 非字面／多跳 evidence recall |
+| H. + Invalidation | G＋dependency-aware invalidation／JIT revalidation | 完整增量架構 |
 
-### 進階階段（Advanced，時程視 Phase 2 成果調整）
+D/E 仍有基本 idempotency、provenance、version filters 與寫入政策，停用的是語意 consolidation，
+不是故意讓重試重複寫入。所有組都可用 raw source，不能讓 baseline 少拿關鍵來源。
+A 與 C 的區別是 **通用 lexical corpus 工具 vs 本系統 corpus retrieval/context infrastructure**，
+不是兩個含義模糊的「Agent 搜原文」。A 的 context 放不下時必須允許工具閱讀，不能直接截斷。
 
-- CodeQL 完整 call graph/DFG、Minecraft AI 輔助語意標註層
-- Small Domain Model：先做 Query Classification + Claim Extraction 兩個高頻低風險任務的 LoRA/SFT（見第14-15節原文任務優先序），CPT 視 SFT 效果不足再評估
-- Litematic/Blueprint 解析與 Component Graph
-- Dynamic Verification（Fabric+Mixin Test Runner）
-- Ablation Study（第26節 A-I 全部跑齊）正式對外報告
+累加 ladder 方便展示，但不是每一模組的因果隔離：主實驗另做 F±invalidation、
+F±graph、E±consolidation 的 matched ablation。Code graph 對所有 memory 主比較組固定，
+其獨立效益再以 A/C 的 repo-only vs light-graph 比較。
 
-**風險**：訓練資料（Expert Research Trajectories，第24節原文）收集成本高，需要真人專家長期參與標註，若無法穩定產出高品質軌跡資料，Small Domain Model 的訓練優先序應該降低，先靠 Strong LLM few-shot 頂住。
+Invalidation-off 組只在封閉 benchmark 中測舊知識風險；正常系統的 provenance／版本邊界保留。
 
----
+## 4. 指標與定義
 
-## 附：Benchmark 與 Ablation（延續原規劃內容，不重複展開）
-
-沿用使用者原始需求第25-26節定義的指標與 Ablation 分組（A. General LLM only 到 I. Agentic+Dynamic Verification），每次 pipeline 變更都要重跑同一份題庫比較（沿用 KNOWLEDGE_SYSTEM_PLAN.md 既有「評測與維護」章節的紀律：命中證據正確性、版本正確性、引用正確性、回答完整性、幻覺情況）。每次評測記錄 `git_sha + data_hash + model_version`，否則不可視為可重現比較。
-
-**v2 修正（題庫規模）**：15-20 題只適合當 MVP smoke test，用來確認 pipeline 沒退步；**不能拿來下「架構優於 baseline」這種強度的研究結論**——樣本數不足以支撐統計意義。正式評測要分層擴充到至少 ~120 題：
-
-| 類別 | 目標題數 |
+| 類別 | 指標／定義 |
 | --- | --- |
-| definition | 20+ |
-| mechanism_explanation | 20+ |
-| causal | 20+ |
-| design | 20+ |
-| debugging | 20+ |
-| version_difference / code_analysis | 20+ |
+| 答案品質 | Answer Accuracy（依必要事實／條件 rubric）、expert rating、完整度；partial／refusal 也計分 |
+| 來源品質 | Evidence/Source Correctness；引用是否存在、定位正確、語意支持分開評分 |
+| Retrieval | passage/section/finding Recall@K、MRR/nDCG；multi-hop all-required-evidence recall |
+| 不可靠結論 | Unsupported Claim Rate＝無足夠依據 factual statements／全部 factual statements；版本錯誤分別統計 |
+| 更新風險 | Stale Knowledge Error Rate；更新後依過期結論造成錯答的受影響問題比例，與每 statement 率并列 |
+| 研究量 | Raw Passages Read、unique/repeated Documents Opened、Code Files/Ranges Read、tool calls；retrieved≠read |
+| 成本 | input/output/cached tokens、API calls/cost、wall latency p50/p95；維護、review、索引分列 |
+| 記憶健康 | duplicate findings、false merges/splits、成長數、Memory Utility Rate、association reuse |
+| 覆蓋 | Knowledge Gap Detection Accuracy、五類 confusion matrix／macro-F1、false-covered rate、need omission rate |
+| 失效 | affected-finding precision/recall、propagation lag、revalidation cost、historical-validity preservation |
 
-擴充節奏：MVP 15-20 題（單一 smoke test 池，不分類別）→ Phase 1 擴到 30-50 題（第17-18節既有規劃）→ Phase 2 結束前擴到六類各 20+ 題的完整分層題庫，只有這個規模的結果才適合寫進正式 Ablation Study 報告（第26節）對外呈現。
+重要衍生指標：
 
----
+- **Repeated Research Reduction**：在相同問題 stream 的窗口 W，
+  `1 - sum(raw_reads_memory[W]) / sum(raw_reads_stateless[W])`；denominator=0 時記 N/A。
+  文件、passage、code bytes／tokens 分別報告，不把原始工具粒度不同的 counts 直接混加。
+- **Memory Utility Rate**：某建立 cohort 中，在固定後續窗口內被真正用於不同後續題的
+  Findings 比例；不能以 retrieved 計 used；同題重試、單純改寫問句另列。
+- **Consolidation Quality**：人工標註的 equivalent/extends/contradicts/supersedes/independent
+  confusion matrix、pairwise merge precision/recall，以及錯誤合併對 retrieval／答案的影響。
+- **Total Cost**：foreground research + admission/consolidation + indexing + revalidation +
+  review 人工時間（與 API 金額分列）；報告攤銷与 break-even，而不是只看最後一題便宜。
 
-## 實際 Implementation Order（第一個月具體順序）
+Latency 減少不能靠把工作藏進背景隊列：另報 time-to-memory-available、維護 backlog
+與次題前可用的 memory snapshot。詳細操作見[長期實驗 protocol](12-longitudinal-experiment.md)。
 
-以下順序刻意把「移植既有資產」排在最前面，因為 5.1 節盤點顯示 `dictionary/entries` 與 `gtmc-database` 已經是可直接標記 approved 的資料，比從零建種子資料快得多，能讓第 6 步就有真實資料可測，不用等到第 8-9 步才有東西可查。
+## 5. 既有評測資產與缺口
 
-1. `docker-compose.yml`（PostgreSQL + Qdrant + 本地檔案系統物件儲存目錄）+ alembic migration 骨架
-2. 建第一批資料表（第22節列出的第一批，含 `concepts.external_ref`/`external_ref_pending`、`knowledge_objects` 的 `AFTER INSERT` trigger），並匯入 `game_versions` 種子資料（Java 版本序列，`release_order` 手動整理一份 1.0~最新版 + 常用 snapshot 的清單）
-3. `ingestion/pipelines/dictionary.py`：實作 5.1.2 節匯入偽代碼，跑通 `public/database/dictionary/entries/*.json`（979 筆）+ `zh-translations.json` 全量匯入，驗收標準：`concepts`/`concept_aliases`/`relations` 筆數與原始 JSON 條目數、`references` 邊數一致
-4. Markdown parser：實作 5.1.3 節規則，跑通 `public/database/gtmc-database/` 全量匯入（215 篇，含 `404.md` 占位偵測與 license 登記），`source_revisions` 去重 + `documents`/`document_sections`/`chunks` 寫入
-5. Dense embedding（BGE-M3，model 名、版本、維度、distance 視為同一份 contract，升級重建，見 4.2 節；可沿用 [`embeddings.ts`](../src/services/embeddings.ts) 已驗證的 hf-mirror 鏡像/代理下載策略，見 5.1.6 節）+ Qdrant `concepts`/`documents` collection 建立與寫入（Point ID 統一 UUID + PG 反查）
-6. `semantic_search` tool + 最小 Gateway `/v1/ask`（先不經過 Agent，直接 retrieve→prompt→LLM，用步驟 3-4 的真實資料驗證管線通）
-7. `ingestion/pipelines/machine.py`：`database.json` -> `farms`（metadata 直接 approved，`tags`->`relations` 候選標 pending），`sub_id` 保留為 `external_ref` 維持與現行分享連結相容
-8. Claim extraction：先實作 5.1.4 節的規則初篩（沿用 [`learn.ts`](../src/services/learn.ts) 的 `KNOWLEDGE_SHARING_PATTERNS` 關鍵詞列表）+ 單一 prompt template，對 `database.csv` 跑一批小樣本（建議先 200 行）+ CLI 審核工具
-9. Orchestrator 4 狀態骨架 + ResearchState 落地（先不做 REFORMULATE），Graph 展開直接查詢步驟 3 產出的 `relations` 資料，不需另外建種子
-10. Evidence Package builder + Final Verification 的 deterministic 子集
-11. 15-20 題 gold 題庫（優先取材自 `dictionary/entries` 涵蓋到的術語，因為這批資料有審核依據，答案可驗證）+ `eval_retriever.py`/`eval_answer.py`
-12. 與現有 QQBot `POST /v1/ask`（對應舊 `/ask`）的 baseline 比較報告 → 決定是否進 Phase 1（含 5.1.5 節 `referencedBy` 懸空引用是否已從資料維護者取得對應表的追蹤事項）
+已有 33 題，29 draft／4 approved（機器推薦）；9 個類別，所有 expected_source_ids 空白。
+9 個 machine baseline cases 是舊 keyword 行為回歸，不是 retrieval relevance gold。
+14 個 triage cases＋9 份人工 AI JSON 是規則契約，不能當真實模型產出或 memory benchmark。
+本 repo 沒有可運行的 eval_agent/eval_retriever，也沒有歷史 accuracy 報告。
+
+因此第一步不是直接跑「六類各 20 題已完成」的計畫，而是補 evidence locators／scope／
+review、將現有範例整理成 pilot。之後依效果量／變異與標註能力擴到多個 topic families：
+定義與別名、機制、因果、設計、debugging、版本差異／code，以及拒絕過度斷言。
+120 題可作規模目標，但不是統計充分性的保證；數百題 stream 亦不能當數百獨立樣本。
+
+## 6. 實作優先序
+
+1. 固定 corpus 與評分 protocol，校正路徑、sources、版本 hints／unknown。
+2. 建 Raw snapshots＋PG schema＋replayable importer，保護 immutable/provenance。
+3. 做 document hybrid＋完整上下文 tools，source search/read；接 strong Agent 與 sessions。
+4. 跑 C baseline，拆解 retrieval、模型推理與 corpus 缺口。
+5. 加 Findings／兩層 index，跑 D，再加 gap-only 跑 E。
+6. 在小資料上完成 consolidation／invalidation correctness，再跑更新 pilot。
+7. 擴充 corpus、問題 families、真實版本修訂與 longitudinal experiment。
+8. 依瓶頸做 graph、symbol 精細化或 model replacement，不預設更多技術一定更好。

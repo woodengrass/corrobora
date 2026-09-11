@@ -1,84 +1,103 @@
-[索引](README.md) ｜ [← PostgreSQL Schema](01-postgres-schema.md) ｜ [Ingestion Pipeline 與 Claim 審核 →](03-ingestion-and-claims.md)
+[索引](README.md) · [← PostgreSQL](01-postgres-schema.md) · [文件攝取 →](03-ingestion-and-claims.md)
 
----
+# 分層語意索引與可替換 Retrieval 元件
 
-## 4. Qdrant Collection / Vector / Payload 設計
+## 1. 兩個核心索引就夠
 
-### 4.1 多 collection vs 單 collection 分析
-
-| | 多 collection（依實體型別） | 單 collection + payload type |
+| Logical collection | 索引單位 | 用途 |
 | --- | --- | --- |
-| 優點 | 各型別可用不同 embedding 維度/模型；HNSW 參數可分別調；filter 更快（不用先篩 type） | 跨型別語意搜尋一次查詢；維運簡單 |
-| 缺點 | 跨型別查詢要 fan-out 多次 query 再合併 | 所有型別被迫用同一 embedding 維度；payload index 變複雜 |
-| 適合本案原因 | **實體型別的 embedding 語意本來就不同**（mechanism 的 effect_vector 和 code_summary 的向量不該共用模型/維度），且 Agent tool 本來就是分別呼叫 `search_mechanisms()`/`search_symbols()`，天然對應多 collection | — |
+| `raw_passages` | 一筆 passage，精確綁定 document revision | 找值得展開閱讀的 section／article |
+| `research_findings` | 一筆 Finding revision 的 scoped validation | 找已有研究成果與需要 revalidation 的線索 |
 
-**建議：多 collection，按「檢索用途」切，不按 SQL 表切**（MVP 只先建 `documents` + `concepts`，dense-only；其餘 collection 按 Phase 1/2 順序加）：
+Qdrant 不是正式內容庫。Finding 的 statement、reasoning、sources 與 status 回 PG 取；
+passage 原文回 PG／blob 取。每個 logical collection 可有一個 active physical build，
+例如 `raw_passages_<build_id>`，升級時以 alias 切換。
 
-| Collection | 對應資料 | 說明 |
+不再預設 concepts、mechanisms、claims、code_summaries、experiments 各建 collection。
+概念先走 PostgreSQL alias/exact lookup，machine catalog 先走原有關鍵字能力；code 直接
+repo search。需要 semantic Finding 的 code 結論使用同一 memory index，無須全量 AI code summary。
+
+## 2. Embedding 表示與 payload
+
+**Raw 表示**：title + heading path + passage 原文，可附少量已解析術語。
+這個表示是搜尋用的拼接，不回寫為 raw text；超長表格／code block 另有索引窗口，
+但窗口必須能定位原始完整區塊，不靜默截斷來源。
+
+**Finding 表示**：title + statement + reasoning summary + typical applicable questions +
+domain concepts + terminology aliases。typical questions 只由已完成研究概括，不能從尚未
+發生的 benchmark 題目或 gold answer 生成。
+
+| 共同 payload | Raw 特有 | Finding 特有 |
 | --- | --- | --- |
-| `documents` | chunks | 一般文件語意檢索 |
-| `concepts` | concepts | 概念定義 |
-| `mechanisms` | mechanisms | 多 named vector（見 4.2） |
-| `claims` | claims | statement 語意 |
-| `code_summaries` | code_symbols 的 AI 摘要 | 不是原始碼本身 |
-| `experiments` | experiments | setup+procedure 描述 |
+| `public_id, pg_id, index_build_id, representation_hash, access_scope, source_types` | `passage_id, section_id, document_revision_id, source_revision_id, language, index_status, version_scope_kind, version_ids` | `finding_id, finding_revision_id, validation_id, status, version_ids, scope_kind, loader, server_implementation, concepts, entities, mechanisms, dependency_generation` |
 
-每個 collection 內用 Qdrant 的 **named vectors** 承載 multi-vector，而不是拆成更多 collection。
+狀態、edition、版本 ID、來源型別、ACL scope、語言／concepts 建 payload indexes。
+Point ID 使用 UUID，或由 target public ID＋build contract 派生 UUID；不得使用 Qdrant
+不支援的任意 `{type}_{id}` 字串。Finding 每個 validation 一個 point，可共用 revision embedding cache。
 
-> **白話說（為什麼要「多 collection」）**：可以把每個 collection 想成圖書館裡的一個獨立分區（技術文件區、術語卡片區、機制卡片區、程式碼摘要區...），每一區的卡片長相跟索引方式本來就不一樣，機制卡片甚至一張卡有四個索引（見下方），程式碼摘要卡只有一個。硬要塞進同一區、用同一種索引卡格式，反而要多繞一手先看「這張卡片是哪一種」才能決定要用哪個索引，不如從一開始分區存放。
+最初每個 point 一個 dense vector，加一個可選 sparse vector。這與 ColBERT token-level
+multi-vector 不同，不因為有兩種表示就導入 late interaction。dimensions 與 distance 來自
+encoder contract，不固定 1024，也不在 domain schema 寫 BGE 專用型別。
 
-### 4.2 Named Vectors 範例（`mechanisms` collection）
+## 3. 抽象邊界：小而具體
 
-> **白話說（Multi-vector 是什麼）**：同一個 mechanism（例如某個 0-tick 活塞裝置）會被問到完全不同角度的問題：「這是什麼」「它能達成什麼效果」「適合用在什麼場景」「有什麼限制」。如果只做一個 embedding，這四種問法混在一起訓練出來的向量誰都照顧不好。所以同一筆 mechanism 資料實際上算了四份不同的向量，分別對應這四個角度——很像圖書館一張書卡除了「書名」索引之外，還另外做了「主題」「適讀對象」「館藏限制」三份獨立索引卡，讀者用哪個角度找書，就查對應那份索引卡。
+| Port | 輸入／輸出責任 | 初始 implementation |
+| --- | --- | --- |
+| `DenseEncoder` | 批次文字→dense vectors + 模型／tokenizer contract | BGE-M3 可作 baseline，另選可用模型比較 |
+| `SparseEncoder` | 文字→term IDs/weights + vocabulary contract | BGE-M3 sparse 可作 baseline；語彙空間不可混用 |
+| `Reranker` | query + candidates→有序 ID 與分數 | strong few-shot 或 cross-encoder baseline，實測成本 |
+| `VectorRetriever` | typed query/filter→candidate IDs/ranks | Qdrant adapter，不洩露 Qdrant Filter 物件給 domain |
+| `LexicalRetriever` | exact／tokenized lexical search | PG exact/trigram/FTS，必要時独立 BM25 implementation |
 
-**v2 修正（Qdrant schema 語法）**：dense named vectors 與 sparse vectors 在 Qdrant 是分開的 collection 設定區塊（`vectors` vs `sparse_vectors`），不能混在同一個 `vectors` dict 裡，否則建 collection 會直接失敗：
+初始 hybrid 為 dense + lexical，learned sparse 與 reranker 用同一評測選擇。
+**PostgreSQL FTS 的 ts_rank 不是 BM25**；中文分詞亦不能靠預設英文 FTS 自動解決。
+對中文術語與 code token 應測 tokenization／trigram／exact 通道，BM25 與 learned sparse
+分別標明实现，不能把兩者的分數或 vocabulary 當作可互換。
 
-```json
-{
-  "vectors": {
-    "description": { "size": 1024, "distance": "Cosine" },
-    "effect": { "size": 1024, "distance": "Cosine" },
-    "application": { "size": 1024, "distance": "Cosine" },
-    "constraint": { "size": 1024, "distance": "Cosine" }
-  },
-  "sparse_vectors": {
-    "sparse": { "modifier": "idf" }
-  },
-  "payload": {
-    "mechanism_id": "int (PG FK)",
-    "concept_slugs": ["array of string, indexed"],
-    "edition": "keyword",
-    "version_ids": ["array of int, indexed"],
-    "status": "keyword",             -- 只有 approved 才進 Answer Index 查詢
-    "confidence": "keyword"
-  }
-}
+RRF 以 rank 融合，不直接加不同模型原始分數。可先試每通道 top 50、fusion 20、rerank 10，
+`k=60` 作起點；這些是可調參數，使用 dev set 選擇並鎖定後測試，不是適用所有 corpus 的常數。
+
+## 4. 版本過濾需要兩種閱讀模式
+
+**reuse 模式**：已知相容 scope、有效 status、授權符合的 Findings。
+**research 模式**：可回傳 provisional、needs_revalidation、stale、disputed 或未知版本線索，
+明示不能當已覆蓋結論；contradictory Findings 即使語意分數低，也應透過關聯顯示。
+
+Documents 通常缺少版本。若一律要求 `version_ids contains target`，大量有價值的文件
+永遠找不到。故 raw search 分成「已知相容」與「未知待判定」兩路，後者只供閱讀與確認，
+不是自動跨版本有效。明確不相容資料預設排除；Agent 做版本比較時可明確指定另一側，
+結果分組顯示，不混成同一版本答案。
+
+每次向量候選取回後，以 PG batch hydration 重查版本、該 validation 的最新狀態、dependency generation
+與權限；被剔除時在同预算內 oversample／補取。若索引落後或 unavailable，以 PG lexical
+降級並記錄 retrieval incomplete，不能把「找不到」當作「記憶裡沒有」。
+
+## 5. PG→Qdrant：可恢復，不做不可靠雙寫
+
+```text
+PG transaction: Finding / status change + index_outbox
+    → commit
+    → worker 讀取目前 PG generation
+    → encoding（如表示未變，重用向量）
+    → idempotent upsert / tombstone
+    → 確認回應後標 outbox 完成
 ```
 
-**v2 修正（版本 payload）**：不再存 `version_min`/`version_max` 字串。改存 `version_ids`：寫入時從 PG 的 `version_scope_versions`（3.1節）展開出該筆資料涵蓋的所有 `game_versions.id`，整份陣列寫進 payload。查詢時 Query Understanding 把使用者的目標版本解析成單一 `game_version_id`，用 Qdrant 的 `MatchAny`/`array-contains` 做精確整數比對，不再有字串 range 比較的正確性風險。
+同一 aggregate 的索引工作序列化；重試處理最新 PG 狀態，不以過期 event payload 覆蓋新狀態。
+寫入前後檢查 generation；若變動，重新排程直到收斂。PG hydration 是最後的正確性檢查。
+不要讓慢速向量工作阻擋 source 失效標記；Qdrant 壞掉不應使過期記憶恢復成 verified。
 
-**Payload index**：`status`（keyword）、`edition`（keyword）、`version_ids`（integer array）、`concept_slugs`（keyword array）都建 payload index，用於檢索前置 filter（見第7節：filter 先行，再 ANN）。`code` 相關 collection 另加 `code_version_id`、`mapping_name` filter，`mapping` 不同不得混排。
+模型／tokenizer／dimensions／normalization／distance／sparse vocabulary／表示組裝版本
+共同構成 index contract。**模型更換重建索引，不重寫 Finding 正文，不重新研究整個 corpus。**
 
-**Point ID = UUID + PG 反查（統一，不用 `{table}_{id}` 字串）**：每個 point 用 UUID，PG 側用 `chunks.qdrant_point_id` 等欄位反查。確保 Qdrant 只是 candidate index，PostgreSQL 永遠是 truth source，可隨時從 PG 全量重建 Qdrant。重建時先清 collection 再按 `updated_at` 分批寫入，避免新舊混存。
+重建流程：固定 PG snapshot + outbox high watermark → 建新 collection → backfill → replay
+增量 → 驗證筆數、抽樣 locator／filters、retrieval regression → 原子切 alias。
+保留舊 build 到觀察期完成，失敗可切回；切回後仍受 PG 最新有效性與權限檢查。
+不採用舊稿「先清空 active collection 再慢慢重灌」的停機方式。
 
-**Embedding contract（MVP 先凍結，升級必須重建）**：model 名、版本、維度、distance、切段規則（chunk size / overlap / 語言處理）視為同一份 contract。`mechanisms` 的 4 向量現階段只是佔位，MVP 只用 `description` dense；sparse / reranker / ColBERT 留到 Phase 1/2，model 升級一律重建對應 collection，不混用新舊向量。
+## 6. 成本與何時擴展
 
-### 4.3 Version Filter 流程
-
-檢索一律：`must: status=approved` + `must: version_ids contains <target_game_version_id>` → 縮小候選集 → 才做 ANN/RRF。不相容版本资料**不進入 ANN 距離計算**，避免語意相近但版本錯誤的內容排到高分。這個 filter 現在是整數精確比對而非字串 range，正確性由 3.1 節 `game_versions`/`version_scope_versions` 保證。
-
-### 4.4 Exact Lexical Layer（不做 OpenSearch，但保留精確比對通道）
-
-`NaturalSpawner`、`BUD`、`1.21.1` 這類 token 不值得浪費在 embedding 語意搜尋上——語意相近排序對「精確符號/版本號」是負優化。即使不引入 OpenSearch，也要保留一條低成本的精確詞彙比對通道，作為 Dense+Sparse+RRF（第8節）之外的第三個候選來源：
-
-| 用途 | 技術 |
-| --- | --- |
-| Concept/別名精確查找 | `concept_aliases` 上的 `lower(alias)` 唯一索引（已在3.3節），O(1) 查找 |
-| 模糊拼寫/縮寫容錯 | PostgreSQL `pg_trgm` extension 對 `concepts.canonical_name`/`concept_aliases.alias` 建 GIN trigram index |
-| 長文技術詞彙全文比對 | PostgreSQL 內建 FTS（`tsvector`/`tsquery`）對 `chunks.content` 建索引，當 fallback，不當主要檢索 |
-| 程式符號精確查找 | `code_symbols(fqcn)` 一般索引 + `(code_version_id, fqcn, signature)` 定位唯一（`fqcn` 跨版本/overload 會重複，不可建全域唯一，見 3.8 節） |
-
-這條通道的結果與 Dense+Sparse 的結果一起送進 RRF 融合，而不是獨立回傳——這樣「使用者打對了精確術語」時排序自然靠前，不需要額外規則判斷何時該用哪條通道。
-
----
-
+將 query encoding、候選搜尋、rerank、PG hydration、context expansion 與 indexing 分開計時。
+每個 build 保存資料 snapshot、模型 artifact、輸入表示 hash 與記憶體／儲存量。
+ColBERT、多 named vectors、獨立 concept vector index 只在指定題型 recall／成本曲線
+證明有益後加入；Qdrant baseline 的好壞也由同一 port 下的比較決定。

@@ -1,129 +1,138 @@
-[索引](README.md) ｜ （本篇是第一篇） ｜ [PostgreSQL Schema →](01-postgres-schema.md)
+[計畫索引](README.md) · [資料模型 →](01-postgres-schema.md)
 
----
+# corrobora：專業研究記憶與資料基礎設施
 
-# 特定領域 AI 專家化系統 開發計畫
+> 討論稿，2026-09-11。這是一份專案啟動前的設計計畫，描述建議方向、取捨與驗證方法，
+> 不是已完成的系統，也不是已接受的 ADR。實際 repository 狀態見[盤點與遷移](10-current-state-and-migrations.md)。
 
-## 0. 定位與範圍
+## 1. 我們要解決什麼問題？
 
-本文件規劃一個**獨立系統**（暫名 `corrobora`），與 OpenST-QQBot 是不同 repository、不同技術棧、不同開發節奏：
+**為強通用 Agent 建立 Domain Research Infrastructure / Agentic Research Memory。**
 
-| 項目 | OpenST-QQBot（現有） | corrobora（本計畫） |
-| --- | --- | --- |
-| 技術棧 | Node.js / TypeScript | Python / FastAPI |
-| 資料 | CSV / JSON | PostgreSQL + Qdrant |
-| 角色 | QQ 平台 adapter、使用者互動 | 領域知識檢索與推理後端 |
-| 關係 | 未來作為 **client**，呼叫本系統 `POST /v1/ask`（正式 API，舊 `/answer` 僅視為 legacy adapter） | 提供 Evidence Package 或最終答案 |
+Agent 已能讀大型程式庫、追蹤方法、比較執行路徑、理解長文，甚至從機制反向提出設計。
+因此，研究重點不再是教模型理解 Minecraft，或自行建造完整 code reasoner。
+真正需要累積的是：私人資料的索引、曾經花費研究成本得到的結論、結論的來源與適用範圍，
+以及資料變動後哪些結論必須重新查證。
 
-驗證領域：Minecraft Technical / 生電（Redstone Tech）。所有 schema 與模組命名刻意保持領域中立（`concepts`、`mechanisms` 而非 `blocks`、`redstone_devices`），使日後可替換領域語料而不改架構。
+本系統不是訓練一個固定的領域專家模型，而是為強通用 Agent 建立可持續累積的專業研究環境。
+Agent 首先檢索既有 Research Findings，判斷已知知識與研究缺口，只對缺失部分搜尋大量
+未整理專業文檔、原始碼及其他私人資料；高價值研究成果經 provenance 綁定、consolidation
+與 version/dependency 管理後寫入 Research Memory。後續問題重用已有成果；相關來源變動時，
+受影響成果進入重新驗證狀態。這使 **non-parametric continual domain learning** 成為可驗證的
+研究假說，而不是把記憶容量增加直接視為學習成功。
 
-不做的事寫在第 21 節，先讀那節可以避免規劃膨脹。
+第一個驗證領域是 Minecraft Technical／生電。模組邊界盡量領域中立；版本、mapping、
+機器結構等具體知識仍由 Minecraft adapter 表達，不為尚未出現的領域預建 ontology。
 
-### 0.1 一句話心智模型
+## 2. 分工：Agent 做研究，系統維護研究資產
 
-如果只能記住一句話：**PostgreSQL 是圖書館真正的館藏（每本書、每筆資料都編了目、審核過、找得到出處），Qdrant 只是一份「憑感覺猜你想找哪本書」的快速索引卡；Agent 是一個按規定流程做研究的館員，不是一個想到哪查到哪的自由讀者；LLM 只有在館員把資料整理好、按規定格式交出研究筆記之後，才負責寫出最後的分析報告，而不是自己憑印象回答**。
+| Strong Agent | corrobora |
+| --- | --- |
+| 理解問題、拆子問題、提出與修正 hypothesis | 提供可搜尋的 corpus、Findings 與版本範圍 |
+| 自主選擇查詢、文章、symbol 與 code path | 工具存取、来源權限、预算、超時與取消 |
+| 閱讀完整上下文、比較矛盾、跨來源推理 | immutable raw、精確引用、依賴、研究事件 |
+| 從 mechanism 提出新設計、整合答案 | 寫入驗證、consolidation、invalidation 與評估 |
 
-後面每一節的設計原則，幾乎都能拆解回這句話：
-- 「Qdrant 只是 candidate index，可以從 PG 重建」→ 索引卡弄丟了没关系，館藏（PostgreSQL）還在。
-- 「Candidate Claim 要人工審核才能變成 Verified Claim」→ 新書要先編目審核，才能上架讓讀者借閱，不能有人隨手塞一本書進書架就算數。
-- 「Deterministic State Machine 而非自由 Agent」→ 館員按借閱規則做事（先查目錄、找不到才擴大範圍搜尋），不是想查什麼就查什麼。
-- 「Evidence Package 分開 verified/candidate」→ 研究筆記要註明哪些是查證過的事實、哪些只是還沒證實的猜測，不能混在一起讓看報告的人分不清楚。
+**控制資料與寫入的邊界，不預先規定每一步思考。**
+不要求 hypothesis 必須先對上完整概念庫，不以固定 query template 限制發散；
+但 Agent 不能自己把推論標成 `verified`、改寫既有 verified 內容、刪 source 或改 provenance。
 
-### 0.2 如何閱讀本文件
+白話說：Agent 是研究員；corrobora 是有目錄、研究筆記、版本標籤與查證紀錄的研究室。
+研究員可以自由閱讀與推理，但不能把自己的草稿偷偷改成已審核的館藏。
 
-本文件同時給工程團隊實作參考（含 SQL/Python 等可執行層級的細節）與給人閱讀理解設計動機，因此每個複雜設計旁邊都會有一段「**白話說**」的框，用大白話+比喻重講一次「為什麼要這樣設計」，不想看 SQL/程式碼細節的讀者可以只看這些框和每節開頭的敘述段落，跳過程式碼區塊也不會斷掉理解脈絡。文中出現「v2 修正」字樣的地方，代表這是根據工程團隊審閱後修正過的設計，保留修正說明是為了讓未來的人知道「為什麼不是更直覺的那個寫法」，不是文件寫壞了忘記刪除。
-
----
-
-## 1. 整體架構
-
-**白話說**：一次問答的請求進來後，不是「查資料→丟給 LLM→回答」三步結束，而是先經過一個會判斷「這是什麼類型的問題」的前置分類，再交給一個像專案經理一樣的 Orchestrator 反覆調度檢索/圖譜/程式碼三個下游服務，直到湊齊足夠證據，才整理成一份結構化報告（Evidence Package）交給真正負責寫長篇分析的 LLM，LLM 寫完之後答案還要被拆解回頭核對一次才能真的送出去。下圖的每一條線都對應後面某一節的詳細規格：
+## 3. 架構圖
 
 ```mermaid
 flowchart TD
-    Client["Client（QQBot 等）"] -->|"POST /v1/ask"| Gateway["API Gateway (FastAPI)"]
-    Gateway --> QU["Query Understanding Service<br/>輸出 query_type / entities / constraints / goal"]
-    QU --> Orch["Research Orchestrator<br/>(Deterministic State Machine，第9-12節)"]
-    Orch <--> Retrieval["Retrieval Service<br/>(Qdrant + PG，第4/8節)"]
-    Orch <--> Graph["Graph Service<br/>(PG relations，第7節)"]
-    Orch <--> Code["Code Intelligence Service<br/>(第13節，Phase 2+)"]
-    Retrieval --> Workspace["Evidence Workspace（第18節）"]
-    Graph --> Workspace
-    Code --> Workspace
-    Workspace -->|"sufficiency check 通過（第12節）"| Package["Evidence Package Builder（第19節）"]
-    Package --> LLM["Strong Online LLM（負責推理與寫作，不負責記憶專業知識）"]
-    LLM -->|"draft answer"| Verify["Final Claim Verification（第20節）"]
-    Verify --> Answer["Final Answer"]
+    User[使用者 / 外部 Agent] --> API[FastAPI / Research Tools]
+    API --> Agent[Strong Agent：研究與整合]
+    Agent --> Memory[Finding Search：memory-first]
+    Memory --> Gap[Agent Coverage / Gap Assessment]
+    Gap -->|已有足夠適用成果| Answer[整合答案、引用與未知項]
+    Gap -->|缺失 / 過期 / 矛盾| Research[JIT Fresh Research]
+    Research <--> Docs[Document Search → Section / Article 閱讀]
+    Research <--> Code[Repo Search / Lightweight Code Graph → 實際 source]
+    Research <--> Machines[Machine Catalog / Blueprint 資產]
+    Research --> Candidate[可重用 Candidate Finding]
+    Candidate --> Write[Schema / Policy / Provenance / Consolidation]
+    Write --> PG[(PostgreSQL：正式內容與歷程)]
+    PG --> Index[可恢復的索引工作]
+    Index --> Q[(Qdrant：raw_passages / research_findings)]
+    Q --> Memory
+    Q --> Docs
+    Research --> Answer
+    Write --> Answer
+    Changes[Source / Code / Upstream Finding 變動] --> Invalidate[Dependency-aware Invalidation]
+    Invalidate --> PG
+    PG --> Raw[Immutable Raw Blob Store / Repo Snapshots]
+    Agent --> Sessions[Research Sessions / Events]
+    Sessions --> PG
 ```
 
-圖裡的雙向箭頭（Orchestrator ↔ 三個下游服務）是重點：這不是一條單向的資料管線，Orchestrator 會反覆呼叫這三個服務很多輪（第11節的 Multi-hop Loop），直到證據夠了才往下走，不是查一次就結束。
+圖中的 gap assessment 是 Agent 可修正的研究紀錄，不是額外訓練的必備分類模型。
+檢索回傳候選後必須回 PostgreSQL 讀取有效狀態與權限；Qdrant payload 不決定真偽。
+研究可以產生答案但不保存 Finding；保存失敗也不等於答案必須失敗，回應須分別報告兩者結果。
 
-支撐服務（背景執行，不在單次問答的 critical path）：
+## 4. 三種不同的資料資產
 
-- **Ingestion Service**：原始資料 → Candidate Claim/Concept
-- **Review Service**：人工審核介面 + API
-- **Code Indexing Service**：離線建立 AST/Symbol/Call Graph
-- **Small Domain Model Service**：本地推論（分類/路由/抽取）
-- **Training Pipeline**：CPT / LoRA / SFT（離線，第 14-15 節）
+| 資產 | 做多少預處理 | 存在的價值 |
+| --- | --- | --- |
+| Documents | 原文快照、結構切段、metadata、術語、dense + lexical/sparse、rerank | 從未整理 corpus 找到值得閱讀的位置 |
+| Code | 版本化 repository、檔案／symbol index、可可靠取得的輕量邊 | 告訴 Agent 去哪裡找；實際 code 才是 implementation 依據 |
+| Research Findings | 只保存高 utility 結論，附來源、條件、依賴與查證狀態 | 避免跨 session 反覆付出相同研究成本 |
 
----
+Blueprint／machine catalog 回答「人類做過哪些結構」，與「機制是什麼」互補。
+目前有 81 筆目錄記錄，但本工作區未找到實體 `.litematic`，不能當成已有完整藍圖庫。
 
-## 2. Repository / 模組切分
+## 5. 延續既有合理設計，收斂不必要的部分
 
-單一 monorepo，Python 為主，poetry/uv 管理，每個 service 可獨立部署。狀態標記：`[MVP]` 首批實作、`[Phase 1]` 檢索強化、`[Phase 2]` 程式碼智能、`[Future]` 進階／訓練：
+保留 Python 3.12、FastAPI、Pydantic、PostgreSQL、Qdrant，以及原始版本、來源政策、
+中英術語、精確引用、測試 fixture 的基礎。舊文件已區分 code facts 與人類解釋，也已主張
+Qdrant 可重建、PG relations 優先於 Neo4j；這些與新方向一致。
+
+需要重新定位的是 Claim-first ingestion、固定狀態機、先收集 Evidence Package 再讓強模型
+寫答案的分工，以及預排 Tree-sitter → JDT → SCIP → CodeQL 的技術路線。
+這些項目多數仍是規劃，並非已有 production code，應直接修改建置方向，避免先實作再包裝。
+
+新預設為 **單一 Python modular monolith + 背景 worker**。模組不是獨立 microservices：
 
 ```text
-corrobora/
-├── pyproject.toml
-├── docker-compose.yml                 # postgres, qdrant, api 一鍵起本地環境
-├── services/
-│   ├── gateway/                       # [MVP] FastAPI 入口，路由到各 service
-│   │   ├── main.py
-│   │   └── routers/{ask,review,ingest}.py
-│   ├── query_understanding/           # [MVP]
-│   │   ├── classifier.py              # query_type 分類（小模型或規則+LLM）
-│   │   └── entity_linker.py           # alias -> concept_id
-│   ├── orchestrator/                  # [MVP 簡版，Phase 1 完整]
-│   │   ├── state_machine.py           # 第11節
-│   │   ├── research_state.py          # 第9節 Pydantic model
-│   │   └── stop_conditions.py         # 第12節
-│   ├── retrieval/                     # [MVP dense-only，Phase 1 hybrid]
-│   │   ├── dense.py / sparse.py / fusion.py / reranker.py
-│   │   └── qdrant_client.py
-│   ├── graph/                         # [MVP 簡版，Phase 1 完整]
-│   │   ├── relations.py               # PG relations CRUD
-│   │   └── traversal.py               # find_path, expand
-│   ├── code_intel/                    # [Phase 2]
-│   │   ├── indexer/{treesitter,jdt,scip}.py
-│   │   ├── mc_semantic_layer.py       # 第14節
-│   │   └── query.py                   # get_callers 等
-│   ├── claims/                        # [MVP]
-│   │   ├── extraction.py              # AI 抽取 candidate claim
-│   │   ├── review.py                  # workflow
-│   │   └── verification.py            # deterministic check
-│   ├── evidence/                      # [MVP]
-│   │   ├── workspace.py               # 第18節
-│   │   └── package.py                 # 第19節
-│   ├── tools/                         # [MVP] Agent 高階 tool，第10節
-│   │   └── registry.py
-│   └── domain_model/                  # [Future] Advanced 訓練／推論
-│       ├── inference.py               # 本地小模型 serving（vLLM/SGLang client）
-│       └── training/{cpt,sft,lora}.py
-├── db/                                # [MVP]
-│   ├── migrations/                    # alembic
-│   └── schema.sql
-├── ingestion/                         # [MVP]
-│   ├── parsers/{markdown,csv,json,litematic}.py
-│   └── pipelines/{document,machine,dictionary}.py
-├── benchmark/                         # [MVP smoke]
-│   ├── gold_dataset/
-│   ├── eval_retriever.py
-│   ├── eval_agent.py
-│   └── eval_answer.py
-└── tests/                             # [MVP]
+src/corrobora/                 # 建議結構，目前尚未建立
+├─ api/                       # ask、research tools、寫入與管理邊界
+├─ research/                  # Agent adapter、budget、session recorder
+├─ memory/                    # Finding、coverage record、consolidation、invalidation
+├─ corpus/                    # source policy、capture、parser、sections/passages
+├─ retrieval/                 # encoder ports、fusion、reranker、context expansion
+├─ code/                      # repo snapshots、symbol navigation、diff
+├─ machines/                  # catalog、之後的 blueprint adapter
+├─ storage/                   # PostgreSQL、blob store、Qdrant adapters
+└─ jobs/                      # ingestion、index outbox、revalidation 排程
 ```
 
-> **註（與第 9 節 / 01-schema 銜接）**：`ResearchState` 需持久化到 PostgreSQL（預定 `research_sessions`、`research_events`、`tool_calls`），完整 DDL 留待 `01-postgres-schema.md` 補上，本篇不另行定義，避免兩邊各寫一套。
+以 PostgreSQL transaction 管理核心寫入，慢速 LLM 呼叫與 embedding 在 transaction 外執行。
+先用 PG 工作佇列與有界 worker；不預設 Kafka、Neo4j、多模型 serving 或複雜分散式協調。
+瓶頸量測後才拆部署；外部 Agent 可直接使用 research tools，`POST /v1/ask` 是便利入口，
+不是強制所有研究都由自製 Agent runtime 啟動。
 
----
+## 6. 如何知道這個方向有價值？
 
+核心主張必須同時符合：
+
+1. 相關但不同 wording／不同 constraints 的後續題，raw research 成本減少。
+2. accuracy、evidence correctness 與回答完整度維持或提高，不能靠少答換省錢。
+3. 更新後 stale error 下降，重新驗證成本低於完整重研。
+4. 新 Agent 模型可讀取同一份研究資產，不需重訓或重建所有 Findings。
+
+最先做 Documents + Memory 的閉環，加上目前已有 source 的直接閱讀能力。
+graph expansion、進階 program analysis、blueprint structural understanding、distillation
+依獨立 benchmark 結果擴展。完整研究問題見[roadmap 與 benchmark](09-roadmap-and-benchmark.md)。
+
+## 7. 尚需討論的選擇
+
+- 專題第一輪主題採漏斗／物品處理，還是方塊更新／活塞？應依可標註資料與題型選擇。
+- `provisional` 記憶可重用到何種程度？本稿建議作研究線索與有條件推論，不能單獨宣稱已驗證。
+- 人工 review 的供給量與可用 API 预算？它們決定 MVP 題數與 verified 成果的成長速度。
+- 大型私人 corpus 的取得與時間切片：目前 23 篇 GTMC 不足以驗證數千篇規模。
+- 第二份真實 code version 尚需取得；synthetic update 可測正確性，但不能取代真實版本實驗。
+
+以上是設計討論項，不把未知人力、效能或成本填成已確定承諾。

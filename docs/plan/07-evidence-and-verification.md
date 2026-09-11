@@ -1,108 +1,88 @@
-[索引](README.md) ｜ [← 程式碼智能與多版本支援](06-code-intelligence-and-versioning.md) ｜ [範圍界定與 MVP 定義 →](08-scope-and-mvp.md)
+[索引](README.md) · [← Code](06-code-intelligence-and-versioning.md) · [MVP →](08-scope-and-mvp.md)
 
----
+# Evidence 重新定位：精確來源與必要的驗證
 
-## 18. Evidence Workspace
+## 1. 核心判斷
 
-職責：ResearchState 中不斷累積的 evidence，在放入 LLM prompt 前做**壓縮與去重**，這是防止 context 爆炸的關鍵模組。
+Evidence 不再是一套獨立龐大的知識實體系統，而是 **Finding 與答案的可追溯來源、
+依賴與驗證紀錄**。保留來源的重要性，簡化把所有東西先轉成 atomic Claim 的成本。
 
-> **白話說**：Agent 跑了 8 輪、呼叫了 40 次工具之後，`ResearchState.evidence` 裡可能塞了上百筆結果，但很多是同一件事的不同說法（同一份文件被不同 subquestion 各查到一次），也有不少是低品質、可有可無的旁證。Evidence Workspace 的工作就是在交給 LLM 之前先做一次「編輯審稿」：去掉重複的，把品質差的排到後面甚至丟掉，只留下 token 預算裝得下、且真正有代表性的那一批，讓 LLM 讀到的是精華筆記，不是研究過程中所有的雜訊。
+| 證據來源 | 保存什麼 | 不能推論什麼 |
+| --- | --- | --- |
+| Document | source/revision、passage、位置、原文、版本 hint、作者／品質 | 高可信來源不代表每句都正確 |
+| Code | 具體 snapshot/version/mapping、symbol/file/range/hash | 讀到分支不代表 runtime 一定走該分支 |
+| Experiment | protocol、run、環境、量測與 raw logs | 一次結果不代表任意硬體／版本普遍成立 |
+| Finding | revision、scoped validation、來源與依賴鏈 | verified 標記不能替代適用條件檢查 |
+| Agent 推論 | reasoning_summary、假設、支持／反對來源 | 自信或 another LLM agreement 不等於已驗證 |
 
-```python
-class EvidenceItem(BaseModel):
-    id: str
-    source_type: Literal["claim","chunk","code_symbol","experiment","relation"]
-    source_id: int
-    summary: str            # 精簡摘要，非全文
-    full_ref: str            # 需要時可展開的引用（doc id + heading path 等）
-    version_scope: dict
-    confidence: str
-    stance: Literal["supports","contradicts","neutral"]
-    version_match: float     # 0~1，該證據的 version_scope 與 environment 目標版本的吻合程度
-    source_authority: float  # 見下方 source authority 表
-    directness: float        # 0~1，是否直接陳述問題所問的事，還是需要推論串接
-    priority: float          # 見下方 EvidenceQuality 公式，取代 v1 的 relevance*confidence*recency
+## 2. 引用存在，不等於結論被證明
 
-def compress(items: list[EvidenceItem], token_budget: int) -> list[EvidenceItem]:
-    # 1. dedup: 同 source_id 或近似 summary（embedding sim > 0.95）只留最高 priority 一筆
-    #    例外：code_symbol 不同 overload / 不同 signature 不得合併，去重鍵必須含 fqcn + signature + code_version_id
-    # 2. sort by priority desc
-    # 3. greedy 填入直到 token_budget 用盡，優先保留 supports + contradicts 各至少一筆／critical claim
-    # 4. code evidence 不做語意摘要替換原文，保留 fqcn + signature + file/line + hash + full_ref
-```
+確定性檢查擅長回答：引用 ID 是否存在、hash 是否正確、line range 是否属于该 snapshot、
+版本／環境是否相容、來源是否可存取、有無失效依賴。
+它不能僅因存在 `CALLS` 邊就证明「這個呼叫在指定情況一定發生」，也不能因
+`finding_sources` 有一列就證明來源支持結論全部語意。
 
-**v2 修正（Evidence Quality 公式）**：原公式用 `relevance × confidence × recency`，但 `recency`（新舊）對 Minecraft 技術知識是錯誤的通用指標——2020 年寫的 1.16.1 原始碼分析，不會因為「舊」就比一篇 2025 年但寫錯版本的文章差。拿掉 `recency`，換成真正決定證據可信度的因素：
+語意 entailment、條件充分性與跨來源推理仍由 Agent／reviewer 評估。
+可用独立 LLM verifier 做 baseline，但它的意見是檢查結果，不是自動 truth stamp。
+重要設計／量測題需要相稱的來源，不能用通用 source authority 乘積公式替代判斷。
+
+## 3. Finding 的 verified 政策
+
+MVP 由人工 reviewer 核准，寫入指定 `finding_validation`：
+
+1. statement 是可重用、有邊界的結論；conditions／exceptions 清楚。
+2. 引用能回到實際原文或 source，含 supports 與已知 contradicts。
+3. 明确版本／環境有適用依據；未知 scope 不偽裝成全版本。
+4. dependency set 包含結論依賴的關鍵來源與上游 Findings。
+5. 核准前 generation 再檢查，研究期间來源若改變則重新確認。
+
+通過後記 review actor、時間、policy version、source_set_hash 與 checked_generation。
+provisional 可作研究線索，disputed/stale 可供比較；只有當前有效且適用的 verified validation
+可被當成已覆蓋的研究記憶。人工只審高價值成果，不逐段批准整個 corpus 才開始研究。
+
+對可重現、狹義的機器檢查，後續可讓授權 verifier 升格指定命題；必須列明可驗證範圍，
+例如「snapshot 中常數值」不等於「某農場所有情況都可靠」。不為實現自動化而降低 verified 定義。
+
+## 4. 輕量 Research Workspace 與答案交付
+
+Agent 的工作上下文保留：目前問題與 scope、相關 Findings、已讀資料、反證、必要條件與 gaps。
+不再建立「館員按固定步驟收齊 package，Strong LLM 最後才閱讀」的雙層 reasoner。
+
+上下文節省以精確 locator 去重、按 need 聚合、progressive disclosure 為主。
+**不能按 source_id 一筆去重整篇文章**，因為同一文章不同段落可能互為反證；
+也不能因 summary 相似就丟掉不同版本或不同 overload。保留原文展開能力。
+
+對 client 的最小交付可包含：
 
 ```text
-EvidenceQuality = retrieval_relevance × version_match × source_authority × directness × verification_weight
+answer
+scope_and_assumptions
+citations: [finding revision/validation 或 passage/code/experiment refs]
+unresolved_needs / contradictions
+verification_summary
+session_id / usage
+memory_write_outcome
 ```
 
-- **`retrieval_relevance`**：tool 呼叫時的檢索分數（RRF/rerank 分數正規化到 0~1）。
-- **`version_match`**：該證據 `version_scope` 是否精確涵蓋 environment 目標版本（4.3節整數比對，1.0=精確涵蓋，按版本距離遞減，不相容則整條證據不進候選，不是壓低分數）。
-- **`source_authority`**：由證據型別決定的預設權重表（非永恆規則，見下方按 Claim 類型調整）：
+Evidence Package 可作這份回應的相容名稱，不再是独立 ontology／服務或模型唯一准許看見的材料。
+答案區分已有驗證的结論、有條件推論、設計建議與未確認部分，引用跟在相關敘述旁。
 
-  | 證據型別 | 預設 authority |
-  | --- | --- |
-  | 原始碼直接證據 / 可重現實驗結果 | 1.0 |
-  | Expert-reviewed 技術文件（如 gtmc-database） | 0.85 |
-  | 官方文件 / Wiki | 0.7 |
-  | 社群討論（如已審核的 dictionary entry） | 0.55 |
-  | AI 推論（未經人工審核的 candidate） | 0.3 |
+## 5. 最終檢查的最小實作
 
-- **`directness`**：證據是否直接回答 subquestion，還是要經過額外推論鏈才連得上（人工標註或由 Claim Extraction 階段的 AI 抽取信心分數帶出）。
-- **`verification_weight`**：`review_status='approved'` 為 1.0，`pending` 打七折，`disputed` 打三折，`rejected` 直接排除不進 workspace。code 證據的 `review_status` 以 `code_annotations` + `relations(IMPLEMENTED_BY)` 為準，不以 `code_symbols` 本身判斷（`code_symbols` 只存事實，無審核狀態）。
+先驗證所有引用是否由工具取得、locator／version／permissions 是否有效，
+再讓 Agent 修正 unsupported 或範圍過大的關鍵敘述。對一般文字不做全量離線 Claim extraction；
+對答案評估可按需拆 factual statements，這只用於 verification／benchmark，不把它們全部入 memory。
 
-**這個公式本身不是寫死的全域常數**：不同 `query_type`/Claim 類型可以覆蓋 `source_authority` 表（例如 `debugging` 類問題應該把 code evidence 的權重拉得比一般問題更高），實作上把上表當作 per-query_type 可覆蓋的 policy，不是硬編碼進 `compress()` 函式本體。
+若失效在研究期間發生，最終交付前重新檢查被重用的 validation generations；
+失配的部分補查或明示 unresolved，不用舊 prompt 中的 verified 標籤當永久通行證。
+沒有足夠來源仍可回答哪些部分已知、如何測試，但不得標成完整已驗證結論。
 
-- **Deduplication**：優先用 `source_id` 精確去重，其次用 summary embedding 相似度。
-- **Token budget**：Evidence Workspace 對「進 LLM 的量」設獨立 budget（與 tool call budget 分開管理），例如固定 8K tokens 給證據區塊，超出時只保留摘要 + full_ref，讓 Strong LLM 需要時才顯式要求展開（可設計成 Strong LLM 也能呼叫 `read_document_section` 一次，但次數受限）。
+## 6. 私人 corpus 的來源與權限延續
 
----
+沿用已有 source-policy 的來源界定、署名與 export 限制，但不把其 `trust_level=high`
+（主要表示授權／來源可追溯）當作 factual accuracy 分數。
+文件研究权限與答案輸出权限分開：允許讀私人材料的 Agent，不代表可對任意 client 輸出内容。
+衍生 Finding 必須保留所依據來源的 access constraints，merge 不會把 private 資料洗成 public。
 
-## 19. Evidence Package Schema
-
-```python
-class EvidencePackage(BaseModel):
-    question: str
-    environment: dict
-    verified_claims: list[ClaimRef]      # review_status=approved
-    candidate_claims: list[ClaimRef]      # 明確標記未審核
-    mechanisms: list[MechanismRef]
-    constraints: list[ConstraintRef]
-    execution_paths: list[CodePathRef]    # call graph 摘要，非原始碼全文；每段保留 code_version_id + mapping + fqcn + signature + file/line + hash
-    counterevidence: list[EvidenceRef]
-    experiments: list[ExperimentRef]
-    unknowns: list[str]                   # 明確列出未覆蓋項目，來自第12節 checklist
-    source_snippets: list[SourceSnippet]  # 少量必要原文引用，附出處
-    sufficiency: SufficiencyChecklist     # 附上第12節 checklist 結果，讓 LLM/使用者知道信心邊界
-```
-
-Prompt 組裝規則：`verified_claims` 與 `candidate_claims` **視覺上與語意上都要分開呈現**（不同段落，明確標籤），系統 prompt 明確指示 Strong LLM「不可將 candidate_claims 當作已驗證事實」，並要求輸出時援引 `claim_id`/`source_snippet.id`，這是第20節 Final Claim Verification 能自動比對的前提。
-
-> **白話說**：這份 Evidence Package 就是館員（Orchestrator）交給撰稿人（Strong LLM）的研究筆記，格式明確規定「哪些是查證過的事實」「哪些只是還沒證實的線索」「哪些地方查不到資料」都要分開列，而不是揉成一段連續的文字敘述交出去——這樣撰稿人才不會不小心把「有人在論壇這樣講」寫成「已驗證這樣運作」，讀者也才能一眼看出這份分析報告的信心邊界在哪裡。
-
----
-
-## 20. Final Claim Verification
-
-**白話說**：這是整個系統最後一道防線——LLM 寫完答案之後，還要把答案「拆句」，逐句反查資料庫核對是不是真的說得出證據，而不是寫完就直接送出去。能用資料庫查證的，優先用查的（快、準確、不會被文字表面說服），只有真的查不出來、屬於語意推論的句子，才讓另一個 AI 去判斷合不合理。
-
-```mermaid
-flowchart TD
-    Draft["LLM Draft Answer"] --> Split["Claim Splitter（規則+輕量LLM）<br/>拆成 atomic 陳述句，各自綁定引用的 claim_id/symbol_id"]
-    Split --> Route{"這句話宣稱了什麼？"}
-    Route -->|"引用具體 claim_id"| C1["claim_has_evidence(claim_id)<br/>直接查 PG"]
-    Route -->|"宣稱 A calls B"| C2["call_edge_exists(A,B)<br/>查 code 邊（版本內，需帶 code_version_id，不跨 mapping 混查）"]
-    Route -->|"宣稱 X requires Y"| C3["relation_exists(X, REQUIRES, Y)"]
-    Route -->|"宣稱版本限定"| C4["version_matches(claim_id, environment)"]
-    Route -->|"宣稱有實驗佐證"| C5["experiment_exists(claim_id)"]
-    Route -->|"純語意/推理，查不到具體記錄"| C6["AI verifier：對 Evidence Package<br/>做 entailment 判斷（最後手段）"]
-    C1 & C2 & C3 & C4 & C5 & C6 --> Agg["彙總：verified / unsupported / contradicted"]
-    Agg -->|"全部 verified"| Final["送出最終答案"]
-    Agg -->|"有 unsupported/contradicted"| Retry["觸發二次生成（附驗證失敗原因）<br/>或在答案中標註不確定性"]
-```
-
-**設計要點**：deterministic 檢查一律優先於 AI verifier，AI verifier 只處理「陳述句本身無法對應資料庫具體記錄，但需要判斷是否被證據語意涵蓋」的剩餘案例，把 AI 判斷的比例壓到最低，這樣整個系統的可信度才立得住。
-
----
-
+一般日志不存 tokens、完整私人原文或 query。Raw 永久保存與研究事件 retention 分開管理；
+刪除低 utility 的索引 projection 不影響原始來源、revision 或過往引用可追溯性。
