@@ -38,3 +38,13 @@
 
 閱讀時請區分 **實測現況、建議設計、待驗證假說**。任何「能力提升」都要回到 benchmark，
 任何「已實作」都要能指向本 repository 的程式與執行結果。
+
+## 參考文獻
+
+- Cao et al. 2026. Remember Me, Refine Me: A Dynamic Procedural Memory Framework
+  for Experience-Driven Agent Evolution. *Findings of ACL 2026*, pp. 16803–16822.
+  （ReMe：procedural memory 三機制——multi-faceted distillation、context-adaptive
+  reuse、utility-based refinement；memory-scaling 效應：  Qwen3-8B＋記憶勝過無記憶的
+  Qwen3-14B（BFCL-V3＋AppWorld 平均 55.03% vs 54.65%）。本計畫的 admission／
+  consolidation／invalidation 與效率論述對齊此框架。程式碼見
+  https://github.com/agentscope-ai/ReMe。）

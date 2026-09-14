@@ -156,6 +156,11 @@ LLM judge 只作輔助，需與人工校準，不让生成模型無監督自評�
 2. 比較新模型 stateless、新模型＋舊 memory、新模型＋自己可用的同预算 memory。
 3. 固定 retrieval contract 作主要比較；encoder 更換需重建索引時，另計其成本。
 4. 檢查舊 memory 是否造成 anchoring／版本錯誤，與可節省的研究量一起報。
+5. 加測 memory-scaling 效應：小模型＋舊 memory 對更大模型 stateless，同 budget 下比較。
+   ReMe 在 BFCL-V3＋AppWorld 實測 Qwen3-8B＋記憶 55.03% 勝過無記憶 Qwen3-14B 54.65%，
+   本實驗以此為對照基準；若在 Minecraft 領域復現，即效率護城河的直接證據。
+   注意論文限制：其 retrieval 每題只取一次、驗證主要靠 LLM-as-judge；本計畫的
+   gap-only 多輪與人工 review 若做出更大差距，需確認增益來源，不可直接歸因於記憶。
 
 這測的是可轉移研究資產，而非保證任何未來模型必然受益。
 模型越強若收益變小也是有價值的結果，應分析是否 corpus 搜尋／revision 管理仍提供穩定價值。

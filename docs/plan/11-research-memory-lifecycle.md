@@ -18,7 +18,9 @@ Research Finding 是一個經過一定研究成本、未來有重用價值的結
 
 Admission 先用 Strong Agent 的簡短理由＋policy checks：研究成本、跨來源程度、
 可重用性、版本敏感性、典型適用問題、條件完整性與 provenance。
-不先發明一個精確 utility 分數；之後用實際 reuse／review 成本校準。
+蒸餾時按三面向記錄——成功模式、失敗觸發、比較洞見（ReMe 的 multi-faceted
+distillation，見參考文獻 Cao et al. 2026），讓後續不同情境能情境感知重用，
+而不只存結論文字。不先發明一個精確 utility 分數；之後用實際 reuse／review 成本校準。
 不保存也記 `finding_not_saved` 原因，才能評估 admission 是否漏掉有價值成果。
 
 負面 Findings 必須有搜尋 corpus snapshot、查詢範圍與時間；新增相關 corpus 後應重查。
@@ -31,7 +33,8 @@ MVP 不自動以負面 finding 支撐普遍不存在的結論。
 - title／statement：可重用的结論，不嵌入這次使用者的完整問題。
 - reasoning_summary：簡短可查證的依據摘要，不保存私有 chain-of-thought。
 - conditions／exceptions：版本、環境、容器狀態與時序前提。
-- domain concepts／typical questions：讓未來不同 wording 能找到它。
+- domain concepts／typical questions：讓未來不同 wording 能找到它（對應 ReMe 的
+  scenario ω＋keywords κ：什麼情境用、什麼工具鏈，檢索時按情境 embedding 找，不只按結論文字）。
 - sources：相關文章段落與精確 code methods，分 supports／contradicts／context／derived_from。
 - dependencies：哪些 source、method、tag 或上游 Finding 改動要重查。
 - validation：provisional 或特定 scope 的 verified 等状态，含查證人與時間。
@@ -72,7 +75,13 @@ MVP 人工 review 才可升格 verified。Agent 不能在 submit payload 中指�
 
 - 完全相同 idempotency key、相同 candidate payload／receipts：不重複寫入。
 - Strong LLM few-shot 提供 consolidation 建議，记录模型與 prompt。
+- 寫入採 selective addition（ReMe 實證）：只從成功軌跡蒸餾，單次失敗的教訓只在重試成功後保留，
+  否則丟棄不入池；失敗重試設上限，避免模型自身限制造成無限迴圈。
 - 新 provisional 的獨立保存可自動完成；語意 merge／supersede／影響 verified 的操作先人工確認。
+- 剪枝用效用規則：某 Finding 被取回 f 次、成功貢獻 u 次，當 f≥α 且 u／f＜β 時移除
+  （ReMe 的 utility-based deletion；α、β 由 pilot 校準，先保守）。
+- LLM-as-judge 只作第一道過濾（actionable／accurate／valuable＋相似去重），
+  ReMe 自陳其可能遺漏細微品質問題；本計畫 verified 一律要人工 review，比論文更嚴。
 - 自動規則可降低可用性，例如收到有效反證提案先排 revalidation；不能自動升格 verified。
 - 合併結果保存 candidate、比對目標、decision、rationale、差異與 sources；可追查錯誤 merge。
 - 人工 review 不必在線阻擋答案，寫入可先排隊。benchmark 分別記 foreground 與等待／review 成本。
@@ -172,7 +181,9 @@ diff／新版本 locator，以及受影響的 needs。Agent 只查變動部分�
 
 ## 9. 記憶長期成長與健康度
 
-先以 admission 控量，再做相似候選比較與周期 consolidation。
+先以 admission 控量，再做相似候選比較與周期 consolidation，並按實際 reuse／review
+成本做 utility-based refinement：加入已驗證成果、剪除過期低價值者，保持記憶緊湊高品質
+（ReMe 第三機制，見參考文獻）。
 低 reuse 但高成本／稀有用途的 Finding 不因不熱門立即刪除；可從 active index 降權或移到
 archive projection，保留 PG、provenance 與歷史。需監測：
 

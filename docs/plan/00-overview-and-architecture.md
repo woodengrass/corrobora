@@ -122,6 +122,12 @@ src/corrobora/                 # 建議結構，目前尚未建立
 2. accuracy、evidence correctness 與回答完整度維持或提高，不能靠少答換省錢。
 3. 更新後 stale error 下降，重新驗證成本低於完整重研。
 4. 新 Agent 模型可讀取同一份研究資產，不需重訓或重建所有 Findings。
+5. 小模型＋記憶在同 budget 下不輸更大無記憶模型（memory-scaling 效應）。
+
+第 5 點是本系統三五年不過時的論據：RAG 每次重付檢索與上下文成本且不累積，
+模型越大成本越高；此處累積的是可轉移、可驗證的 procedural 研究資產，
+模型越強其重用價值越高。ReMe（Cao et al. ACL 2026 Findings）已實證
+Qwen3-8B＋記憶勝過無記憶的 Qwen3-14B，見[模型接棒實驗](12-longitudinal-experiment.md)。
 
 最先做 Documents + Memory 的閉環，加上目前已有 source 的直接閱讀能力。
 graph expansion、進階 program analysis、blueprint structural understanding、distillation
