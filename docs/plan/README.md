@@ -23,6 +23,7 @@
 | [10 現況與架構遷移](10-current-state-and-migrations.md) | 實際有哪些 code／資料？哪些沿用、重構、移除或尚不存在？ |
 | [11 Research Memory 生命週期](11-research-memory-lifecycle.md) | Finding admission、consolidation、invalidation 如何可實作？ |
 | [12 Longitudinal Experiment](12-longitudinal-experiment.md) | 如何公平測量累積效果、版本更新與模型接棒？ |
+| [13 文獻與完整度](13-related-work-and-completeness.md) | 哪些外部工作可直接補強記憶、標註與評測？ |
 
 `03-ingestion-and-claims.md` 保留既有檔名以維持連結，內容已改為文件攝取與按需研究成果。
 `01` 是人可讀的邏輯 schema 與完整性約束提案，不是可直接執行的 migration；
