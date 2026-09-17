@@ -37,6 +37,10 @@ coverage_status, missing_parts, rationale, assessment_at`。
 | `uncovered` | 沒有足夠成果或搜尋未能確認 | fresh search；區分檢索失敗與 corpus 真空 |
 | `stale` | 有關成果需 revalidation 或已知不再有效 | 定位原依賴與變動部分 |
 | `contradictory` | 同 scope 存在未解决反證／disputed | 比較版本、條件與來源，不任選最高分 |
+| `harmful` | 重用該成果反而答錯（噪聲／過期記憶誤導，見 SealQA） | 降級為線索模式，該 family 停用 memory 臂並記 reuse-harm |
+
+某 family 上 memory 臂顯著差於 stateless（見 `12` reuse-harm 指標）即自動降級，
+不等待人工介入；降級只影響該 family 的重用政策，不刪除記憶本身。
 
 先以 deterministic 檢查版本、環境、權限、validation status、dependency generation；
 再由 Agent 評估語意是否涵蓋、哪些条件缺失。不能僅以 cosine > threshold 或 evidence count
@@ -46,6 +50,12 @@ coverage_status, missing_parts, rationale, assessment_at`。
 搜尋服務失敗時標 `retrieval_incomplete`，不是 uncovered 的確定標籤；reranker 沒命中也不能
 推導「整個 corpus 沒資料」。Knowledge gap 評估至少區分使用者缺少條件、memory 缺口、
 raw corpus 缺口與工具失敗，並允許問使用者或停止。
+
+### 時間感知（版本／時間敏感查詢）
+
+版本比較本質是時間推理。time-aware 索引＋查詢擴展（LongMemEval 實測 recall ＋11.3%）：
+值按事件日期加索引，查詢時先抽時間範圍再 filter，不把「找不到」當「沒資料」。
+`01` 的 `revision_at`／`captured_at` 已具備欄位，此處只加查詢行為，不加 schema。
 
 ### 貫穿例：漏斗處理系統
 

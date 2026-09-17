@@ -80,6 +80,7 @@ Invalidation-off 組只在封閉 benchmark 中測舊知識風險；正常系統�
 | 記憶健康 | duplicate findings、false merges/splits、成長數、Memory Utility Rate、association reuse |
 | 覆蓋 | Knowledge Gap Detection Accuracy、五類 confusion matrix／macro-F1、false-covered rate、need omission rate |
 | 失效 | affected-finding precision/recall、propagation lag、revalidation cost、historical-validity preservation |
+| 重用傷害 | Reuse-harm rate：memory 錯而 stateless 對的題比例；觸發 `04` harmful 降級的門檻線 |
 
 重要衍生指標：
 

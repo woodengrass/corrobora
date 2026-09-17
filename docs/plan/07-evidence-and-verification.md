@@ -77,6 +77,11 @@ Evidence Package 可作這份回應的相容名稱，不再是独立 ontology／
 失配的部分補查或明示 unresolved，不用舊 prompt 中的 verified 標籤當永久通行證。
 沒有足夠來源仍可回答哪些部分已知、如何測試，但不得標成完整已驗證結論。
 
+模型自報信心、相似分數一律只作排序提示，不作機率使用（BrowseComp 實測
+calibration error 65–91%，模型不會表達不確定）。verified 只認人工 review、
+deterministic check 與 held-out 實測校準；任何 `confidence` 欄位不得寫入
+Finding 當作可信度事實。
+
 ## 6. 私人 corpus 的來源與權限延續
 
 沿用已有 source-policy 的來源界定、署名與 export 限制，但不把其 `trust_level=high`
