@@ -14,12 +14,13 @@ Agent 已能讀大型程式庫、追蹤方法、比較執行路徑、理解長�
 真正需要累積的是：私人資料的索引、曾經花費研究成本得到的結論、結論的來源與適用範圍，
 以及資料變動後哪些結論必須重新查證。
 
-本系統不是訓練一個固定的領域專家模型，而是為強通用 Agent 建立可持續累積的專業研究環境。
-Agent 首先檢索既有 Research Findings，判斷已知知識與研究缺口，只對缺失部分搜尋大量
-未整理專業文檔、原始碼及其他私人資料；高價值研究成果經 provenance 綁定、consolidation
-與 version/dependency 管理後寫入 Research Memory。後續問題重用已有成果；相關來源變動時，
-受影響成果進入重新驗證狀態。這使 **non-parametric continual domain learning** 成為可驗證的
-研究假說，而不是把記憶容量增加直接視為學習成功。
+本系統不是訓練一個固定的領域專家模型，而是建立來源可追溯、版本化、可重現的研究基礎設施。
+持久化的 Findings 只是其中一種重用機制，是否省成本又不降品質，需經基線對照與消融實驗驗證，
+不預設 memory-first 最優。Agent 可走檢索／研究策略的多條路徑：直接沿用既有 Findings、
+直接研究原始 corpus、Findings 加新證據佐證後再用，或僅在缺口處補研；高價值研究成果經
+provenance 綁定、consolidation 與 version/dependency 管理後才寫入 Research Memory，
+來源變動時進入重新驗證狀態。此處若沿用 non-parametric continual domain learning 一詞，
+一律指待驗證假說／歷史用語，不代表已實現持續學習。
 
 第一個驗證領域是 Minecraft Technical／生電。模組邊界盡量領域中立；版本、mapping、
 機器結構等具體知識仍由 Minecraft adapter 表達，不為尚未出現的領域預建 ontology。
@@ -46,10 +47,17 @@ Agent 首先檢索既有 Research Findings，判斷已知知識與研究缺口�
 flowchart TD
     User[使用者 / 外部 Agent] --> API[FastAPI / Research Tools]
     API --> Agent[Strong Agent：研究與整合]
-    Agent --> Memory[Finding Search：memory-first]
-    Memory --> Gap[Agent Coverage / Gap Assessment]
-    Gap -->|已有足夠適用成果| Answer[整合答案、引用與未知項]
-    Gap -->|缺失 / 過期 / 矛盾| Research[JIT Fresh Research]
+    Agent --> Policy[Retrieval / Research Policy：非強制 memory-first]
+    Policy --> F[Findings Search：既有成果候選]
+    Policy --> R[Raw Corpus Research：直接重研]
+    Policy --> C[Findings + Fresh Corroboration：舊成果加新證據佐證]
+    Policy --> G[Gap-only Research：僅對缺口補研]
+    F --> Cover[Agent Coverage / Gap Assessment]
+    R --> Cover
+    C --> Cover
+    G --> Cover
+    Cover -->|可直接回答| Answer[整合答案、引用與未知項]
+    Cover -->|需補研| Research[JIT Fresh Research]
     Research <--> Docs[Document Search → Section / Article 閱讀]
     Research <--> Code[Repo Search / Lightweight Code Graph → 實際 source]
     Research <--> Machines[Machine Catalog / Blueprint 資產]
@@ -58,8 +66,8 @@ flowchart TD
     Write --> PG[(PostgreSQL：正式內容與歷程)]
     PG --> Index[可恢復的索引工作]
     Index --> Q[(Qdrant：raw_passages / research_findings)]
-    Q --> Memory
-    Q --> Docs
+    Q --> F
+    Q --> R
     Research --> Answer
     Write --> Answer
     Changes[Source / Code / Upstream Finding 變動] --> Invalidate[Dependency-aware Invalidation]
@@ -71,6 +79,8 @@ flowchart TD
 
 圖中的 gap assessment 是 Agent 可修正的研究紀錄，不是額外訓練的必備分類模型。
 檢索回傳候選後必須回 PostgreSQL 讀取有效狀態與權限；Qdrant payload 不決定真偽。
+檢索／研究策略不強制 memory-first，四條路徑（findings 沿用、原始重研、加佐證重用、僅補缺口）
+由 Agent 依 coverage 與成本選擇，並在評估中與無記憶基線對照。
 研究可以產生答案但不保存 Finding；保存失敗也不等於答案必須失敗，回應須分別報告兩者結果。
 
 ## 4. 三種不同的資料資產
@@ -122,12 +132,14 @@ src/corrobora/                 # 建議結構，目前尚未建立
 2. accuracy、evidence correctness 與回答完整度維持或提高，不能靠少答換省錢。
 3. 更新後 stale error 下降，重新驗證成本低於完整重研。
 4. 新 Agent 模型可讀取同一份研究資產，不需重訓或重建所有 Findings。
-5. 小模型＋記憶在同 budget 下不輸更大無記憶模型（memory-scaling 效應）。
+5. 不可接受的重用傷害必須量測並設停損：reuse-harm／negative transfer（沿用過期或不適用
+   Findings 導致的錯誤）不得高於無記憶基線，否則該重用路徑視為失敗。
 
-第 5 點是本系統三五年不過時的論據：RAG 每次重付檢索與上下文成本且不累積，
-模型越大成本越高；此處累積的是可轉移、可驗證的 procedural 研究資產，
-模型越強其重用價值越高。ReMe（Cao et al. ACL 2026 Findings）已實證
-Qwen3-8B＋記憶勝過無記憶的 Qwen3-14B，見[模型接棒實驗](12-longitudinal-experiment.md)。
+另設輔助實驗，不列為核心主張：小模型＋記憶在同 budget 下是否不輸更大無記憶模型。
+ReMe（Cao et al. ACL 2026 Findings）在此僅作強基線／相關工作，其經驗觀察為
+Qwen3-8B＋記憶在 BFCL-V3＋AppWorld 平均 55.03%，對照無記憶 Qwen3-14B 的 54.65%，
+見[模型接棒實驗](12-longitudinal-experiment.md)；是否在本 corpus 與任務上成立，
+仍需以本計畫的基線與消融結果為準。
 
 最先做 Documents + Memory 的閉環，加上目前已有 source 的直接閱讀能力。
 graph expansion、進階 program analysis、blueprint structural understanding、distillation

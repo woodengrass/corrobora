@@ -53,7 +53,7 @@
 | 舊設計 | 建議處置 | 理由／新定位 |
 | --- | --- | --- |
 | Python/FastAPI/Pydantic | 保留 | 與資料研究生態相容，邊界有型別驗證 |
-| PostgreSQL authority + Qdrant candidate index | 保留，提高優先級 | 研究記憶與索引分離，跨模型可重建 |
+| PostgreSQL authority + Qdrant candidate index | 保留，提高優先級 | 已評估的 baseline substrate，不是唯一 thesis；PG 權威、索引可重建，成效以後續 reuse／benchmark 證據判定 |
 | immutable source revisions、document revisions | 保留並補完 capture | bytes 快照而非只存可變原路徑 |
 | aliases／terminology | 保留，提高優先級 | 混語 corpus、社群詞與一詞多義仍需穩定管理 |
 | 一切先抽 atomic Claim 再人審 | 移除主線 | Documents 先可研究，Finding 只存高 utility 結論 |
@@ -71,8 +71,8 @@
 | BGE-M3 | baseline implementation | ports 解耦，不固定模型／維度 |
 | 專家 Domain LLM／CPT | 降出主線 | 強 Agent 使用外部記憶；只在高頻規律任務考慮訓練 |
 | vLLM／SGLang／多 serving backend | optional | 有本地推理負載才加入 |
-| Blueprint catalog | 保留，独立支線 | 人類作品實例，不是教模型機制的先決條件 |
-| Research sessions／benchmark | 提高優先級 | 把節省與錯誤传播變成可觀測、可反駁的研究 |
+| Blueprint catalog | 保留，獨立延伸支線 | 獨立於 Research Memory 主線的延伸，人類作品實例，不是教模型機制的先決條件 |
+| Research sessions／benchmark | 保留，提高優先級 | 高優先級，把節省與錯誤傳播變成可觀測、可反駁的研究 |
 
 ## 4. 現有 code：具體如何用
 
@@ -116,7 +116,7 @@ query-specific state machine、預生成 code summaries、Domain LLM 必備服�
 | P4：Claims→Findings | 原規劃 atomic statements→高價值 Finding revisions／validations | 如外部有 Claim：逐筆保留 ID 映射、review 與 sources，缺 scope／依賴先 provisional，不批次冒充 verified |
 | P5：Evidence／Graph | registry／Evidence ontology→typed finding_sources/dependencies/relations＋少量概念連結 | orphan/cross-scope 檢查；不推定所有 semantic edges 都是必要依賴 |
 | P6：Retrieval | 多 collections／code summaries→raw_passages＋research_findings | shadow build／alias cutover，PG hydration，壞 build 可回切 |
-| P7：Agent | 固定 planner／state→自主 tools＋memory-first／gap-only＋events | 同 C baseline 对照，budget／scope／寫入限制測試；feature flags 可停 gap／graph |
+| P7：Agent | 固定 planner／state→自主 tools＋按 arm 切換 retrieval policy＋events | 同 C baseline 对照，budget／scope／寫入限制測試；feature flags 可停 gap／graph |
 | P8：Code | 預排四工具→repo snapshot search/read＋light index | 使用現有 1.21.11、hash refs；進階工具 on/off 可比較 |
 | P9：Memory lifecycle | 無跨題成果→admission/consolidation/invalidation | 先 PG validity，再向量；worker crash／亂序／併發／間接失效測試 |
 | P10：Benchmark | 靜態 draft questions→versioned gold＋sequential streams | 保留舊資料與 status，新 rubric 另版；不得用覆寫 baseline 掩蓋失敗 |

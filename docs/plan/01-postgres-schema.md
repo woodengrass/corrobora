@@ -121,9 +121,17 @@ reasoning_summary + concepts + scope + status + sources + dependencies + timesta
 current_revision_id 僅是預設導航：查歷史版本仍須查所有符合目標 scope 的有效 revisions，
 不能因最新 revision 用於新版，就把仍有效的舊版研究從檢索中排除。
 
-`status` 允許 `provisional / verified / disputed / needs_revalidation / stale / superseded`。
+`reasoning_summary` 是簡短的推導說明，不是證據，也不是隱藏思考鏈的揭露。
+它只說明本 revision 由哪些來源與檢查組合得到，不能單獨支撐 `verified`；
+驗證仍須回到 `finding_sources` 的具體引用、`finding_validations` 的 scope
+與 `finding_reviews` 的檢查紀錄。
+
+`status` 允許 `provisional / verified / disputed / needs_revalidation / stale / superseded`，
+共六種，不另設 `forgotten` 或 `expired_by_time`。
 狀態屬 `finding_validations`；不存在另一個可以不同步的 `research_findings.status`。
 `verified` 表示通過指定驗證政策，不代表「模型覺得很有信心」；建立者不能自行賦值。
+`stale` 須由證據、版本或依賴變動觸發，例如來源修訂、scope 成員失效或上游 validation 轉態，
+絕不以 TTL 或經過時間自動判定。時間只影響排序與維護優先順序，不決定事實有效性。
 候選被拒絕是 admission outcome，記在 session／review，無須硬塞入 Finding 的有效性 enum。
 
 有效 scope 的成員不可重疊而產生兩個互相衝突的 active validation：相同 revision、相同環境
@@ -144,8 +152,12 @@ current_revision_id 僅是預設導航：查歷史版本仍須查所有符合目
 | `code_file_id` | 無 symbol 或涉及檔案／資源的 source locator |
 | `experiment_run_id` | 具體量測 run，不只 experiment 名稱 |
 | `upstream_validation_id` | 引用另一 Finding 的具體 revision／scope 有效性 |
-| `role` | `supports / contradicts / context / derived_from` |
+| `role` | `supports / contradicts / context / derived_from`，四種角色維持不變 |
 | `locator, quoted_text_hash, observed_at, note` | line range／record pointer 等，附當時觀測值 |
+
+角色不新增通用的失敗記憶型別。失敗經驗經由具體 `experiment_run_id`、
+來源引用或 observation 進入記錄，仍須指明是哪一次量測、哪一份來源、
+哪一個觀測結果，不能以無定位的失敗標籤取代引用。
 
 六種 target FK **恰有一個非 NULL**（PG `num_nonnulls(...) = 1`）。code 引用的 file、
 version、mapping 與 hash 從 symbol／file FK 解出；line range 額外限定片段，不能與檔案矛盾。
@@ -210,7 +222,7 @@ symbol 唯一鍵包含 code file、qualified name、kind、signature，overload 
 reference 另記 unresolved locator，不偽造 resolved call edge。line 為 1-based inclusive。
 樹 hash／commit ID 以實際取得值登記，不從資料夾名稱猜 Minecraft 版本。
 
-## 9. Episodic Memory 與背景工作
+## 9. 研究軌跡與執行存檔（Research Trace / Execution Archive）
 
 | 表 | 主要欄位 |
 | --- | --- |
@@ -221,11 +233,16 @@ reference 另記 unresolved locator，不偽造 resolved call edge。line 為 1-
 | `index_builds` | `id, target, encoder_contract, representation_version, corpus_snapshot, collection_name, state, high_watermark` |
 | `invalidation_events` | `id, change_key, target_ref, old_fingerprint, new_fingerprint, detected_at, affected_count, status` |
 
-events 包含 findings retrieved/used/rejected、passages retrieved/read、documents/code files opened、
-tools called、candidate/consolidation/revalidation outcome、coverage assessment、tokens、API cost、latency。
+events 包含 findings retrieved／read／used／rejected、passages retrieved／read、
+documents／code files opened、tools called、candidate／consolidation／revalidation outcome、
+coverage assessment、tokens、API cost、latency。其中 `retrieved` 僅表示被檢索回傳，
+`read` 表示已讀取內容，`used` 表示進入本次推導，`associated` 表示僅具關聯、
+`causally-helpful` 才表示對結論有因果幫助；五者不可混用，不能把檢索到等同於已採用。
 payload 裡核心 ID 使用有型別的 reference，入庫檢查存在性；事件保存的是當時事實，不跟 current pointer 改寫。
 general logs 不寫私人正文／token；session 原始 query 與回答屬受權限保護的研究資料。
 不要求模型揭露隱藏思考鏈，僅記錄外顯行動、簡短判斷理由與結果。
+`research_events` 是執行軌跡存檔，預設不進入 Finding 通用語意檢索；
+Trace 回答「當時做了什麼」，Finding 回答「目前可重用的結論」，兩者語意檢索分開。
 
 ## 10. 唯一鍵與交易邊界的落地提案
 

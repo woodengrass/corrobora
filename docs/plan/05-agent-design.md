@@ -19,7 +19,8 @@ Finding 寫入；不是控制 Agent 每一個中間推論。Query classification
 ## 2. Agent 必須知道與不必知道的東西
 
 每次 session 提供：使用者問題、edition／版本／環境與未定條件、可用 corpus、工具說明、
-budget、memory-first 原則，以及 Finding statuses／引用規則。
+budget、本次適用的 retrieval arm 政策（stateless／findings-assisted／gap-only，見 `04`），
+以及 Finding statuses／引用規則。不預設信任 findings；是否重用由 coverage 評估決定。
 不用暴露 Qdrant API 或 SQL；可直接給 Agent repo search／read_file 這類通用能力，
 不把每一種 Minecraft 問法包成獨立 tool。
 
@@ -51,7 +52,7 @@ corpus_snapshot, index_build_id`；不用任意 `dict | list[dict]` 當全系統
 服務端注入 source access constraints；Agent 不能透過傳入寬鬆 filter 提升權限。
 
 `POST /v1/ask` 接受 question、scope、budget profile，回傳 answer／citations／unresolved needs／
-session ID／usage／memory-write outcome。外部 coding/research Agent 也能直接使用相同工具；
+session ID／usage／findings-write outcome。外部 coding/research Agent 也能直接使用相同工具；
 MCP 可日後作薄 transport adapter，不是核心資料模型的依賴。
 
 ## 4. Budget 與停止
@@ -65,6 +66,8 @@ Agent 決定研究足夠時可停止；硬限制、取消或不可用工具時�
 停止可產生 `complete / partial / failed / cancelled` outcome；若缺必要資訊，回答清楚列出
 條件與未解項，不能為了通過固定 checklist 不斷繞圈。
 不要求所有 hypothesis 都已證明或反駁才能回答，保留尚未驗證的假設是合理研究結果。
+停止規則：若連續迭代未新增 coverage、未解决任何 contradiction、且未新增有效來源，
+即停止重試並以 `partial` 收斂，不為湊 checklist 空轉。
 
 單次 timeout 依工具設定，不用相同 5 秒套在 repo scan、向量查詢與長文章閱讀。
 第一輪以 pilot 量測設 budget profile；舊稿 90 秒／0.50 美元／15 秒回答不是已測得的 SLO。
@@ -74,7 +77,7 @@ Agent 決定研究足夠時可停止；硬限制、取消或不可用工具時�
 | Actor | 可做 |
 | --- | --- |
 | Research Agent | 讀授權資料、提出 provisional Finding／修訂／合併／反證 |
-| Memory write service | schema、provenance、版本與併發檢查後保存；維護 append-only 歷程 |
+| Findings write service | schema、provenance、版本與併發檢查後保存；維護 append-only 歷程 |
 | Invalidation worker | 依實際來源變動降低受影響 validation 的可用性，不能自動升格 verified |
 | Reviewer | 按明確 scope 與來源核准 verified／disputed／superseded，不能覆寫舊原文 |
 
@@ -82,15 +85,16 @@ MVP 的 verified 由人工 reviewer 明確核准，介面可為 CLI。provisiona
 provenance validation 與 admission 後即可存在，供後續研究定位，不需每個 raw paragraph 人審。
 日後可對可程式驗證命題加入受政策授權的独立 verifier，但 LLM 自評不等於 verification。
 
-## 6. Episodic Memory：可觀測的研究歷程
+## 6. 研究軌跡：可觀測的執行歷程（Research Trace）
 
-低成本保存 `research_sessions / research_events`，以 ID 與結構化 metadata 為主，
+低成本保存 `research_sessions / research_events`，屬歸檔用的執行軌跡，
+不是語義記憶（semantic memory）。以 ID 與結構化 metadata 為主，
 不把每次 tool 大段結果再複製一份全文。原文仍在 corpus，事件只保存當時 locator／hash。
 
 | 事件 | 用途 |
 | --- | --- |
 | session_started，query／scope／模型／budget | 比較相同設定的實驗 |
-| finding_retrieved / finding_used / finding_rejected | 區分命中與真正重用，計算 memory utility |
+| finding_retrieved / finding_used / finding_rejected | 區分命中與觀察到的重用次數；finding_used 只記重用頻率／觀察到的關聯，真實效果需 matched ablation 才能歸因 |
 | coverage_assessed / gap_updated | 分析 false-covered、漏拆子問題 |
 | tool_started / tool_finished / tool_failed | tool calls、retry、latency、retrieval failure |
 | passage_retrieved / passage_read / document_opened / code_read | 檢索候選與實際閱讀成本分開 |
@@ -101,8 +105,9 @@ provenance validation 與 admission 後即可存在，供後續研究定位，�
 query／final answer 存於受保護 session store，general logs 只留 ID 與計量；
 訓練資料日後另做來源授權與去識別化 projection，不假設全體 trajectories 都能公開或訓練。
 
-Events 的用途是 debug、回放工具結果、搜尋行為分析、建立未來 preference／next-action
-候選資料；**不進一般 Finding semantic index，也不把前次完整答案當 memory reuse**。
+Events 的用途是 debug、回放工具結果、搜尋行為分析；**不進一般 Finding semantic index，
+也不把前次完整答案當 findings 重用**。未來 skills／preference／next-action 生成屬 out-of-scope，
+暫不設計（parked），不以本軌跡聲稱技能學習收益。
 不能聲稱「完全重播模型思考」；可重播的是相同 tools／來源快照與保存的輸出。
 
 ## 7. 工程形態

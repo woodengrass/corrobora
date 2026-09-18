@@ -21,6 +21,8 @@ Documents 的資料工程仍是主線：metadata、語言、章節與位置越�
 **移除「所有原文必須先經 AI triage→Claim→人審，才能被研究」的前置依賴。**
 資料可供研究、來源可公開、內容是否可信、Finding 是否 verified 是四個不同維度。
 有矛盾的社群文章是研究材料，不應因為不適合直接作答案而在 raw search 中消失。
+攝取只產生可研究的原文基底，不是記憶貢獻；是否成為 Finding 由後續研究與
+admission 決定，執行過程的事件屬研究軌跡存檔，不直接進入 Finding 語意檢索。
 
 ## 2. 原始層與索引層的保留策略
 
@@ -96,6 +98,7 @@ Finding 在研究完成後提出，使用[admission 與 consolidation](11-resear
 全量 `claim_extract`、Flash→Pro 強制分流與 corpus-wide graph extraction 從主線移除。
 過去人工整理的高價值 Claim 未來可經 provenance／scope 稽核轉為 Finding，
 並非把歷史所有 atomic statements 自動搬成 memory。
+攝取順序與時間僅影響處理優先順序，不決定內容有效性。
 
 ## 6. 沿用 fixture 的方式
 

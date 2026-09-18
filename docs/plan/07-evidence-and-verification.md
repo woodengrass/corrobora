@@ -13,7 +13,7 @@ Evidence 不再是一套獨立龐大的知識實體系統，而是 **Finding 與
 | Code | 具體 snapshot/version/mapping、symbol/file/range/hash | 讀到分支不代表 runtime 一定走該分支 |
 | Experiment | protocol、run、環境、量測與 raw logs | 一次結果不代表任意硬體／版本普遍成立 |
 | Finding | revision、scoped validation、來源與依賴鏈 | verified 標記不能替代適用條件檢查 |
-| Agent 推論 | reasoning_summary、假設、支持／反對來源 | 自信或 another LLM agreement 不等於已驗證 |
+| Agent 推論 | reasoning_summary、假設、支持／反對來源（屬 interpretation／hypothesis，不是 evidence） | 無 source／code／experiment 支持的 reasoning_summary，不能靠 LLM agreement 或 self-reflection 升格為已驗證 |
 
 ## 2. 引用存在，不等於結論被證明
 
@@ -24,6 +24,8 @@ Evidence 不再是一套獨立龐大的知識實體系統，而是 **Finding 與
 
 語意 entailment、條件充分性與跨來源推理仍由 Agent／reviewer 評估。
 可用独立 LLM verifier 做 baseline，但它的意見是檢查結果，不是自動 truth stamp。
+Agent reasoning 與 self-reflection 只產生待驗證的 interpretation／hypothesis；
+未附來源支持前，不因多模型一致或自我覆核而提升證據等級。
 重要設計／量測題需要相稱的來源，不能用通用 source authority 乘積公式替代判斷。
 
 ## 3. Finding 的 verified 政策

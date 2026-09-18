@@ -4,11 +4,11 @@
 
 ## 1. MVP 的問題
 
-**在相同強 Agent 與資料條件下，保存可追溯 Findings、先找記憶再補缺口，
-是否能減少重複研究，而不因漏答或過期記憶降低品質？**
+**在相同強 Agent、相同 corpus、相同 budget 下，persistent 且 source-grounded 的 Findings
+在什麼條件下能減少重複研究、在什麼條件下造成 negative transfer，同時保持答案與證據品質？**
 
-MVP 是測量方法與架構閉環，不是論文結論。小樣本用來找問題與估計成本／變異，
-不能因 15 題通過就宣稱 continual learning 已成立。
+MVP 是 infrastructure evaluation，不是最終 contribution。小樣本用來驗證 produce／save／retrieve／revalidate
+是否穩定運轉，並量測 gain／harm 與成本／變異；不能因 15 題通過就宣稱 continual learning 已成立。
 
 ## 2. 最小範圍
 
@@ -18,13 +18,13 @@ MVP 是測量方法與架構閉環，不是論文結論。小樣本用來找問�
 | Raw | bytes snapshots、dual hash、document revisions、sections/passages、links、來源政策 |
 | Retrieval | dense＋lexical baseline、alias lookup、section/article expansion；ports 可換模型 |
 | Memory | Finding revisions、scoped validation、sources/dependencies/relations；兩層 Qdrant index |
-| Agent | 一個 strong provider adapter、自主多輪研究、memory-first＋gap record、budget |
+| Agent | 一個 strong provider adapter、自主多輪研究、按實驗 arm 切換 retrieval policy＋gap record、budget |
 | Consolidation | exact idempotency＋相似 Finding 比較提案＋最小 review CLI |
 | Invalidation | 文檔 revision／上游 Finding 的反向依賴傳播與按需重查，先單一精確版本 validation |
 | Code | 使用現有本機 1.21.11 source 的 search/read＋snapshot/file/range/hash；小範圍 symbol index spike |
 | Sessions | 查詢、讀取／重用、工具、tokens/cost/latency、結果與維護成本 |
 | Catalog | 資產與 81 筆機器 baseline 保留；catalog 移植可平行，不阻塞 memory 核心 |
-| Benchmark | 既有題目重新標註成 pilot stream，raw agent vs memory vs gap-only；可控制的更新事件 |
+| Benchmark | 既有題目重新標註成 pilot stream，至少比較 raw-stateless、findings-assisted、findings+full-fresh、findings+gap-only，並附 matched memory-on/off diagnostic；可控制的更新事件 |
 
 MVP 前半先建立 Documents＋stateless Agent baseline；後半才加入 Findings 與 lifecycle。
 Tree-sitter 全 repo edges、graph associative expansion、自動 semantic merge 都不是閉環前置。
@@ -72,8 +72,9 @@ code file 級 dependency 已可驗證變動管線，symbol-body 粒度在後續�
 
 - 15–20 題 pilot（包含相關不同題、部分重用、新主題及至少一個更新事件）；
   逐題標 expert rubric、必要 evidence／scope，記錄未通過與不能回答的題。
-- raw agent、memory、gap-only 使用同一 Agent、corpus、budget，輸出相同評分欄位。
+- raw-stateless、findings-assisted、findings+full-fresh、findings+gap-only 使用同一 Agent、corpus、budget，輸出相同評分欄位，並附 matched memory-on/off diagnostic。
 - 同時报告 accuracy／完整度、來源正確、false-covered、stale errors、成本与维护工作量。
+- 成功定義為 produce／save／retrieve／revalidate 穩定運轉，並量測出 gain／harm，而非宣稱 continual learning 已成立。
 - 若節省成本但 accuracy 或完整度下降，MVP 工程可能完成，研究假說仍未成立，先分析原因。
 
 ## 6. 功能取捨

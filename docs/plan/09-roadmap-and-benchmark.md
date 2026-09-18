@@ -2,23 +2,26 @@
 
 # Roadmap 與可驗證的研究問題
 
-## 1. 主研究問題
+## 1. 主研究問題（baseline 評估框架）
 
-在強通用 Agent 已能優秀理解專業資料的前提下，具有 provenance、consolidation 與
-dependency-aware invalidation 的 Research Memory，能否讓 Agent 在大型未整理 corpus 上
-形成有效的 **non-parametric continual domain learning**？
+本計畫的主問題是基礎設施／基線評估問題：在相同任務、相同模型、相同工具、
+相同 corpus 快照下，Research Memory（含 provenance、consolidation、
+dependency-aware invalidation）能否減少重複研究並維持品質，以及在什麼條件下
+有益、有害或無差別。
 
-這不是已證實結論。研究需要把「多了可用資料」「重複問相同答案」「少回答」與
-「真正重用研究知識處理新問題」分開。
+ novelty 問題（是否構成新的 continual learning 機制、是否超越既有 memory／
+ RAG／invalidation 方法）本次不主張，延後到 baseline 成立且有受控比較後再談。
+ 研究需要把「多了可用資料」「重複問相同答案」「少回答」與
+ 「真正重用研究知識處理新問題」分開。
 
-| RQ | 可檢驗假說 | 主要對照／指標 |
+| RQ | 可檢驗假說（baseline 口徑） | 主要對照／指標 |
 | --- | --- | --- |
-| RQ1 | Findings 減少重複研究且 accuracy 不劣化 | C vs D；accuracy、evidence correctness、總研究成本 |
-| RQ2 | Memory-first＋gap-only 比整題 fresh search 更省，仍覆蓋必要条件 | D vs E；tokens、tool calls、完整度、false-covered |
-| RQ3 | Consolidation 減少重複而不傷 retrieval quality | E vs F；duplicate rate、false merge/split、recall、維護成本 |
-| RQ4 | Dependency invalidation 降低更新後 stale knowledge errors | 同配置 invalidation on/off；stale error、detection precision/recall、revalidation cost |
-| RQ5 | Associative expansion 幫助跨文章／多跳／設計題 | F vs G；multi-hop evidence recall、答案品質、extra reads |
-| RQ6 | 研究次數增加時，新題可重用比例上升，品質維持 | stateless vs sequential memory learning curves、固定 probe、跨模型接棒 |
+| RQ1 | Findings 作為 baseline，能否減少重複研究且 accuracy 不劣化 | C vs D；repeated reduction、accuracy、evidence correctness、總研究成本 |
+| RQ2 | memory-first／gap-only／full-fresh 各在什麼條件下有效、有害或無差別，不預設 gap-only 較優 | C vs D vs E；accuracy-delta、cost-delta、tokens、tool calls、完整度、false-covered、reuse-harm |
+| RQ3 | Consolidation 作為工程正確性 baseline：減少重複而不傷 retrieval quality，不主張新穎方法 | E±consolidation；duplicate rate、false merge/split、recall、維護成本 |
+| RQ4 | Dependency invalidation 作為來源變更維護 baseline：降低更新後 stale knowledge errors；dependency-guided rollback 已有先前工作，本項只做維護基線 | 同配置 invalidation on/off；stale error、detection precision/recall、revalidation cost |
+| RQ5 | Associative graph expansion 只作條件式 ablation：只在指定題型有效且能支付成本時採用 | F±graph；multi-hop evidence recall、答案品質、extra reads |
+| RQ6 | Longitudinal external-research-asset reuse curve：研究次數增加時，新題重用比例、品質、negative transfer、維護成本、portability 如何變化；不主張模型學會了領域知識 | stateless vs sequential memory reuse curves、固定 probe、跨模型接棒、negative transfer 報告 |
 
 ## 2. 建議開發路線
 
@@ -42,7 +45,9 @@ Catalog 遷移可與 M1/M2 平行；Blueprint 結構研究與自動遊戲測試�
 
 ## 3. A–H 比較組的操作定義
 
-所有主比較使用相同 base Agent 模型、版本、工具權限、corpus 快照與 budget 上限。
+所有主比較遵循 matched memory-on/off 原則：相同任務、相同模型版本、
+相同 prompt、相同工具權限、相同 corpus 快照與相同 budget 上限，只有指定
+memory 特徵開關不同。
 
 | 組 | 定義 | 用來回答什麼 |
 | --- | --- | --- |
@@ -60,7 +65,8 @@ D/E 仍有基本 idempotency、provenance、version filters 與寫入政策，�
 A 與 C 的區別是 **通用 lexical corpus 工具 vs 本系統 corpus retrieval/context infrastructure**，
 不是兩個含義模糊的「Agent 搜原文」。A 的 context 放不下時必須允許工具閱讀，不能直接截斷。
 
-累加 ladder 方便展示，但不是每一模組的因果隔離：主實驗另做 F±invalidation、
+累加 ladder 只是 ablation ladder，不是 novelty ladder：D–H 用來逐段隔離
+增量成本與風險，不代表每一段都是一個新穎主張。主實驗另做 F±invalidation、
 F±graph、E±consolidation 的 matched ablation。Code graph 對所有 memory 主比較組固定，
 其獨立效益再以 A/C 的 repo-only vs light-graph 比較。
 
@@ -77,12 +83,19 @@ Invalidation-off 組只在封閉 benchmark 中測舊知識風險；正常系統�
 | 更新風險 | Stale Knowledge Error Rate；更新後依過期結論造成錯答的受影響問題比例，與每 statement 率并列 |
 | 研究量 | Raw Passages Read、unique/repeated Documents Opened、Code Files/Ranges Read、tool calls；retrieved≠read |
 | 成本 | input/output/cached tokens、API calls/cost、wall latency p50/p95；維護、review、索引分列 |
-| 記憶健康 | duplicate findings、false merges/splits、成長數、Memory Utility Rate、association reuse |
+| 記憶健康 | duplicate findings、false merges/splits、成長數、Finding Reuse Rate、association reuse |
 | 覆蓋 | Knowledge Gap Detection Accuracy、五類 confusion matrix／macro-F1、false-covered rate、need omission rate |
 | 失效 | affected-finding precision/recall、propagation lag、revalidation cost、historical-validity preservation |
-| 重用傷害 | Reuse-harm rate：memory 錯而 stateless 對的題比例；觸發 `04` harmful 降級的門檻線 |
+| 重用傷害 | Reuse-harm rate：memory 錯而 stateless 對的題比例；只作獨立傷害指標，不與生產覆蓋枚舉掛鉤；各 family 的 reuse_policy（active/clue-only/disabled）門檻線另行校準 |
 
-重要衍生指標：
+重要衍生指標（計數與因果分開）：
+
+- **Finding Reuse Rate（計數用）**：後續題實際取用既有 Finding 的比例，只計
+  真正用於不同後續題的 uses，不以 retrieved 計 used；同題重試、單純改寫問句另列。
+  它只回答「用了多少」，不回答「是否因記憶而變好」。
+- **Outcome Delta／Memory Effect（因果主張用）**：在 matched memory-on/off
+  受控比較下的 accuracy-delta、cost-delta 與品質差；沒有同任務同模型同工具
+  同快照對照，不得把 Reuse Rate 當成因果增益。
 
 - **Repeated Research Reduction**：在相同問題 stream 的窗口 W，
   `1 - sum(raw_reads_memory[W]) / sum(raw_reads_stateless[W])`；denominator=0 時記 N/A。

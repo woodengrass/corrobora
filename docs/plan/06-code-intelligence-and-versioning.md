@@ -80,7 +80,7 @@ repo snapshot 粒度，承認較高 false invalidation 成本，透過 benchmark
 
 ## 5. Blueprint：人類做過什麼
 
-Blueprint database 與 mechanism research 平行演進，不阻擋 Documents／Memory。
+Blueprint database 與 mechanism research 平行演進，定位為 catalog／extension 支線，不阻擋 Documents／Memory。
 
 1. **Catalog**：先遷移 81 筆 machines，保存 name、author、description、tags、sub_id、
    filename、preview、原始排序與來源 revision。目錄存在不代表檔案已取得。
@@ -88,8 +88,7 @@ Blueprint database 與 mechanism research 平行演進，不阻擋 Documents／M
    同 machine 可有多種版本與 module。不可假定現在已有 4,000 個藍圖。
 3. **Association**：找到某 mechanism 的人類使用案例、可替代機器與可重用 module；
    tags→concept 關係是待確認的 interpretation，不把名字中「全速」當量測保證。
-4. **Structural research**：另立實驗，deterministic parse blocks/NBT/regions → 結構特徵 →
-   類似機器／component retrieval。靜態結構不能直接证明實際效率或可靠性。
+4. **Extension 支線**：結構理解、效率驗證、動態測試皆屬獨立 extension，不屬 Documents／Memory 核心閉環；本文件不新增結構特徵、3D 編碼、功能模擬或相關模型內容。
 
 現有機器 metadata 中 name、tags、description 可能給出不同適用版號，必須保留矛盾，
 不能採第一個字串就標整機 verified。source_removed_at 延續「來源消失不等於審核否定」的設計。

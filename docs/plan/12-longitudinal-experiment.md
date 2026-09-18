@@ -1,12 +1,18 @@
 [索引](README.md) · [研究問題與 A–H](09-roadmap-and-benchmark.md)
 
-# Longitudinal Experiment：如何驗證研究能力持續累積
+# Longitudinal Experiment：如何驗證研究資產可重用
 
 ## 1. 實驗不是重複問同一題
 
 核心比較是 **Stateless Agent vs Research Memory Agent** 在一串相關但不同的研究問題上，
-隨經驗增加是否减少新檢索，同时維持品質。精確重複題／paraphrase 是診斷子集，
-不能用它們獨自宣稱 continual domain learning。
+隨經驗增加是否減少新檢索，同时維持品質。精確重複題／paraphrase 是診斷子集，
+不能用它們獨自宣稱 continual domain learning。曲線一律稱為
+**longitudinal／research-asset reuse curve**，不是 learning curve；
+它只描述外部研究資產的重用變化，不主張模型參數學會了領域知識。
+
+所有主比較採 paired memory-on/off：相同模型版本、相同 prompt、
+相同 corpus 快照、相同工具與權限、相同 budget／retry，
+只差 memory 開關；多種 topic order／多 seeds 重跑。
 
 本文件是待執行 protocol；目前沒有數百題 stream、gold annotations 或已跑結果。
 
@@ -128,11 +134,16 @@ oracle affected-set（只作診斷上限，不能當部署能力）。
 no-invalidation 組仍保留明確 version filters，所以若新版本本來就無適用 memory，
 不能聲稱其錯誤下降是 dependency 模組功勞；同 scope 來源修訂才可隔離此項效應。
 
-## 8. 曲線與統計
+## 8. 重用曲線與統計（longitudinal reuse curve）
 
+縱軸是 longitudinal／research-asset reuse curve，不是學習曲線：報告 repeated reduction、
+品質、negative transfer、維護成本與 portability，不作模型學會主張。
 Checkpoint 可設第 1／50／100／500 題，實際 stream 未達該長度就不報該點。
 每個窗口繪 raw reads、tool calls、tokens、cost、latency、accuracy／完整度、
 cross-topic reuse、duplicate／stale error，另給累計與 fixed-probe 表現。
+Negative transfer 作正式報告：每題記 helpful／neutral／harmful，
+特別統計 memory-wrong 而 paired stateless-correct 的題，
+以及 more-expensive-same-outcome（同分但多花成本）的題。
 
 先用 pilot 估計 variance，預先約定 accuracy non-inferiority margin（例如 3 個百分點只是
 待專家確認的設計起點），再規劃樣本與 power。成本下降必须在品質非劣性成立下解释。
@@ -148,27 +159,33 @@ LLM judge 只作輔助，需與人工校準，不让生成模型無監督自評�
 拒答、partial、timeout 全部留在 denominator，必要時另報 coverage-adjusted accuracy，
 防止系統只回答最簡單的部分來維持表面 accuracy。
 
-## 9. 模型接棒實驗
+## 9. 模型接棒實驗（portability test，非 continual-learning 證明）
 
-在固定 checkpoint 封存 PG memory、來源與模型無關 public IDs：
+本節只測研究資產的可攜性：換模型後舊 memory 是否可用、省多少、有何傷害；
+不能當作 continual learning 成立的證明。在固定 checkpoint 封存 PG memory、來源與模型無關 public IDs：
 
 1. 旧模型建立 memory；新模型讀同一 memory，不改參數、不預先重研究。
 2. 比較新模型 stateless、新模型＋舊 memory、新模型＋自己可用的同预算 memory。
 3. 固定 retrieval contract 作主要比較；encoder 更換需重建索引時，另計其成本。
 4. 檢查舊 memory 是否造成 anchoring／版本錯誤，與可節省的研究量一起報。
-5. 加測 memory-scaling 效應：小模型＋舊 memory 對更大模型 stateless，同 budget 下比較。
-   ReMe 在 BFCL-V3＋AppWorld 實測 Qwen3-8B＋記憶 55.03% 勝過無記憶 Qwen3-14B 54.65%，
-   本實驗以此為對照基準；若在 Minecraft 領域復現，即效率護城河的直接證據。
-   注意論文限制：其 retrieval 每題只取一次、驗證主要靠 LLM-as-judge；本計畫的
-   gap-only 多輪與人工 review 若做出更大差距，需確認增益來源，不可直接歸因於記憶。
+5. 加測 memory-scaling 效應只作輔助觀察：小模型＋舊 memory 對更大模型 stateless，
+   同 budget 下比較；「小＋記憶勝過大無記憶」若出現，只記為效率輔助信號，
+   不作主要結論。ReMe 在 BFCL-V3＋AppWorld 實測 Qwen3-8B＋記憶 55.03%
+   勝過無記憶 Qwen3-14B 54.65%，本實驗以此為對照基準；若在 Minecraft 領域復現，
+   只算輔助效率觀察。注意論文限制：其 retrieval 每題只取一次、
+   驗證主要靠 LLM-as-judge；本計畫的 gap-only 多輪與人工 review 若做出更大差距，
+   需確認增益來源，不可直接歸因於記憶。
+6. Strong-agent obsolescence diagnostic：當 base 模型升級時，重跑 no-memory baseline
+   （同任務同工具同快照），檢查 memory 的增益是否縮小、消失或轉為傷害；
+   base 變強而增益變小是有價值的負結果，一併報告 corpus 搜尋／revision 管理是否仍有穩定價值。
 
 這測的是可轉移研究資產，而非保證任何未來模型必然受益。
 模型越強若收益變小也是有價值的結果，應分析是否 corpus 搜尋／revision 管理仍提供穩定價值。
 
-## 10. 可主張到哪裡
+## 10. 可主張到哪裡（baseline 口徑）
 
 只有在新題／held-out probes 顯示可重用累積、品質維持、總成本合理且更新後不持續誤用
-stale findings 時，才可主張在本 corpus／問題分布內出現 **non-parametric continual domain learning**。
+stale findings 時，才可在本 corpus／問題分布內主張外部研究資產重用成立。
 這是外部記憶改善 Agent 系統的任務表現，不是模型參數學會 Minecraft，也不是跨領域普遍證明。
 
 若只有相同問句更快，結論限於 cache-like reuse；若省成本但漏答，屬 coverage failure；

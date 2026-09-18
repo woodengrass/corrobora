@@ -16,12 +16,11 @@ Research Finding 是一個經過一定研究成本、未來有重用價值的結
 | 精確版本的可重用設計限制 | 沒來源的模型自信結論 |
 | 有限定搜尋範圍的高成本 negative result | 「搜不到所以世界上不存在」 |
 
-Admission 先用 Strong Agent 的簡短理由＋policy checks：研究成本、跨來源程度、
-可重用性、版本敏感性、典型適用問題、條件完整性與 provenance。
-蒸餾時按三面向記錄——成功模式、失敗觸發、比較洞見（ReMe 的 multi-faceted
-distillation，見參考文獻 Cao et al. 2026），讓後續不同情境能情境感知重用，
-而不只存結論文字。不先發明一個精確 utility 分數；之後用實際 reuse／review 成本校準。
+Admission 依 evidence、scope、可重用性、provenance、novelty 與 verification state 判定，不以 success／failure 判定。candidate 可來自成功、失敗、衝突或一般研究過程，不限成功軌跡。
+蒸餾時按三面向記錄：成功模式、失敗觸發、比較洞見（ReMe 的 multi-faceted distillation，見參考文獻 Cao et al. 2026），讓後續不同情境能情境感知重用，而不只存結論文字。ReMe 本身即分析失敗觸發，成功結論亦可能誤導，不以成功保證品質。
+不先發明一個精確 utility 分數；之後用實際 reuse／review 成本校準。
 不保存也記 `finding_not_saved` 原因，才能評估 admission 是否漏掉有價值成果。
+失敗先落 `research_events`；只有可驗證觀察、量測結果、已定位矛盾或限定範圍的 scoped negative 才可成為 candidate，模型推測維持 hypothesis，不直接入池。
 
 負面 Findings 必須有搜尋 corpus snapshot、查詢範圍與時間；新增相關 corpus 後應重查。
 MVP 不自動以負面 finding 支撐普遍不存在的結論。
@@ -70,16 +69,15 @@ MVP 人工 review 才可升格 verified。Agent 不能在 submit payload 中指�
 不能用 0.95/0.97 cosine 閾值直接 merge；這些舊閾值對新模型、Finding 粒度與不同條件不適用。
 比較需讀完整 Finding，必要時看 raw support。版本不重疊未必矛盾，scope 擴大也不是免費驗證。
 一篇文章的轉載不能算第二個獨立來源；provenance lineage 必須保留。
+equivalent／extends／contradicts／supersedes／independent 五類為 baseline policy，不是 novelty 主張。
 
 ### 保守、可實作的第一版
 
 - 完全相同 idempotency key、相同 candidate payload／receipts：不重複寫入。
 - Strong LLM few-shot 提供 consolidation 建議，记录模型與 prompt。
-- 寫入採 selective addition（ReMe 實證）：只從成功軌跡蒸餾，單次失敗的教訓只在重試成功後保留，
-  否則丟棄不入池；失敗重試設上限，避免模型自身限制造成無限迴圈。
+- 寫入採 selective addition（ReMe 實證）：成功模式、失敗觸發與比較洞見皆可蒸餾，失敗觸發本身即分析對象，不要求失敗必先重試成功才保留。失敗重試設上限，避免模型自身限制造成無限迴圈。未達 candidate 門檻的失敗只留 `research_events`，不入 Finding 池。
 - 新 provisional 的獨立保存可自動完成；語意 merge／supersede／影響 verified 的操作先人工確認。
-- 剪枝用效用規則：某 Finding 被取回 f 次、成功貢獻 u 次，當 f≥α 且 u／f＜β 時移除
-  （ReMe 的 utility-based deletion；α、β 由 pilot 校準，先保守）。
+- 剪枝用效用規則：某 Finding 被取回 f 次、成功貢獻 u 次，當 f≥α 且 u／f＜β 時降權處理：降低優先級、排除於 active index、移入 archive projection 或排程複查（ReMe 的 utility-based refinement；α、β 由 pilot 校準，先保守）。PG 歷史、provenance 與 revisions 不因低 reuse 刪除。未來結果只作相關性訊號，相關不等於因果，validity 與 utility 分開判定。
 - LLM-as-judge 只作第一道過濾（actionable／accurate／valuable＋相似去重），
   ReMe 自陳其可能遺漏細微品質問題；本計畫 verified 一律要人工 review，比論文更嚴。
 - 自動規則可降低可用性，例如收到有效反證提案先排 revalidation；不能自動升格 verified。
@@ -125,8 +123,8 @@ MVP 人工 review 才可升格 verified。Agent 不能在 submit payload 中指�
 
 ## 7. Dependency-aware Invalidation
 
-這裡的「self-invalidating」是系統依已記錄依賴自動找受影響成果，
-**不是自動知道所有語意真偽，也不是保證依賴永遠完整**。
+這裡的「self-invalidating」是系統依已記錄依賴自動找受影響成果，管理已知依賴變更，
+**不是完整信念修正或 rollback，不是自動知道所有語意真偽，也不是保證依賴永遠完整**。
 
 ```text
 偵測來源／code／upstream Finding 變動
@@ -182,10 +180,10 @@ diff／新版本 locator，以及受影響的 needs。Agent 只查變動部分�
 ## 9. 記憶長期成長與健康度
 
 先以 admission 控量，再做相似候選比較與周期 consolidation，並按實際 reuse／review
-成本做 utility-based refinement：加入已驗證成果、剪除過期低價值者，保持記憶緊湊高品質
-（ReMe 第三機制，見參考文獻）。
-低 reuse 但高成本／稀有用途的 Finding 不因不熱門立即刪除；可從 active index 降權或移到
-archive projection，保留 PG、provenance 與歷史。需監測：
+成本做 utility-based refinement：加入已驗證成果、調降低價值者的檢索優先級，保持記憶緊湊高品質
+（ReMe 第三機制，見參考文獻）。不採 Ebbinghaus 式事實衰減。
+低 reuse 不等於 invalid，也不觸發 PG 刪除；低 reuse 但高成本／稀有用途的 Finding 不因不熱門刪除，只影響 active 檢索：可從 active index 降權或移到
+archive projection，保留 PG、provenance、revisions 與歷史。需監測：
 
 - duplicate／false merge、Findings 成長數、平均 provenance/dependency 大小。
 - 保存後固定時間窗口的 reuse rate，與未來還沒有機會被 reuse 的 censored 項分開。

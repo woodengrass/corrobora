@@ -13,6 +13,10 @@ Qdrant 不是正式內容庫。Finding 的 statement、reasoning、sources 與 s
 passage 原文回 PG／blob 取。每個 logical collection 可有一個 active physical build，
 例如 `raw_passages_<build_id>`，升級時以 alias 切換。
 
+`raw_passages` 與 `research_findings` 是基線邏輯索引，不是新穎架構主張；
+向量只是可替換的檢索手段之一，不是強制的第一階段。PG 詞彙檢索仍是合法入口，
+索引落後或不可用時即降級為 PG，不以向量有無決定研究能否進行。
+
 不再預設 concepts、mechanisms、claims、code_summaries、experiments 各建 collection。
 概念先走 PostgreSQL alias/exact lookup，machine catalog 先走原有關鍵字能力；code 直接
 repo search。需要 semantic Finding 的 code 結論使用同一 memory index，無須全量 AI code summary。
@@ -67,6 +71,11 @@ Documents 通常缺少版本。若一律要求 `version_ids contains target`，�
 永遠找不到。故 raw search 分成「已知相容」與「未知待判定」兩路，後者只供閱讀與確認，
 不是自動跨版本有效。明確不相容資料預設排除；Agent 做版本比較時可明確指定另一側，
 結果分組顯示，不混成同一版本答案。
+
+時間敏感查詢與版本相容是兩回事，不可混為一談。前者指查詢本身帶時間條件，
+例如限定來源修訂時間或觀測時間區間，屬 time-aware 檢索；後者指結論適用哪些
+Minecraft 版本，須以明示的 version scope 成員判定。Minecraft 版本比較不是時序推理，
+不能以新舊時間先後推定行為繼承或事實有效，時間只影響排序與維護優先順序。
 
 每次向量候選取回後，以 PG batch hydration 重查版本、該 validation 的最新狀態、dependency generation
 與權限；被剔除時在同预算內 oversample／補取。若索引落後或 unavailable，以 PG lexical

@@ -1,6 +1,6 @@
 [索引](README.md) · [← 文件攝取](03-ingestion-and-claims.md) · [Agent →](05-agent-design.md)
 
-# Memory-first／Gap-only Retrieval 與研究關聯圖
+# Findings-assisted Retrieval、Coverage 與研究缺口
 
 ## 1. Retrieval 是閱讀導航
 
@@ -10,19 +10,32 @@ Retrieval 的責任是縮小需要閱讀的 corpus。Strong Agent 自行閱讀�
 ```text
 問題與目標 scope
   → alias／terminology resolution
-  → Finding dense + sparse/lexical + exact concept lookup
-  → fusion / rerank + PG 狀態與權限回查
-  → Agent 建立 information needs 與 coverage assessment
-      ├─ 足夠：重用 findings → reasoning / synthesis
-      └─ 缺口：只研究 missing / stale / contradictory 部分
-          → Raw Docs Search / Code Search / Machine Catalog
-          → section / article / source file 主動閱讀
-          → 新候選成果 → consolidation → 更新 memory
+  → findings-assisted arm（同一臂內流程）：
+    Finding dense + sparse/lexical + exact concept lookup
+    → fusion / rerank + PG 狀態與權限回查
+    → Agent 建立 information needs 與 coverage assessment
+        ├─ 足夠：重用 findings → reasoning / synthesis
+        └─ 缺口：研究 missing / stale / contradictory 部分
+            → Raw Docs Search / Code Search / Machine Catalog
+            → section / article / source file 主動閱讀
+            → 新候選成果 → consolidation → 更新 findings
 ```
 
-memory-first 是預設存取順序，不是禁止重新看 code。已有 verified Finding 且符合
-條件時通常不用重讀全部 source；當關鍵互動、依賴或新版本不明時，Agent 可回原始資料。
-首次使用 memory 為空時，自然退化成 raw corpus research。
+Finding 搜尋 → coverage 評估 → 缺口研究 → 原始資料閱讀，是同一條
+findings-assisted arm 內部的流程，不是系統預設的存取順序，
+也不假設每次任務都先看到 findings。本文件不預設 findings-assisted 優於 stateless。
+
+正式比較以 benchmark arms 為準（量測方法見 `09`）：
+
+- `stateless-raw`：不取用 findings，直接做原始資料研究；
+- `findings-assisted`：可用 findings 作線索，經 coverage 評估後決定重用或補查；
+- `findings-whole-question-fresh`：可看 findings，但仍對整個問題做 fresh 研究，作對照組；
+- `findings-gap-only`：只研究 coverage 缺口，屬實驗性政策／ablation，不預設為優勝者。
+
+即使某 Finding 為 verified，也只表示該陳述在原有 scope 下通過驗證，
+不表示每個新任務都必須注入（validity 與 utility 分開判斷）。
+首次使用 findings 為空時，assisted arm 自然退化成 raw corpus research；
+當關鍵互動、依賴或新版本不明時，Agent 回原始資料重新確認。
 
 ## 2. Coverage：不把相似分數當「我已經知道」
 
@@ -37,10 +50,11 @@ coverage_status, missing_parts, rationale, assessment_at`。
 | `uncovered` | 沒有足夠成果或搜尋未能確認 | fresh search；區分檢索失敗與 corpus 真空 |
 | `stale` | 有關成果需 revalidation 或已知不再有效 | 定位原依賴與變動部分 |
 | `contradictory` | 同 scope 存在未解决反證／disputed | 比較版本、條件與來源，不任選最高分 |
-| `harmful` | 重用該成果反而答錯（噪聲／過期記憶誤導，見 SealQA） | 降級為線索模式，該 family 停用 memory 臂並記 reuse-harm |
 
-某 family 上 memory 臂顯著差於 stateless（見 `12` reuse-harm 指標）即自動降級，
-不等待人工介入；降級只影響該 family 的重用政策，不刪除記憶本身。
+reuse-harm 是 benchmark／政策層指標（定義與量測見 `09`／`12`），用於比較 arms
+之間重用 findings 是否造成答錯，不從單次 production run 推斷，也不用作
+coverage_status 枚舉。某 family 上 findings-assisted 臂顯著差於 stateless 時，
+才按 benchmark 結果調整該 family 的重用政策；政策調整不刪除 findings 本身。
 
 先以 deterministic 檢查版本、環境、權限、validation status、dependency generation；
 再由 Agent 評估語意是否涵蓋、哪些条件缺失。不能僅以 cosine > threshold 或 evidence count
@@ -48,7 +62,7 @@ coverage_status, missing_parts, rationale, assessment_at`。
 同一 need 可帶多個 reason codes，避免 stale 與 contradictory 同時出現時遺失資訊。
 
 搜尋服務失敗時標 `retrieval_incomplete`，不是 uncovered 的確定標籤；reranker 沒命中也不能
-推導「整個 corpus 沒資料」。Knowledge gap 評估至少區分使用者缺少條件、memory 缺口、
+推導「整個 corpus 沒資料」。Knowledge gap 評估至少區分使用者缺少條件、findings 缺口、
 raw corpus 缺口與工具失敗，並允許問使用者或停止。
 
 ### 時間感知（版本／時間敏感查詢）
@@ -85,11 +99,12 @@ query / aliases / scope
 這類 token 需 lexical／exact 通道；中英、繁簡、社群詞則由 aliases 与 multilingual encoder
 互補。正規化查詢不改變原文引用。
 
-## 4. Finding Graph：Associative Memory
+## 4. Finding Graph：可選的關聯輔助（benchmark-gated）
 
 Graph 以 Findings 為中心，Concept／Mechanism／Effect／Constraint 為連接點；
 Source／Passage／Code Symbol 是 provenance 與導航，Machine／Blueprint 是應用實例。
-不以全量抽取建立 Minecraft 世界 ontology。
+不以全量抽取建立 Minecraft 世界 ontology。本節為可選增強，不是核心 novelty，
+不做範圍擴張；是否保留以 benchmark 是否證明增益為準。
 
 ```text
 semantic retrieval seeds
@@ -115,7 +130,7 @@ Neo4j 只在 PG traversal 經索引、限深、批次查詢後仍成為測得的
 
 | 失敗 | 可行降級 |
 | --- | --- |
-| Finding index 尚未建立／索引延遲 | PG exact／lexical 找記憶，必要時 raw research，記錄原因 |
+| Finding index 尚未建立／索引延遲 | PG exact／lexical 找 findings，必要時 raw research，記錄原因 |
 | Dense encoder 不可用 | lexical／alias 通道，標記 retrieval 降級 |
 | Reranker 超時 | 使用 fusion 結果，保留未 rerank 標記 |
 | Code graph 不完整 | repo search／read_file，不把 missing edge 當作 negative proof |
@@ -127,8 +142,9 @@ Neo4j 只在 PG traversal 經索引、限深、批次查詢後仍成為測得的
 - Finding recall 與 raw passage／section recall 分開量測；無 gold sources 的舊題不能算 recall。
 - Coverage 以人工 information needs 評分，特別計算 **false-covered rate**：
   系統說足夠但實際缺必要條件的比例。
-- 比較 memory-only reuse、memory + fresh whole-question research、memory + gap-only。
-  如 gap-only 只是漏查而省成本，accuracy／完整度與 unsupported claim 指標必須揭露。
+- 比較 stateless-raw、findings-assisted、findings-whole-question-fresh、findings-gap-only。
+  如 gap-only 只是漏查而省成本，accuracy／完整度與 unsupported claim 指標必須揭露；
+  reuse-harm 與成本並列報告，不預設 gap-only 為優勝者。
 - Graph-on/off 使用相同 Finding snapshot，防止把「多存了一批知識」誤算為 graph 收益。
 - 部分 covered 的 precision／recall、stale detection、contradiction detection 分開報告，
   不用一個平均 similarity 掩蓋問題。
