@@ -1,33 +1,39 @@
 # corrobora
 
-研究資料基礎設施的規劃 repository，主線為 Strong Agent + Raw Professional Corpus + Research Memory。
-其中 Research Memory 是待比較的持久化底層，不是核心新穎性，也不預設 memory-first 最優；
-持久化 Findings 只是一種待驗證的重用機制，需與無記憶基線做成本、正確性與重用傷害對照。
-第一個候選驗證領域為 Minecraft Technical／生電，尚未開始驗證。
+**跨農場診斷經驗轉移與持續自主工程研究。**
 
-**目前是專案啟動前的規劃與資料準備 repository**：已有原始資料、benchmark fixtures
-及舊 TypeScript／SQLite 參考碼；Python/FastAPI + PostgreSQL + Qdrant 是建議技術棧，
-尚未建置可執行的 corrobora 服務，執行期 runtime 不存在。完整提案見
-[`docs/plan/00-overview-and-architecture.md`](docs/plan/00-overview-and-architecture.md)，
-實際盤點見 [`docs/plan/10-current-state-and-migrations.md`](docs/plan/10-current-state-and-migrations.md)。
-文件中若出現 non-parametric continual learning，一律指待驗證假說／歷史用語，不代表已實現持續學習。
+讓 Agent 在 Minecraft 生電環境中完成「理解需求 → 設計 → 建造 → 執行 → 測量 → 診斷 → 修改」，並研究：做過前面的農場，是否真的讓它更會設計與改良下一座，而不是只記住藍圖。
 
-## 目錄結構
+第一個候選方法是 **Conditional Diagnostic Experience Transfer（條件式診斷經驗轉移）**：重用過去的實驗前，先檢查適用條件；在多個可能原因之間選擇有辨識力的測試，再局部修正理解與設計。這是待驗證方案，不是已證實原創或有效的演算法。
 
-```text
-corrobora/
-├── docs/
-│   ├── plan/               架構討論、資料模型、MVP、遷移與長期評估計畫
-│   └── legacy-reference/   從 OpenST-QQBot 各 worktree 挖出的既有規格、程式碼與資料
-├── benchmark/
-│   └── gold_dataset/       評測題庫、機器推薦回歸基準、文件攝取測試 fixture
-└── raw-data/               詞典、GTMC、機器目錄與本機忽略追蹤的 Minecraft source
-```
+> **狀態：規劃與資料準備階段，2026-10-01 修訂。** 尚無可執行的農場測試環境、Agent runner 或正式實驗結果。本次改的是規劃文件，不代表完成實作。既有 Research Memory、檢索、資料庫設計降為可選支援，不再是第一階段的建置主線。
 
-## 從這裡開始
+## 先讀這幾份
 
-1. 讀 [`docs/plan/README.md`](docs/plan/README.md) 依序了解完整架構設計，建議順序為 00 → 10 → 08 → 09。
-2. 讀 [`docs/legacy-reference/README.md`](docs/legacy-reference/README.md) 了解哪些規則/資料
-   已有可沿用經驗，以及哪些舊假設需要重新定位。
-3. `raw-data/` 是實際會被匯入的內容，`benchmark/gold_dataset/` 是驗證匯入與檢索是否正確的
-    題庫與 fixture。
+| 文件 | 內容 |
+| --- | --- |
+| [定位與架構](docs/plan/00-overview-and-architecture.md) | 研究什麼、保留什麼目標、哪些不是貢獻 |
+| [範圍與里程碑](docs/plan/08-scope-and-mvp.md) | 先診斷改良、再跨農場、最後從需求自主設計；各階段驗收與停損 |
+| [農場測試環境](docs/plan/15-farm-testbed.md) | 世界控制、建造、測量、權限與固定評分器 |
+| [候選方法](docs/plan/16-conditional-diagnostic-transfer.md) | 適用性檢查、實驗選擇、局部修正與經驗契約 |
+| [研究問題與對照](docs/plan/09-roadmap-and-benchmark.md) | 強基線、消融、指標與資訊科學貢獻 |
+| [長期實驗協定](docs/plan/12-longitudinal-experiment.md) | 任務切分、歷史隔離、成本公平、隨機性與統計 |
+| [完整索引](docs/plan/README.md) | 現行主線、舊規劃效力與閱讀順序 |
+
+## 要交付的研究結果
+
+1. 可重現的完整農場設計／改良評測，能區分有效重用、無關經驗與錯誤重用。
+2. 一個具體的診斷經驗轉移方法，與同一強模型使用原始紀錄、普通筆記及固定診斷流程比較。
+3. 對「經驗何時有益、何時有害、模型變強後還需要哪些外部機制」的實證，不預設記憶一定比較好。
+
+農場產量提高不等於 Agent 改進；跨任務表現提高也不自動等於 RSI。只有學習／改進流程本身被改進，並在未見任務得到受控證據，才另討論遞迴自我改進。
+
+## 目前保留的資產
+
+- `docs/plan/`：現行研究計畫及可選的舊基礎設施設計。
+- `docs/research/`：既有文獻與方向討論紀錄；不是已完成成果或現行排程。
+- `docs/legacy-reference/`：舊 TypeScript／SQLite 規格與參考碼，不能直接視為可運行服務。
+- `raw-data/`：詞典、GTMC、機器目錄等；來源授權與公開限制維持不變。
+- `benchmark/gold_dataset/`：舊問答／推薦／攝取 fixtures，不是農場測試集。
+
+既有盤點見 [10 現況](docs/plan/10-current-state-and-migrations.md)，其中數量與本機 ignored source 是當時盤點，不代表本次重新存取過本機資料。沒有把機器目錄當成已取得藍圖，也沒有修改原始資料來配合新研究。

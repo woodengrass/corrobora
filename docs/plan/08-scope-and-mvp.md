@@ -1,93 +1,63 @@
-[索引](README.md) · [← 驗證](07-evidence-and-verification.md) · [Roadmap →](09-roadmap-and-benchmark.md)
+[索引](README.md) · [整體架構](00-overview-and-architecture.md) · [實驗協定](12-longitudinal-experiment.md)
 
-# 範圍與 MVP：先完成一個可累積、可重查的研究閉環
+# 範圍、MVP 與驗收
 
-## 1. MVP 的問題
+> 2026-10-01。先找出值得研究的失敗模式，再投入方法與基礎設施。P0–P5 都是未來工作，沒有既有完成狀態或固定完成日期。
 
-**在相同強 Agent、相同 corpus、相同 budget 下，persistent 且 source-grounded 的 Findings
-在什麼條件下能減少重複研究、在什麼條件下造成 negative transfer，同時保持答案與證據品質？**
+## 1. 最小研究範圍
 
-MVP 是 infrastructure evaluation，不是最終 contribution。小樣本用來驗證 produce／save／retrieve／revalidate
-是否穩定運轉，並量測 gain／harm 與成本／變異；不能因 15 題通過就宣稱 continual learning 已成立。
+以 **2–3 類完整農場的候選範圍**開始，具體類型依可取得授權、可觀測性、重置成本與機制差異選定；不是已準備好的資料集。優先考慮可分辨生產、收穫、運輸、收集的設計，先不選需要大量不可控前置條件的複雜農場。
 
-## 2. 最小範圍
+完整農場必須從宣告的合法輸入／遊戲機制產生目標物，經主要處理流程送到指定輸出端。不能以燈號電路、無限物品注入或孤立收集模組冒充完整農場。模組級注入只用於診斷副本。
 
-| 能力 | MVP 做到哪裡 |
+先固定一個 Java Edition 版本、mod／loader 清單、規則與硬體測試配置。版本選擇由可運行環境驗證後定案；不把本機舊 source 版本直接當成已部署 server。
+
+## 2. 階段與決策閘門
+
+| 階段 | 工作 | 可檢查產出／進入下一步的條件 |
+| --- | --- | --- |
+| P0 問題與量測定義 | 選農場候選、來源授權、資源限制、成功門檻、故障／變體類型 | 人工 reference 設計可在固定配置運作；實驗與量測規格鎖定；沒有就先修環境 |
+| P1 可執行 testbed | reset/snapshot/build/patch/run/observe、外部固定 evaluator、budget 與紀錄 | 完整農場可反覆量測；注入／作弊不會算產量；相同配置的波動有記錄 |
+| P2 強基線 pilot | B0–B3，先不實作 CDET；分析自然失敗與受控變體 | 找到可重現的錯誤重用、診斷浪費或轉移缺口；若強基線已足夠，調整問題而非硬加模組 |
+| P3 最小候選方法 | 依 16 實作經驗契約、適用性檢查、測試選擇與局部修正 | 與 B1/B2/B3 做同證據同預算比較；效益不足就刪減或記負結果 |
+| P4 跨農場正式研究 | dev 鎖定後，held-out 組合／條件、多順序與獨立重跑 | 依 12 報成功、成本、負遷移與 CI；有 held-out 也不自動代表已形成機制理論 |
+| P5 需求到完整設計 | 不提供完整起始藍圖，允許自行建造與迭代；資源和成功限制相同 | 獨立報初始設計品質、後續改善與總成本；只有這階段完成才主張自主設計 |
+
+P2 可先用約 12–24 個「設計×條件」候選案例和少量獨立重跑找訊號；這只是工作量規劃，不是保證統計充分的數量。正式規模依 pilot 變異、family 數量、效果量與可負擔成本決定，不用任意的五百題作研究門檻。
+
+## 3. 第一個可交付閉環
+
+1. 載入一座完整但表現不足的農場，取得需求與允許的初始觀察。
+2. Agent 提出候選原因與下一個測試；執行前保存可檢查的預測。
+3. 在隔離副本量測，根據結果修改完整設計，再由固定 evaluator 驗收。
+4. 經驗連同條件、證據與失效範圍封存，不把失敗直接寫成永久禁令。
+5. 對新的、部分相似農場，驗證前提後重用／調整／放棄過去測試。
+6. 與同一模型的原始歷史、普通筆記及固定檢查表比較，成本包含全部維護。
+
+完成六步只是方法能運行；有跨設計的受控證據後，才主張經驗有效。
+
+## 4. 工程驗收
+
+- manifest 記清遊戲版本、世界狀態、規則、模組、載入範圍、預熱與量測時段。
+- 每個試驗綁定 baseline snapshot、patch、預測、觀察、artifact hashes 與成本。
+- 診斷副本與正式評分隔離；原始事件不可被 Agent 覆寫，故障真值與保留 seeds 不可被讀取。
+- 用無產出、積壓、輸出容量限制、越界修改等 sanity cases 檢查評分器；假物品不能提高正式成績。
+- timeout、無效藍圖、工具錯誤、零產出、無法確定原因全部保留，不能悄悄重跑到成功。
+- 對不能完整還原的亂數與排程狀態記錄限制；不只靠同一 world seed 宣稱完全 deterministic。
+
+## 5. 研究停止／縮減條件
+
+| 觀察 | 決策 |
 | --- | --- |
-| Corpus | 112 筆詞典、23 篇 GTMC；擇可標註的漏斗／物品處理或更新主題，不要求全量 legacy 語意清理 |
-| Raw | bytes snapshots、dual hash、document revisions、sections/passages、links、來源政策 |
-| Retrieval | dense＋lexical baseline、alias lookup、section/article expansion；ports 可換模型 |
-| Memory | Finding revisions、scoped validation、sources/dependencies/relations；兩層 Qdrant index |
-| Agent | 一個 strong provider adapter、自主多輪研究、按實驗 arm 切換 retrieval policy＋gap record、budget |
-| Consolidation | exact idempotency＋相似 Finding 比較提案＋最小 review CLI |
-| Invalidation | 文檔 revision／上游 Finding 的反向依賴傳播與按需重查，先單一精確版本 validation |
-| Code | 使用現有本機 1.21.11 source 的 search/read＋snapshot/file/range/hash；小範圍 symbol index spike |
-| Sessions | 查詢、讀取／重用、工具、tokens/cost/latency、結果與維護成本 |
-| Catalog | 資產與 81 筆機器 baseline 保留；catalog 移植可平行，不阻塞 memory 核心 |
-| Benchmark | 既有題目重新標註成 pilot stream，至少比較 raw-stateless、findings-assisted、findings+full-fresh、findings+gap-only，並附 matched memory-on/off diagnostic；可控制的更新事件 |
+| 普通歷史／筆記已達同樣品質與成本 | 不建複雜記憶層；改報適用邊界或找不同且合理的未解任務 |
+| 增益只來自額外模型呼叫／更多試驗 | 做 budget-matched 對照；尚不能主張方法有效 |
+| 只在同藍圖近重複上有效 | 限制為局部重用，不主張跨 family 泛化 |
+| 波動大於觀察到的改善 | 先修測量與增加獨立重跑，不發明勝利門檻 |
+| 新農場變好、舊有效設計退化 | 記為負遷移／回歸；修復流程需要重設 |
+| 新強模型吸收了方法收益 | 報模型依賴與失效條件；保留評測資產，不宣稱永遠必要 |
 
-MVP 前半先建立 Documents＋stateless Agent baseline；後半才加入 Findings 與 lifecycle。
-Tree-sitter 全 repo edges、graph associative expansion、自動 semantic merge 都不是閉環前置。
-code file 級 dependency 已可驗證變動管線，symbol-body 粒度在後續測細化收益。
+## 6. 先不做的工程
 
-## 3. 可交付的使用流程
+不先全量匯入 corpus、不先建立全部 01 的資料表、不先部署 Qdrant／Neo4j、不先寫 web UI、不先做多 Agent 系統或任意 harness 自改。生成測量腳本可在沙箱試驗，但不當成另一個獨立研究主題。
 
-1. 使用者問一個需跨文章／code 的問題，Agent 找不到足夠記憶，完成一次 fresh research。
-2. 保存一個高價值 provisional Finding，綁實際來源；review 可在 session 後完成。
-3. 新問題 wording／條件不同，但部分需要同一機制，系統找回它，只補缺失部分。
-4. 更新一份相關文件／上游 Finding，受影響 validation 進 needs_revalidation。
-5. 下一題只重查受影響部分；不相關 Finding 与歷史版本引用保持可用。
-6. 全流程能比較答案、來源正確性、閱讀量與總成本，而不只是顯示「命中 memory」。
-
-## 4. 第一批資料與 API
-
-按依賴建 migration batches，而不是一次建立所有未來 extension：
-
-- **Corpus batch**：sources/revisions/observations/import_runs、documents/revisions、sections/passages、
-  links/assets、versions/scopes、concepts/aliases/translations/sources、unresolved references。
-- **Research batch**：sessions/events、jobs、index_builds/outbox；先讓 raw baseline 有可比觀測。
-- **Memory batch**：findings/revisions/validations、sources/dependencies/relations/concepts、reviews、
-  invalidation_events。無 source 或 upstream dependency 的 verified 寫入要被拒絕。
-- **Code batch**：repositories/versions/files；symbol/index 擴展可獨立加入。
-- **Extension batch**：machines/revisions/tags、blueprints、experiments，依案例開啟。
-
-最小入口（皆為待實作契約）：
-
-- `POST /v1/ask`、`GET /v1/research/sessions/{id}`。
-- `POST /v1/ingest/documents`、`GET /v1/documents/{id}/revisions/{revision_id}`。
-- `POST /v1/findings/search`、`POST /v1/findings/candidates`、`POST /v1/findings/reviews`。
-- `GET /health`；對外 Agent tools 使用同一 application services，避免兩套寫入政策。
-
-## 5. 完成條件
-
-### 工程底線
-
-- Raw revision 可還原，重匯入與 job retry 不重複產生資料。
-- 非授權 Agent 不能標 verified／覆寫來源；version、permission、dependency 在 PG 強制檢查。
-- 同條件重送、相似但不同條件、矛盾、跨版本、間接依賴、失效途中查詢都有 fixture。
-- Qdrant 停機／索引延遲時能降級且不錯用 stale status。
-- 完成上述六步 demo，可從 session 重建「實際讀了哪些資料與用了哪些 Findings」。
-
-### 研究起步
-
-- 15–20 題 pilot（包含相關不同題、部分重用、新主題及至少一個更新事件）；
-  逐題標 expert rubric、必要 evidence／scope，記錄未通過與不能回答的題。
-- raw-stateless、findings-assisted、findings+full-fresh、findings+gap-only 使用同一 Agent、corpus、budget，輸出相同評分欄位，並附 matched memory-on/off diagnostic。
-- 同時报告 accuracy／完整度、來源正確、false-covered、stale errors、成本与维护工作量。
-- 成功定義為 produce／save／retrieve／revalidate 穩定運轉，並量測出 gain／harm，而非宣稱 continual learning 已成立。
-- 若節省成本但 accuracy 或完整度下降，MVP 工程可能完成，研究假說仍未成立，先分析原因。
-
-## 6. 功能取捨
-
-| 處置 | 項目 |
-| --- | --- |
-| 保留／提高優先級 | PG、Qdrant、immutable raw、document hybrid retrieval、aliases、Findings、provenance、sessions、benchmark |
-| 簡化 | orchestrator、Evidence Workspace、graph schema、code pipeline、review 的操作介面 |
-| 從核心建置清單移除 | deterministic query planner、巨大 query-specific state machine、全量 Claim／KG extraction、專家生成小模型 |
-| 後續研究增量 | 更細 dependency、associative expansion、自動 consolidation、擴大 longitudinal stream |
-| Optional，需實驗支持 | JDT、SCIP、CodeQL、CFG/DFG、Neo4j、ColBERT、multi-vector、SGLang／多 serving backend |
-| 獨立平行支線 | Blueprint structural understanding、機器資料庫深化、dynamic test runner |
-| 最後才評估 | 特定任務 SFT/LoRA、retrieval fine-tuning、CPT；均非架構 requirement |
-
-小模型不是依固定階段「時間到了就要做」。只有頻率、品質與費用證明有需求，才投入訓練。
-排期應在 pilot 後依開發與 review 人力決定，不延續舊稿尚未實測的固定週數。
+原始資料、既有來源政策與 `benchmark/gold_dataset/` 保持不變。新的農場 fixtures 將來另建目錄，命名與 split 在 P0/P1 決定；本次沒有產生假 gold 或把規劃標成完成。

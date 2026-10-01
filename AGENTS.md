@@ -1,120 +1,121 @@
 # AGENTS.md
 
-## Project Overview
+## Project Overview and Planning Authority
 
-Domain Research Infrastructure / Agentic Research Memory. First domain: Minecraft Technical.
-Planning-phase repo: no runnable `src/`, no PG/Qdrant running yet. Truth is `docs/plan/`,
-current-state is `docs/plan/10-current-state-and-migrations.md`.
-Read order `00-overview-and-architecture.md -> 10 -> 08-scope-and-mvp.md -> 09-roadmap-and-benchmark.md`.
-`docs/legacy-reference/`, `raw-data/`, `benchmark/gold_dataset/` are inputs, not specs.
-Current tree: `docs/plan/`, `docs/legacy-reference/`, `raw-data/`, `benchmark/gold_dataset/`;
-future runtime `src/corrobora/` does not exist yet — do not invent it as done.
+Corrobora studies cross-farm diagnostic experience transfer and continual autonomous
+engineering in Minecraft Technical. The intended loop is requirements -> design -> build
+-> execute -> measure -> diagnose -> revise. Start with complete-farm repair/optimization;
+from-requirements design is a separate later acceptance stage, not a removed objective.
+
+Planning-phase repo: no runnable Corrobora application, farm runner, or reported experiment
+results exist yet. Do not infer implementation from proposed APIs, schemas, or diagrams.
+Read `docs/plan/README.md`, then 00 -> 08 -> 15 -> 16 -> 09 -> 12.
+
+The 2026-10-01 versions of 00/08/09/12/13/15/16/17 define the current research plan.
+Plans 01-07/10/11/14 and `docs/research/` remain supporting or historical references;
+they do not mandate the old Documents+Memory-first roadmap. In particular, the migration
+sequence in 10 is historical, not the current P0-P5 milestones. Keep provenance, licensing,
+immutable evidence, and verification boundaries even when simplifying infrastructure.
+
+`docs/legacy-reference/`, `raw-data/`, and `benchmark/gold_dataset/` are existing inputs,
+not the new farm benchmark. Historical inventory counts are not a fresh audit.
 
 ## Commands
 
-No `pyproject`, FastAPI app, compose, or Alembic chain exists yet. Do not invent
-`pytest / uvicorn / alembic upgrade` as passing. Currently only: `python -m json.tool`
-for tracked JSON sanity, `git status`, docs link checks. When runtime lands,
-single source is `pyproject.toml`: `uv run ruff check`, `uv run ruff format --check`,
-`uv run pyright`, `uv run pytest`.
+No pyproject, application, compose stack, or Alembic chain exists yet. Do not claim
+pytest, uvicorn, or database migrations passed. For documentation-only changes, check
+links, changed paths, and Git diffs; distinguish manual review from executed checks.
+When runtime lands, its actual project configuration is the source of truth for lint,
+type checking, tests, and launch commands. Do not invent passing commands.
 
 ## Code Style
 
-- Ruff is source of truth: four spaces, double-quoted strings, 100-char line length,
-  absolute imports, deterministic ordering. Config lives in `pyproject.toml`; do not hand-format.
-- Use `snake_case` for modules, functions, variables, and Python model fields; `PascalCase` for
-  classes; `UPPER_SNAKE_CASE` for constants. DB tables/columns are `snake_case` per
-  `docs/plan/01-postgres-schema.md`.
-- New Python and new JSON contracts use `snake_case`. Pydantic aliases only to preserve an
-  existing external contract. Tracked legacy JSON in `raw-data/`, `benchmark/` is immutable —
-  translate at the adapter boundary, never rename source fixtures to fake consistency.
-- Annotate public boundaries and return types. Prefer built-in generics and `X | None` on
-  Python 3.12; no unbounded `Any`, unchecked casts, or untyped `dict` without a `# reason:`
-  comment at the use site. `pyright` strictness follows `pyproject.toml`.
-- Pydantic `extra="forbid"` at API, tool, config, and import boundaries. SQLAlchemy ORM models
-  are not Pydantic models — validate with Pydantic schemas at the edge, persist with ORM
-  inside. Internal value objects use frozen dataclasses; no `dict | list[dict]` as a system
-  contract.
-
-```python
-from dataclasses import dataclass
-
-from pydantic import BaseModel, ConfigDict, Field
-
-
-class SearchRequest(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    query: str = Field(min_length=1)
-    version_scope_id: int | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class RankedFinding:
-    finding_revision_id: int
-    validation_id: int
-    score: float
-```
-
-- Raise specific domain exceptions (`src/corrobora/**/errors.py` when runtime lands). Translate
-  to stable `error_code` at API/tool boundary only; never expose raw DB/driver exceptions.
-- Use stdlib logging with `extra={}` structured context, not f-strings. Never log tokens,
-  credentials, private source content, or complete user payloads. Raw retention and event
-  retention are separate per `docs/plan/07-evidence-and-verification.md`.
-- Code, comments, docstrings in English (docs in `docs/` stay Traditional Chinese). Google-style
-  docstrings on public APIs and non-obvious behavior; comments explain why, not what.
+- New runtime is proposed in Python, with a version-pinned Minecraft server adapter.
+  Use the language required by the selected server integration; do not invent APIs.
+- Prefer typed small functions, explicit dependencies, snake_case Python/JSON fields,
+  PascalCase classes, and UPPER_SNAKE_CASE constants. Do not rename tracked legacy
+  fixture fields to fake consistency; adapt at the import boundary.
+- Proposed Python conventions: four spaces, double quotes, 100-character lines,
+  deterministic ordering, absolute imports. Configure Ruff/Pyright before treating
+  their rules as enforced. Actual project configuration wins.
+- Annotate public boundaries and return types. Prefer built-in generics and `X | None`.
+  Avoid unbounded Any, unchecked casts, or untyped system contracts.
+- Validate tool/config/import boundaries with explicit schemas; reject unknown fields.
+  Pydantic models are not database ORM models. Use immutable value objects where useful.
+- Raise specific domain errors and translate them to stable tool error codes. Do not
+  expose raw database errors, credentials, or host details to an agent.
+- Use structured logging, avoid secrets and unnecessary full source copies in logs.
+  Raw experimental evidence and source retention follow separate policies.
+- Code, comments, and docstrings in English; planning prose in Traditional Chinese.
 
 ## Architecture Rules
 
-- Stack: Python 3.12, FastAPI, Pydantic, PostgreSQL + Alembic, Qdrant, Ruff (100-char),
-  Pyright. Future shape is single modular monolith `src/corrobora/` (`api/ research/ memory/
-  corpus/ retrieval/ code/ machines/ storage/ jobs/`) + bounded worker, not microservices.
-- PG is authoritative for findings, status, versions, permissions. Qdrant holds
-  `raw_passages` / `research_findings` candidates only and must stay rebuildable from PG.
-  Always hydrate status/scope/ACL from PG; Qdrant payload never decides truth. On stale or
-  unavailable index, degrade via PG lexical and record `retrieval_incomplete`.
-- Short PG transactions; slow LLM calls and embeddings run outside transactions. Small typed
-  functions with explicit dependencies; no hidden global singletons. External tools and
-  `POST /v1/ask` share the same application services.
-- Do not add Kafka, Neo4j, ColBERT/multi-vector everywhere, JDT/SCIP/CodeQL, CFG/DFG,
-  vLLM/SGLang, or domain LLM training without a benchmark win. Ports (`DenseEncoder`,
-  `VectorRetriever`, etc.) stay swappable; BGE-M3 is baseline, not fixed.
-- No DB to migrate yet. `docs/legacy-reference/migrations/0001-0004` are SQLite references,
-  not executable on PG. Future batches follow `docs/plan/08-scope-and-mvp.md:44-53` and
-  P1-P10 in `10-current-state-and-migrations.md`; raw bytes + revisions append-only with
-  dual hash (`raw_content_hash` + `normalized_content_hash`), never overwrite originals.
+- Build the executable testbed and strong baselines first. CDET is an untested candidate,
+  not an assumed winning method. Generic memory, reflection, tool creation, and RSI
+  are not automatically novel contributions.
+- Pilot can use typed Python contracts, immutable artifact files, and SQLite/JSONL
+  metadata. FastAPI, PostgreSQL, Qdrant, complete corpus ingestion, and large knowledge
+  graphs are optional supporting infrastructure, not prerequisites for P0-P2.
+- If PostgreSQL/Qdrant are introduced, PG owns authoritative records, scopes, permissions,
+  and validation states. Qdrant provides rebuildable candidates only; hydrate authority
+  from PG and record degraded retrieval. Slow model calls stay outside transactions.
+- Prefer a small modular runtime with replaceable model/harness/environment adapters.
+  Do not add distributed services, Kafka, Neo4j, full CodeQL/SCIP pipelines, domain model
+  training, or arbitrary self-modification without a measured need.
+- Separate immutable raw evidence, revisioned persistent experience, and task-local
+  working state. Agent-generated scripts or narratives never replace trusted observations.
+- Proposed module paths are not existing files. Database schema documents are not
+  executable migrations; old SQLite reference migrations are not a deployed database.
 
-## Boundaries
+## Experiment Boundaries
 
 ### Always Do
 
-- Distinguish observed state vs proposed design vs untested hypothesis; link to
-  `docs/plan/` instead of claiming done.
-- Keep deterministic validation, state transitions, and version handling separate from LLM
-  calls; save research sessions/events with locators/hashes, not full copied texts.
-- Prefer pure-function unit tests for validation, scope, and permission checks; synthetic
-  fixtures only, no network/`.env`/production DB. `benchmark/` is evaluation, not unit tests.
+- Distinguish observed repository state, proposed design, hypotheses, and measured results.
+- Preserve source bytes/revisions and artifact hashes. Record pre-intervention predictions
+  before observing outcomes; never reconstruct them after a result and call them prior.
+- Keep simulator, diagnostic forks, final evaluator, and private evaluation metadata
+  isolated. Enforce budgets, allowed areas, actions, and filesystem/network permissions
+  in code, not only in prompts. No unrestricted host/server-op access for agents.
+- Exclude injected diagnostic items and initial inventories from legitimate farm output.
+  Run final validation on a clean world; do not trust an agent-authored scorer.
+- Match raw evidence access, tools, model version, and budgets across relevant baselines.
+  Baselines may reason, inspect applicability, search raw history, and write bounded tools.
+  Count memory construction, maintenance, failures, and human assistance.
+- Treat timeout, zero production, invalid designs, and unsupported explanations as data.
+  Do not discard failed runs to reduce reported cost. Keep held-out feedback out of
+  agent memory and method tuning; use separate development data.
+- Preserve version/scope uncertainty. A source change triggers revalidation, not an
+  automatic assertion that its dependent claims are false.
+- Use synthetic fixtures for unit tests. Benchmark runs are separate from unit tests;
+  do not use private data, .env files, or production databases in tests.
 
 ### Ask First
 
-- Expanding corpus sources, adding a second code snapshot, changing encoder/reranker,
-  introducing any optional stack above, or reusing `provisional` beyond research hints.
-- Turning `TechMC Glossary` (`internal`, license pending) or `minecraft source code/`
-  (`DO NOT REDISTRIBUTE`) into public output.
+- Expanding corpus licenses/public disclosure, adding copyrighted game source snapshots,
+  or redistributing third-party blueprints beyond verified permissions.
+- Publishing TechMC Glossary (internal/license pending) or the ignored Minecraft source.
+- Deploying to an external server, making purchases, opening unrestricted network access,
+  installing unreviewed executable dependencies, or using private credentials.
+- Turning provisional evidence into an automatically approved fact, or changing the
+  independent evaluator after formal evaluation has started.
 
 ### Never Do
 
-- Self-mark `verified`, overwrite `verified` content, delete sources, edit provenance, or
-  lower `verified` bar for automation. `trust_level` is license traceability, not factual
-  accuracy. Research agents propose `provisional`; only reviewers/workers per
-  `docs/plan/05-agent-design.md` and `07-evidence-and-verification.md` change validity.
-- Modify `raw-data/`, `benchmark/gold_dataset/`, `docs/legacy-reference/` to fit new code;
-  do not claim 81 machine rows imply `.litematic` bytes exist (count is 0), or 33 questions
-  have `expected_source_ids` (all empty), or 9 machine baselines were replayed here.
-- Batch-import external Claims as `verified`; missing scope/dependencies enter as
-  `provisional` with ID mapping preserved.
+- Self-mark claims globally verified, overwrite approved evidence, delete sources, or
+  edit provenance. Agents propose provisional revisions; reviewers/trusted workers
+  validate only the stated scope. Citation existence, execution success, prediction
+  accuracy, and causal support are different checks.
+- Modify raw-data/, benchmark/gold_dataset/, or docs/legacy-reference/ to fit new code.
+  Historical machine catalog rows do not establish possession of .litematic bytes;
+  old QA fixtures are not complete-farm gold or executed benchmark results.
+- Redistribute ignored game source, license-pending data, secrets, or hidden test answers.
+- Claim global priority, demonstrated RSI, model-proof necessity, conference acceptance,
+  or a science-fair outcome from this planning document.
 
 ## Git, Commits, and Pull Requests
 
-Use `docs:`, `docs(plan-xx):`, `feat:`, `fix:` per existing `git log`; small focused commits,
-no force-push, no secrets in history.
+Use docs:, docs(plan-xx):, feat:, or fix: prefixes. Keep changes scoped and reviewable.
+Read current files before replacing them. Preserve concurrent user changes; no force-push.
+Do not change existing raw data, benchmark fixtures, runtime code, or workflows as a
+side effect of a planning-document request.
