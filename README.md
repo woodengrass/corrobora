@@ -1,39 +1,46 @@
-# corrobora
+# Corrobora
 
-**跨農場診斷經驗轉移與持續自主工程研究。**
+**研究 AI 能否把前一座完整生電農場的診斷與實驗經驗，適当地用在下一座農場：什麼時候會進步，什麼時候反而被舊經驗誤導？**
 
-讓 Agent 在 Minecraft 生電環境中完成「理解需求 → 設計 → 建造 → 執行 → 測量 → 診斷 → 修改」，並研究：做過前面的農場，是否真的讓它更會設計與改良下一座，而不是只記住藍圖。
+Minecraft 是可執行、可干預的工程實驗平台。長期目標包含理解需求、設計、建造、量測與自我迭代；第一個研究先從完整農場的診斷與改良開始，再獨立驗證從需求自主設計。
 
-第一個候選方法是 **Conditional Diagnostic Experience Transfer（條件式診斷經驗轉移）**：重用過去的實驗前，先檢查適用條件；在多個可能原因之間選擇有辨識力的測試，再局部修正理解與設計。這是待驗證方案，不是已證實原創或有效的演算法。
+**目前狀態：規劃／P0。沒有可執行的 Corrobora runtime、農場 runner、正式 farm dataset 或實驗結果。** 文件中的 API、目錄、方法與測試都是待實作，不代表已完成。
 
-> **狀態：規劃與資料準備階段，2026-10-01 修訂。** 尚無可執行的農場測試環境、Agent runner 或正式實驗結果。本次改的是規劃文件，不代表完成實作。既有 Research Memory、檢索、資料庫設計降為可選支援，不再是第一階段的建置主線。
+## 直接開始
 
-## 先讀這幾份
+先讀 [現行計畫索引](docs/README.md) 與 [研究總覽](docs/plan/00-overview.md)，再填 [第一座農場實驗工作表](docs/experiments/p0-first-farm.md)。第一個目標是人工跑通一座完整農場，記清配置、合法輸入、正式輸出與量測波動；不先建記憶資料庫。
 
-| 文件 | 內容 |
-| --- | --- |
-| [定位與架構](docs/plan/00-overview-and-architecture.md) | 研究什麼、保留什麼目標、哪些不是貢獻 |
-| [範圍與里程碑](docs/plan/08-scope-and-mvp.md) | 先診斷改良、再跨農場、最後從需求自主設計；各階段驗收與停損 |
-| [農場測試環境](docs/plan/15-farm-testbed.md) | 世界控制、建造、測量、權限與固定評分器 |
-| [候選方法](docs/plan/16-conditional-diagnostic-transfer.md) | 適用性檢查、實驗選擇、局部修正與經驗契約 |
-| [研究問題與對照](docs/plan/09-roadmap-and-benchmark.md) | 強基線、消融、指標與資訊科學貢獻 |
-| [長期實驗協定](docs/plan/12-longitudinal-experiment.md) | 任務切分、歷史隔離、成本公平、隨機性與統計 |
-| [完整索引](docs/plan/README.md) | 現行主線、舊規劃效力與閱讀順序 |
+[實作路線](docs/plan/06-roadmap.md)：P0 定義農場與量測 → P1 建可靠測試環境 → P2 強基線 → P3 必要的最小方法 → P4 正式跨農場實驗 → P5 從需求設計。
 
-## 要交付的研究結果
+## 研究內容
 
-1. 可重現的完整農場設計／改良評測，能區分有效重用、無關經驗與錯誤重用。
-2. 一個具體的診斷經驗轉移方法，與同一強模型使用原始紀錄、普通筆記及固定診斷流程比較。
-3. 對「經驗何時有益、何時有害、模型變強後還需要哪些外部機制」的實證，不預設記憶一定比較好。
+在相同模型、工具、原始歷史與預算下，比較無歷史、可搜尋完整紀錄、普通筆記、固定診斷流程與候選方法。
 
-農場產量提高不等於 Agent 改進；跨任務表現提高也不自動等於 RSI。只有學習／改進流程本身被改進，並在未見任務得到受控證據，才另討論遞迴自我改進。
+候選方法 CDET 的工作方式是：重用過去測試前先確認前提；有多個可能原因時，選能區分原因且成本合理的實驗；依新證據修正局部設計與經驗，再由獨立評分器驗收。**這是待驗證提案，不是已證實有效或原創的演算法。**
 
-## 目前保留的資產
+主要結果是固定預算成功率、達標成本、錯誤重用和修正後的回歸。只報幾座成功農場、記憶命中率或模型自己說理解了，都不足以支持研究結論。詳見 [研究問題](docs/plan/01-research-questions.md) 與 [實驗協定](docs/plan/05-evaluation-protocol.md)。
 
-- `docs/plan/`：現行研究計畫及可選的舊基礎設施設計。
-- `docs/research/`：既有文獻與方向討論紀錄；不是已完成成果或現行排程。
-- `docs/legacy-reference/`：舊 TypeScript／SQLite 規格與參考碼，不能直接視為可運行服務。
-- `raw-data/`：詞典、GTMC、機器目錄等；來源授權與公開限制維持不變。
-- `benchmark/gold_dataset/`：舊問答／推薦／攝取 fixtures，不是農場測試集。
+## 技術與邊界
 
-既有盤點見 [10 現況](docs/plan/10-current-state-and-migrations.md)，其中數量與本機 ignored source 是當時盤點，不代表本次重新存取過本機資料。沒有把機器目錄當成已取得藍圖，也沒有修改原始資料來配合新研究。
+第一版提案是 Python 控制與分析、固定版本的 Minecraft Java／Fabric adapter、受限工具、JSONL 原始紀錄與 SQLite 中繼資料。先驗證相容性，不預設最新版範例適用舊版本。PostgreSQL、Qdrant、完整知識圖譜、多 Agent 和模型訓練都不是前置需求。
+
+Agent 可改農場與提出測試，不能改評分器、注入成品造分或讀保留答案。原始證據、推導經驗與當題工作狀態分開。詳見 [系統與技術棧](docs/plan/02-system-and-stack.md)、[農場環境](docs/plan/03-farm-testbed.md) 與 [資料安全](docs/plan/07-data-and-safety.md)。
+
+## 文件與資料
+
+```text
+AGENTS.md                    協作規則與真實進度邊界
+README.md                    專案入口
+docs/
+  README.md                  唯一現行計畫索引
+  plan/00-09                 研究、方法、工程、評測與最新文獻
+  experiments/p0-first-farm.md  第一個實驗工作表
+raw-data/                    既有來源素材，非已驗證機制或農場資料集
+benchmark/gold_dataset/       既有問答／匯入 fixture，非本研究 farm benchmark
+```
+
+舊規劃與不再採用的實作參考已從工作樹移除，不另保留 archive；歷史可由 Git 查閱。原始資料與 fixture bytes 保留，不代表來源已允許外部模型使用或公開再散布，先查 [來源限制](docs/plan/07-data-and-safety.md)。
+
+[相關工作](docs/plan/08-related-work.md) 檢索截止 2026-10-02，明列全文、摘要與索引摘要的查核程度。已有方法包含條件式重用、讀取時整理、信念修正與工程迭代；本專案不預先宣稱全球第一、模型永遠需要特殊架構、已實現 RSI 或保證科展成果。
+
+目前沒有安裝／啟動命令可執行；實作後以真正的專案設定、測試與 [現況文件](docs/plan/09-status-and-deliverables.md) 更新，不把規劃寫成完成。
