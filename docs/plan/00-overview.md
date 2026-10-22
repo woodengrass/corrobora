@@ -1,12 +1,14 @@
 # 00｜研究總覽
 
-[索引](../README.md) · 更新：2026-10-08 · 狀態：待實作計畫
+[索引](../README.md) · 更新：2026-10-22 · 狀態：MIS 首組配對完成、獨立重測待做，經驗轉移待驗
 
 ## 1. 研究什麼
 
 用完整 Minecraft 生電農場研究：AI 做過前面的工程任務後，能否更有效地診斷與改良新的設計；舊經驗何時有幫助、何時反而誤導。
 
-第一個可檢驗問題是：**在相同模型、工具、證據與預算下，重用舊診斷程序前確認必要条件，是否能降低新農場的錯誤重用與達標成本？改善來自新證據，還是來自外部程式強制規則？**
+近期先完成一個機器的「理解操作條件 → 提出競爭假設 → 區分實驗 → 候選改善 → 同條件比較 → 獨立重測 → 操作建議」。MIS 第二波投入案例作為這個能力目標；它是物品處理機器，不算自然生產農場，也不證明跨案例經驗轉移。後續研究問題與完整農場標準保留，不能要求先完成全部農場／介面驗收才開始這個受控案例。
+
+後續經驗轉移研究的第一個可檢驗問題是：**在相同模型、工具、證據與預算下，重用舊診斷程序前確認必要條件，是否能降低新農場的錯誤重用與達標成本？改善來自新證據，還是來自外部程式強制規則？**
 
 Minecraft 提供可執行環境，不保證結果直接適用真實工廠。結論只涵蓋實際測過的條件、家族及模型。
 
@@ -20,7 +22,7 @@ Minecraft 提供可執行環境，不保證結果直接適用真實工廠。結�
 
 需求 → 設計 → 建造 → 運行 → 測量 → 診斷 → 修改 → 完整驗證 → 下一座農場。
 
-首個研究使用 `repair_restricted`：給定起始農場並公開必要保留介面／結構和修改限制。`free_optimize` 允許合法重建，`design_build` 不給完整起始藍圖，分開驗收。不能用修好現成農場證明已完成自主設計。
+後續正式完整農場／跨案例研究的首個模式使用 `repair_restricted`；近期 MIS 是 host 操作開發案例。正式模式給定起始農場並公開必要保留介面／結構和修改限制。`free_optimize` 允許合法重建，`design_build` 不給完整起始藍圖，分開驗收。不能用修好現成農場證明已完成自主設計。
 
 第一輪不做生存採礦、模型訓練、任意改遊戲規則或 harness 自我重寫。版本遷移、跨模型記憶、全面工具治理與 RSI 是後續選項，不是必做清單。
 
@@ -32,7 +34,7 @@ Minecraft 提供可執行環境，不保證結果直接適用真實工廠。結�
 | 經驗改善未見農場 | 凍結歷史、獨立新題、強對照及完整成本 | 模型權重變更或完整世界理論 |
 | Agent 改善學習流程 | 流程修改後在另一批未見題再次受益 | 無限制的遞迴加速 |
 
-先爭取第二層。若沒有有效方法，仍可能得到實證／評測成果，但其價值需由新資訊、比較深度與證據品質支持，不保證負結果一定可發表。
+近期先完成第一層的機器案例；後續研究爭取第二層。原版配合正確操作若已符合需求，可以建議維持原版。若沒有有效方法，仍可能得到實證／評測成果，但其價值需由新資訊、比較深度與證據品質支持，不保證負結果一定可發表。
 
 ## 5. 模型怎麼接入與理解世界
 
@@ -46,11 +48,11 @@ Minecraft 提供可執行環境，不保證結果直接適用真實工廠。結�
    -> 獨立新世界驗收
 ```
 
-Python runner 透過本機控制通道呼叫 Java/Fabric adapter；模型不拿 OP、RCON、世界檔或評分器寫權。普通方塊資料不混入研究者的正確模組圖，模型需要自己解釋。
+正式 Corrobora 環境提案由 Python runner 透過本機控制通道呼叫 Java/Fabric adapter；近期先利用 Farm 現有工具與受控 host runner，差異和人工協助如實記錄，不先重建整個平台。模型不拿 OP、RCON、世界檔或評分器寫權。普通方塊資料不混入研究者的正確模組圖，模型需要自己解釋。
 
-原始觀察、可修訂經驗、當題工作狀態分開。模型等待期間不因供應商速度不同讓農場多跑；讀取也不偷偷載入 chunk 或推進時間。主版先用結構化資料和切片，圖片是另測的可選能力。
+目標契約要求原始觀察、可修訂經驗、當題工作狀態分開；模型等待期間不因供應商速度不同讓農場多跑，讀取也不偷偷載入 chunk 或推進時間。現有 Farm／整合原型的讀取仍可能載入 chunk，受控案例須揭露並固定觀測條件，不能宣稱已達正式契約。主版先用結構化資料和切片，圖片是另測的可選能力。
 
-詳見 [介面](agent-world-interface.md)、[工具契約](agent-tool-contracts.md) 與 [驗收](agent-world-acceptance.md)。API 名稱和測試 ID 均為提案，尚無 runtime。
+詳見 [介面](agent-world-interface.md)、[工具契約](agent-tool-contracts.md) 與 [驗收](agent-world-acceptance.md)。這些是 Corrobora 的目標契約，API 名稱和測試 ID 均為提案；外部 Farm 與整合庫已有部分 runtime，不代表已符合此契約。
 
 ## 6. CDET 首版只處理固定的重用檢查
 
@@ -68,4 +70,16 @@ Python runner 透過本機控制通道呼叫 Java/Fabric adapter；模型不拿 
 
 ## 8. 現在先做
 
-填 [P0](../experiments/p0-first-farm.md)，從第一個候選起登記 [去留理由](../experiments/candidate-registry.md)。人工跑通、核對輸出與自然波動後，依 [P1 工作表](../experiments/p1-interface-smoke.md) 建世界介面，再跑普通強模型。暫不建立大型資料平台或完整 CDET。
+MIS 第二波投入的[首組配對](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/63-mis-idle-strategy-results.md)已報告 6→12 件／5,000 刻，紅石結構未改、獨立重複 0；先依 [近期里程碑](06-roadmap.md#0-近期mis診斷與改善案例)完成同協定獨立配對重測，交付操作說明及有依據的改善／維持原版結論；操作、host 續跑與紅石結構修改分開歸因。從首次考慮候選即登記 [去留理由](../experiments/candidate-registry.md)。
+
+[P0](../experiments/p0-first-farm.md) 與 [P1](../experiments/p1-interface-smoke.md) 保留作完整農場與正式模型比較的放行工作。先看普通強模型加工具、原始歷史與普通筆記的表現；反覆錯用經驗或選測浪費有證據時，再決定是否測 CDET 子集。暫不建立大型資料平台或完整 CDET。
+
+## 9. 三個庫的分工
+
+| 庫 | 目前角色 | 不直接代表 |
+| --- | --- | --- |
+| [minecraft-farm-mcp](https://github.com/hthOG/minecraft-farm-mcp) | 遊戲控制、證據取得、MIS 等機器的診斷與改善案例 | 通用機器理解、自動因果驗證或完整農場驗收 |
+| [corrobora-minecraft-mcp](https://github.com/woodengrass/corrobora-minecraft-mcp) | agent 工具整合、選擇性查詢、context 與 checkpoint 實驗原型 | 世界／恢復契約已全部成立、普遍成本優勢 |
+| [corrobora](https://github.com/woodengrass/corrobora) | 研究問題、經驗重用對照與評測規格 | 本庫已有可執行環境或經驗轉移結果 |
+
+以 [Farm 55](https://github.com/hthOG/minecraft-farm-mcp/blob/main/docs/55-operability-diagnosis-and-improvement.md) 為近期案例主線，實際試驗條件以 Farm 對應版本的計畫與原始證據為準；本庫 [06](06-roadmap.md) 管理研究階段與交付。整合採能力逐項對照，不整庫替換；共同邊界見 [工具契約](agent-tool-contracts.md#0-既有runtime的接入邊界)。

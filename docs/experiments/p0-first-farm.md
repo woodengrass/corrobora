@@ -2,7 +2,9 @@
 
 [索引](../README.md) · [農場規格](../plan/03-farm-testbed.md) · [候選登記](candidate-registry.md) · [P1](p1-interface-smoke.md)
 
-建立：2026-10-02；更新：2026-10-08。尚未填寫／執行，不用合理猜測的數字代替量測。
+建立：2026-10-02；更新：2026-10-22。完整農場欄位尚未填寫／執行，不用合理猜測的數字代替量測。
+
+MIS 第二波投入的[首組 host 策略配對](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/63-mis-idle-strategy-results.md)已有 6→12 件的個案結果；近期先完成[同協定獨立配對重測](../plan/06-roadmap.md#0-近期mis診斷與改善案例)，獨立重複仍為 0。本表保留為後續完整農場研究工作表，沒有被 MIS 的分類處理量填成已通過；也不以本表全部完成作為受控單機改善的前置。候選與既有結果來源分開記於[登記表](candidate-registry.md)。
 
 ## 1. 先完成什麼
 

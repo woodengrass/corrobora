@@ -1,8 +1,20 @@
 # 候選農場與選題登記表
 
-[索引](../README.md) · [P0 工作表](p0-first-farm.md) · [評測協定](../plan/05-evaluation-protocol.md) · 2026-10-08
+[索引](../README.md) · [P0 工作表](p0-first-farm.md) · [評測協定](../plan/05-evaluation-protocol.md) · 更新：2026-10-22
 
-狀態：尚未登記任何實測農場。本文件定義欄位與選題規則，不填假資料。正式紀錄可另存 JSONL；本次不建立虛假的研究資料集。
+狀態：尚未完成本庫正式農場登記與驗收；下列先登記一項外部既有的單機開發案例，不填成新執行結果。正式紀錄可另存 JSONL；本次不建立虛假的研究資料集。
+
+## 0. 已知外部開發案例
+
+| 項目 | 2026-10-22 登記內容 |
+| --- | --- |
+| candidate_id／範圍 | machine-dev-001；MIS 第二波追加與續跑策略，非自然生產農場 |
+| 來源 | Farm commit c7c9ba4a5e62c41f38eb29f420244387e10ef59c 的 [59](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/59-mis-idle-input-diagnosis.md) 與 [62](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/62-mis-idle-strategy-comparison.md)及[63 首組結果](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/63-mis-idle-strategy-results.md)；原設計作者／資產散布權以 Farm 來源紀錄為準，本次未重新核實 |
+| 任務與分類 | 受控 host 操作策略比較；不冒充 repair_restricted 結構修復、完整農場或跨案例測試 |
+| 已見資料 | 登記前已見 C-v2 症狀與較早續跑成功報告；本次更新亦已見 63 的 D 組結果；本次是事後登記外部已知案例，不稱預先未見選題；沒有由此取得 CDET 比較結果 |
+| 決定／理由 | 納入近期開發里程碑：已有操作問題與固定對照計畫，可完成一次診斷／改善流程；不是依 CDET 輸贏選擇 |
+| 量測／恢復限制 | 依來源報告有原始重算、保存／冷還原核對；本次未獨立重跑；世界時間與實體不完全相同，首組交付 6→12 件已報告，獨立重複配對為 0；逐臂 ticket／讀前載入狀態、玩家及模擬距離的完整可比性仍 unknown，納入重測紀錄 |
+| split／後續 | dev；不能再稱未見正式保留題。正式農場 family／lineage、權限、會計與模式仍需另登記與驗證 |
 
 ## 1. 何時登記
 

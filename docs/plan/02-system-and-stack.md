@@ -1,8 +1,10 @@
 # 02｜系統架構與技術棧
 
-[索引](../README.md) · [模型—世界介面](agent-world-interface.md) · [工具契約](agent-tool-contracts.md) · [農場與計分](03-farm-testbed.md) · 更新：2026-10-08
+[索引](../README.md) · [模型—世界介面](agent-world-interface.md) · [工具契約](agent-tool-contracts.md) · [農場與計分](03-farm-testbed.md) · 更新：2026-10-22
 
-全部為待實作提案。本次沒有建立 Python package、Java mod、可執行啟動命令或通過遊戲測試的環境。工具語意以 agent-world-interface 為準，欄位與呼叫範例統一在 agent-tool-contracts，不在各文件維護第二套 schema。
+以下為本庫正式研究環境的待實作提案。本庫沒有 Python package、Java mod 或通過遊戲測試的環境；外部 Farm 與整合庫已有部分 runtime，狀態分開記錄。近期 MIS 案例先沿用 Farm 現有受控 host 流程，按需移植整合庫的查詢與證據能力，不要求先重建本頁全部架構。三庫角色見 [總覽](00-overview.md#9-三個庫的分工)，實際能力與目標契約的缺口見 [工具契約](agent-tool-contracts.md#0-既有runtime的接入邊界)。工具語意以 agent-world-interface 為準，欄位與呼叫範例統一在 agent-tool-contracts，不在各文件維護第二套 schema。
+
+Farm 與整合原型同為 `minecraft-farm-mcp==0.1.0`、module `farm_mcp`、CLI `farm-mcp`，不能在同一環境用版本字串判定來源。採隔離 interpreter，記錄實際 module 路徑與程式 hash；本輪 context 修正由整合庫的獨立候選分支提供，不整份覆蓋 Farm core/server。MIS 重播使用純資料比較，不依賴 live context 或世界寫入能力。
 
 ## 1. 最小技術選擇
 
