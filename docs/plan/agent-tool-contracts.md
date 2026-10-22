@@ -1,8 +1,45 @@
 # 模型—世界工具契約與呼叫範例
 
-[索引](../README.md) · [介面語意](agent-world-interface.md) · [驗收](agent-world-acceptance.md) · 2026-10-08
+[索引](../README.md) · [介面語意](agent-world-interface.md) · [驗收](agent-world-acceptance.md) · 更新：2026-10-22
 
 狀態：`corrobora.world.v0.1-draft` 人可讀契約，未實作、未產生正式 JSON Schema。下列呼叫都是合成範例，不是實驗紀錄。實作時以此建立型別、機器 schema 和契約測試，不將格式文件冒充通過測試的程式。
+
+## 0. 既有Runtime的接入邊界
+
+近期 MIS 案例沿用 Farm 的受控流程；正式 Corrobora 工具仍以下列目標契約為準。名稱相同不代表參數、權限、回執或時間語意相同，不將本文件的示例直接送入現有 MCP。移植選擇性查詢與證據管理前，按固定 commit 對照能力，保留缺口。
+
+### 建議共用證據契約（待實作與驗證）
+
+共用的是可比性與證據語意，暫不新增另一套 API schema：
+
+| 紀錄 | 必須能追溯的內容 |
+| --- | --- |
+| 環境／身分 | episode、來源與 runtime/config/manual/schema hashes、遊戲／模組版本、dimension、host 宣告的 world_ref、身分是否經握手驗證；宣告值不能冒充已驗證 UUID |
+| 觀測 | capture/evidence ID 與 hash、實際覆蓋及缺失、捕捉 tick 界線、是否原子、是否可能載入 chunk、讀取前載入狀態是否已知；revision、模擬時間和內容 hash 分開 |
+| 寫入／恢復 | operation/request ID、請求 hash、預期狀態、意圖及回執、pending/completed/rejected/uncertain 的對應、部分進度與成本；明示哪些內容持久保存及重啟後能否重建查詢／預算 |
+| 診斷／比較 | 觀測與來源、呼叫者假說、事前預測、介入、結果、適用條件、反例和 evidence refs；格式／引用有效、效果達標與原因受支持分開 |
+
+表中的狀態是對接時需要區分的意義，不是宣布現有工具已接受的新枚舉。若重啟後無法恢復舊操作狀態，先由 host 核對或冷還原；狀態保持 uncertain，禁止盲目重送。checkpoint、文字摘要與診斷紀錄不能單獨證明世界已恢復或因果已成立。近期 host 個案以固定範圍、原始資料核對與獨立冷還原控制風險；正式跨案例實驗前仍需補足世界識別、持久操作狀態與恢復驗證。
+
+### 目前整合原型的能力
+
+以下核對 `corrobora-minecraft-mcp` commit `38cbbc1dd347636cd9626b0b02ba6b638378a456`，不是本文件目標契約的通過表：
+
+| 項目 | 實際限制 |
+| --- | --- |
+| 世界身分 | world_ref 是設定宣告，world_identity_verified=false，尚無 UUID 握手 |
+| 世界讀取 | may_load_chunks=true、atomic_snapshot=false；時間一致性及讀前載入狀態未驗證 |
+| 操作紀錄 | actions.jsonl 追加寫入意圖／receipt 的磁碟稽核紀錄，但未驗證 crash-durability；operations 查詢表只在程序記憶體，重啟建立新 episode，沒有重建舊表與預算的恢復服務 |
+| 診斷／checkpoint | 保存 solver 主張和來源，回應明示未經獨立驗證；不是原因驗證器或記憶晉升 gate |
+| context-v2 | 巨大無關 NBT 的定向欄位查詢有縮減證據；小型關鍵狀態的一組配對兩邊均成功，尚無普遍總成本優勢；協定 token proxy 不等於模型實際用量 |
+
+依據：[Runtime](https://github.com/woodengrass/corrobora-minecraft-mcp/blob/38cbbc1dd347636cd9626b0b02ba6b638378a456/src/farm_mcp/core.py)、[操作紀錄](https://github.com/woodengrass/corrobora-minecraft-mcp/blob/38cbbc1dd347636cd9626b0b02ba6b638378a456/src/farm_mcp/agent_operations.py)、[設計限制](https://github.com/woodengrass/corrobora-minecraft-mcp/blob/38cbbc1dd347636cd9626b0b02ba6b638378a456/docs/integration/DESIGN_繁中.md)及 [context-v2 報告](https://github.com/woodengrass/corrobora-minecraft-mcp/blob/38cbbc1dd347636cd9626b0b02ba6b638378a456/research/context-v2/REPORT_繁中.md)。Farm 私人 MIS runner 已有持久意圖／回執與冷還原個案，見 [Farm 53](https://github.com/hthOG/minecraft-farm-mcp/blob/main/docs/53-mis-batch-continuation-live.md)；不能把通用原型缺口解讀成所有 host 個案都沒有恢復證據。
+
+### 本輪採納範圍
+
+MIS 首組結果以 [Farm 63](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/63-mis-idle-strategy-results.md)為來源；新的可攜離線包分離 proposal validation、host 決定、操作回執與純結果比較。它不送出世界操作，也不把策略成功推為模型自主推理。原始觀測缺失、逐臂載入狀態不明、工具錯誤及未完成收尾仍須拒絕或標 unknown；重播不增加獨立遊戲樣本。
+
+context 採納前修正提交至整合庫的獨立候選分支，正式 Farm 不接入外部 core/server。公開工具 schema 及目前世界身分／恢復能力以實際 runtime 為準；離線 checkpoint 只能恢復其工作資料，不能認證 live 世界、跨重啟 exactly-once 或撤銷已發生的效果。
 
 ## 1. 共同型別與信任邊界
 

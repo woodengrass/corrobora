@@ -22,15 +22,23 @@ Document ownership:
 Only the current specification is authoritative. Update dependent documents together, do not
 recreate old memory-first plans or archive copies. Git preserves history.
 
-Current state is planning/P0: no runnable Corrobora application, server adapter, farm runner
-or experiment results. Proposed APIs, example JSON and acceptance IDs are not implemented tests.
+Current state in this repository is planning/P0: no runnable Corrobora application, server
+adapter, farm runner or experience-transfer results. Farm has scoped live machine evidence;
+the integration repository has a tool/context prototype. Neither establishes this contract.
+The first MIS second-wave pair is reported in Farm docs/63; the immediate milestone is its independent paired retest,
+with operating instructions and a scoped improvement or keep-original conclusion. Follow
+Farm's frozen case plan; distinguish operating, host-control and redstone changes. Do not
+require the full natural-farm benchmark or every W/G check before this controlled case.
+Proposed APIs, example JSON and acceptance IDs are not implemented tests.
 raw-data/ and benchmark/gold_dataset/ are source/reference assets, not the new farm benchmark.
 
 ## Workflow and implementation
 
 Inspect current files and Git state before editing; preserve concurrent user changes.
 Keep planning prose in Traditional Chinese and code/comments/docstrings in English.
-Build a measurable reference farm and independent evaluator before model experiments.
+Build a measurable reference farm and independent evaluator before formal farm/model
+comparisons. The scoped MIS diagnosis/improvement case can precede them using the existing
+controlled host workflow; report manual assistance and actual observation/recovery limits.
 Register every candidate and exclusion in docs/experiments/candidate-registry.md.
 Use p0-first-farm.md and p1-interface-smoke.md for actual evidence, not invented results.
 

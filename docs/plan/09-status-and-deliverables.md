@@ -1,6 +1,25 @@
 # 09｜實際狀態、待決事項與交付
 
-[索引](../README.md) · [實作順序](06-roadmap.md) · 更新：2026-10-08
+[索引](../README.md) · [實作順序](06-roadmap.md) · 更新：2026-10-22
+
+## 0. 目前跨庫狀態與近期交付（2026-10-22）
+
+近期先完成單機操作診斷／改善，後續才驗證完整農場經驗轉移。MIS 首組 C-v2／D 配對已有結果，同協定獨立重複配對仍為 0；沒有因此完成 P0–P5。角色與順序以 [00](00-overview.md)、[06第0節](06-roadmap.md#0-近期mis診斷與改善案例)為準；後文 10 月 8 日內容保留其歷史時點。
+
+本輪透過 GitHub connector 核對的發佈基底：Corrobora main `35f60ab58bcc5b1781611daca59b829e7d1de12e`、Farm main `c7c9ba4a5e62c41f38eb29f420244387e10ef59c`、整合庫 main `38cbbc1dd347636cd9626b0b02ba6b638378a456`。候選程式與文件分別提交至各庫的 `codex/` 分支審查，未把參考快照當正式 Farm，也不將分支提交說成已合併 main。
+
+| 範圍 | 核對到的狀態 | 尚缺的證據／能力 |
+| --- | --- | --- |
+| Farm MIS 首組配對 | [62 事前計畫](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/62-mis-idle-strategy-comparison.md)、[63 結果](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/63-mis-idle-strategy-results.md)：各 12 件／5,000 刻，交付 6→12，入口 6→0，原生啟動 1→2，紅石未改 | 同協定獨立配對重測；完整機器可靠性、作者意圖、唯一根因與跨案例泛化 |
+| 取樣與成本 | D 首次固定取樣確認全送達為 3,200 刻；HTTP 請求差 -269、回應多 607,094 bytes | 精確到達時間、策略的 token 節省、完整主子 agent 成本、MSPT 及自然產量；缺資料保持 unknown |
+| 證據／收尾 | 來源報告有原始重算、存檔及 32 檔冷還原核對；本輪新增只讀離線重播與明確驗證層次，輸出另存 | 摘要布林值不能單獨認證收尾；逐臂 chunk/ticket、讀前載入、玩家及模擬距離若缺完整證據仍 unknown，冷還原也不代表重進遊戲驗證 |
+| Farm 候選程式 | 本輪處理 trace/source I/O 的實際讀取上限、部分結果及錯誤邊界；命令、結果與限制依本地交付紀錄 | 不把離線修正當新遊戲校準；公開 MCP 權限不因此擴張 |
+| 整合原型 | 固定來源另有查詢／checkpoint；本輪修正獨立提交整合庫分支並驗證離線能力，不覆蓋 Farm core/server | 世界身分認證、持久操作對帳、跨重啟恢復及 Windows 世界範圍租約；參見[契約對照](agent-tool-contracts.md#0-既有runtime的接入邊界) |
+| Corrobora | 本庫仍是研究規格／P0；強基線、I0/I1/I2、隔離與 CDET 待驗定位保留 | 本庫 runtime、完整農場驗收、盲測 solver 或經驗轉移結果 |
+
+公開候選交付分工：[Farm 修正分支](https://github.com/hthOG/minecraft-farm-mcp/tree/codex/mis-offline-correctness-20261022)提供 I/O／decoder 修正及 `tools/mis_offline/` 的純比較／workflow 與合成 fixture；[整合修正分支](https://github.com/woodengrass/corrobora-minecraft-mcp/tree/codex/context-pre-adoption-fixes-20261022)提供 context／checkpoint／receipt 修正與離線 saved-capture CLI。本庫只同步研究狀態與契約。命令、版本與限制由相應分支文件列出；私人 capture、世界、原始藍圖、本機設定、host 日誌及完整本地工作台帳不隨之公開。合成反例驗程式契約、重播重新處理舊觀測；兩者均不增加遊戲樣本，亦不證明通用自主診斷已完成。
+
+下一個遊戲步驟是新 case／episode 的同協定 C-v2→D 配對，先固定初始化、順序、觀測副作用、停止／排除與恢復規則，再於明確授權的開發副本執行。本次分支發佈沒有操作遊戲、解除 guard、外部模型請求或資料授權變更。維持原版、只改操作或不採候選都是合法結論；失敗及人工介入全部保留。
 
 ## 1. 可確認的起點
 
@@ -74,4 +93,4 @@
 
 ## 8. 開始位置
 
-先填 [P0](../experiments/p0-first-farm.md) 並登記 [全部候選](../experiments/candidate-registry.md)，取得一次真实人工 reference 配置與原始輸出，再重跑波動。之後按 [P1](../experiments/p1-interface-smoke.md) 接入工具與普通模型；不先擴充記憶資料庫。
+先完成 [近期 MIS 案例](06-roadmap.md#0-近期mis診斷與改善案例)，並登記 [全部候選](../experiments/candidate-registry.md)。正式農場研究仍需填 [P0](../experiments/p0-first-farm.md)，取得人工 reference 配置、原始輸出與波動，再按 [P1](../experiments/p1-interface-smoke.md) 接入工具與普通模型；不先擴充記憶資料庫。

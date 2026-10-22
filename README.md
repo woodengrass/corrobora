@@ -2,11 +2,11 @@
 
 研究 AI 在處理完整 Minecraft 生電農場時，先前的診斷經驗何時有幫助、何時會誤導，以及有限成本的重新檢查能否讓經驗更可靠地轉移。
 
-**目前是規劃／P0，沒有已完成的 Corrobora runtime、server adapter、農場 runner 或研究結果。** 文件中的工具與測試都是待實作契約。
+**本庫目前是規劃／P0，沒有已完成的 Corrobora runtime 或經驗轉移結果。** Farm 已有受控機器實測，整合庫已有工具／context 原型；它們不自動算本庫正式契約通過。文件中的 Corrobora 工具與測試仍是待實作契約。
 
 ## 從這裡開始
 
-[現行索引](docs/README.md) → [研究總覽](docs/plan/00-overview.md) → [P0 農場工作表](docs/experiments/p0-first-farm.md) → [實作路線](docs/plan/06-roadmap.md)。先人工跑通農場、量正常波動，不先建大型記憶系統。
+[現行索引](docs/README.md) → [研究總覽與三庫分工](docs/plan/00-overview.md) → [近期 MIS 診斷／改善里程碑](docs/plan/06-roadmap.md#0-近期mis診斷與改善案例)。第二波投入的[首組配對已完成](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/63-mis-idle-strategy-results.md)：5,000 刻內基準送達 6 件、host 策略版 12 件，紅石未改；只有一組配對，獨立重複為 0。下一步是同協定獨立重測與操作建議；[P0 完整農場工作表](docs/experiments/p0-first-farm.md)保留給後續正式農場研究，不把 MIS 當自然農場或跨案例成果。不先建大型記憶系統。
 
 模型接入規格已拆清：
 
@@ -25,11 +25,11 @@
  -> 獨立新世界驗收
 ```
 
-首版提案是 Python、固定版本的 Minecraft Java/Fabric、JSONL 原始紀錄與 SQLite。MCP 可選包裝，不是必備；PostgreSQL、向量資料庫、完整知識圖、多 Agent 和模型訓練不在開工前置。
+本庫正式環境提案是 Python、固定版本的 Minecraft Java/Fabric、JSONL 原始紀錄與 SQLite。近期先沿用 Farm 現有受控流程，按需移植整合庫的選擇性查詢與證據能力，依[共同接入邊界](docs/plan/agent-tool-contracts.md#0-既有runtime的接入邊界)標記缺口。MCP 可選包裝，不是必備；PostgreSQL、向量資料庫、完整知識圖、多 Agent 和模型訓練不在開工前置。
 
-第一個研究採 `repair_restricted`；允許重建的 `free_optimize` 及無起始完整藍圖的 `design_build` 分開。長期仍保留需求、設計、建造、測試與迭代目標；修好現成農場不等於已完成自主設計。
+後續正式完整農場／跨案例研究的首個模式採 `repair_restricted`；近期 MIS 是受控 host 操作開發案例。允許重建的 `free_optimize` 及無起始完整藍圖的 `design_build` 分開。長期仍保留需求、設計、建造、測試與迭代目標；修好現成農場不等於已完成自主設計。
 
-CDET 首版只驗證固定的重用檢查：模型提出前提，程式依當前可測證據准用、補查或退回。假說／測試排序另外比較，不把一整套流程的勝出當每個模組有效。
+CDET 是待驗候選：先觀察普通強模型加工具、原始歷史或普通筆記能做到什麼。反覆錯用經驗有證據時，再比較固定的重用檢查；假說／測試排序另外比較，不把一整套流程的勝出當每個模組有效。
 
 [評測協定](docs/plan/05-evaluation-protocol.md) 保留強模型原始歷史、普通筆記與固定流程，並加入提示／證據／證據＋規則三組，分清額外資訊和執行控制。主要看真正成功、總成本、錯誤重用與回歸，不只看記憶命中或遵守率。
 
@@ -39,7 +39,7 @@ CDET 首版只驗證固定的重用檢查：模型提出前提，程式依當前
 
 `docs/` 只保留現行計畫、介面及工作表；舊稿由 Git 查閱，不另留 archive。`raw-data/` 是既有來源素材；`benchmark/gold_dataset/` 是舊問答／管線 fixture，不能當完整農場資料或已跑的模型結果。
 
-本輪文件更新為 2026-10-08。廣泛文獻檢索仍依 [08](docs/plan/08-related-work.md) 的 2026-10-02 範圍及閱讀限制，並非全部文獻今日重新審查。介面所需官方技術來源另列於規格。
+研究入口與近期順序於 2026-10-22 對齊，並同步 Farm 63 的首組結果；本庫沒有新增 runtime、遊戲試驗或方法成效。廣泛文獻檢索仍依 [08](docs/plan/08-related-work.md) 的 2026-10-02 範圍及閱讀限制，並非全部文獻今日重新審查。介面所需官方技術來源另列於規格。
 
 目前沒有可執行安裝／啟動命令。實作後用真實配置、命令和結果更新 [現況](docs/plan/09-status-and-deliverables.md)，不預先宣稱全球首創、RSI、模型不可取代或科展成果。
 

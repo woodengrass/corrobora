@@ -1,12 +1,12 @@
 # Corrobora 現行計畫
 
-文件更新：2026-10-08。文獻登記簿的廣泛檢索截止仍是 2026-10-02；本輪只補模型接入、工程契約與實驗識別，不冒稱全部文獻已重新審查。
+近期順序更新：2026-10-22。三庫分工與 MIS 診斷／改善案例先行，正式經驗轉移規格保留。文獻登記簿的廣泛檢索截止仍是 2026-10-02，不冒稱全部文獻已重新審查。
 
-狀態：規劃／P0。沒有可執行農場 runner、正式測試資料或實驗結果。只維護一套現行計畫，歷史由 Git 保存，不另建 archive。
+狀態：本庫規劃／P0，沒有本庫可執行農場 runner 或正式經驗轉移結果。外部 Farm 的局部實測與整合原型分開列於[現況](plan/09-status-and-deliverables.md)，不等於本庫驗收。只維護一套現行計畫，歷史由 Git 保存，不另建 archive。
 
 ## 開始路徑
 
-讀 [研究總覽](plan/00-overview.md) → 填 [P0 農場表](experiments/p0-first-farm.md) 並登記候選 → 按 [實作路線](plan/06-roadmap.md) 建可量測環境。開始模型介面前，讀下列三份規格，不先寫 CDET。
+讀 [研究總覽](plan/00-overview.md) → [近期 MIS 配對比較](plan/06-roadmap.md#0-近期mis診斷與改善案例)，[首組 host 策略比較](https://github.com/hthOG/minecraft-farm-mcp/blob/c7c9ba4a5e62c41f38eb29f420244387e10ef59c/docs/63-mis-idle-strategy-results.md)已有結果；接著完成同協定獨立配對重測與條件化操作建議，並[登記候選](experiments/candidate-registry.md)。[P0 農場表](experiments/p0-first-farm.md)及 P1 保留作正式農場與模型研究準備；不要求先建完整平台才開始受控單機案例。接入工具前，讀下列規格，不先寫 CDET。
 
 | 文件 | 負責內容 |
 | --- | --- |
@@ -24,7 +24,7 @@
 | [03 農場規格](plan/03-farm-testbed.md) | 三種任務、完整產出、耦合、修改成本與固定驗收 |
 | [04 候選方法](plan/04-experience-method.md) | 模型／程式責任、重用方案、可測前提、固定 gate 及独立排序 |
 | [05 實驗協定](plan/05-evaluation-protocol.md) | B0–B4、I0–I2、固定候選池、長期、切分、成本與統計 |
-| [06 實作路線](plan/06-roadmap.md) | P0、P1a–c、P2、P3a–c、P4、P5 與停止條件 |
+| [06 實作路線](plan/06-roadmap.md) | 近期 MIS 交付、P0、P1a–c、P2、P3a–c、P4、P5 與停止條件 |
 | [07 資料與安全](plan/07-data-and-safety.md) | 來源限制、原始證據、工具沙箱及發布 |
 | [08 相關工作](plan/08-related-work.md) | 既有查核層級、新穎性邊界與待比較方法 |
 | [09 現況與交付](plan/09-status-and-deliverables.md) | 可確認狀態、待決事項、研究紀錄與本次修訂 |
